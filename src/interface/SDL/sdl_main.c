@@ -7,9 +7,11 @@
 #include "sdl_main.h"
 
 #include "../../i_event.h"
+#include "../../i_system.h"
 #include "../../i_video.h"
 
 #include "../../game_main.h"
+#include "../../game_video.h"
 
 #include <stdio.h>
 
@@ -26,13 +28,12 @@ int main(int argc, char *argv[])
 	}
 	
 	printf("Successfully initialized SDL!\n");
-	printf("Starting graphics backend...\n");
-	I_StartupGraphics();
 	
+	/*
 	// Load a test bitmap!
 	{
 		int i;
-		SDL_Surface *loading = SDL_ConvertSurfaceFormat(SDL_LoadBMP("test.bmp"), SDL_PIXELFORMAT_RGB888, 0);
+		SDL_Surface *loading = SDL_ConvertSurfaceFormat(SDL_LoadBMP("test.bmp"), SDL_PIXELFORMAT_RGB332, 0);
 		byte *pixels = loading->pixels;
 		
 		for (i = 0; i < vid.width * vid.height; i++)
@@ -42,8 +43,10 @@ int main(int argc, char *argv[])
 		
 		SDL_FreeSurface(loading);
 	}
+	*/
 	
 	gameMain();
+	gameLoop();
 	
 	printf("Quitting SDL!\n");
 	

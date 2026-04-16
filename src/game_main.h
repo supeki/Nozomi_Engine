@@ -9,5 +9,7 @@
 extern bool game_quit;
 
 void gameMain(void);
+void gameLoop(void);
+void gameRunTicks(int elapsed);
 
 #endif

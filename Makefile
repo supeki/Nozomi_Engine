@@ -17,6 +17,7 @@ ifdef SDL
 	INTERFACE = SDL
 	i_main = sdl_main
 	i_event = sdl_event
+	i_system = sdl_system
 	i_video = sdl_video
 
 	# Define some stuff!
@@ -43,6 +44,7 @@ ifdef NDS
 	INTERFACE = NDS
 	i_main = nds_main
 	i_event = nds_event
+	i_system = nds_system
 	i_video = nds_video
 
 	GAME_TITLE	:= JADEFRACTURE
@@ -87,8 +89,10 @@ INTERFACE_BIN = $(BIN_DIR)/$(INTERFACE)
 
 OBJS := $(OBJS) \
 		$(OBJ_DIR)/game_main.o \
+		$(OBJ_DIR)/game_video.o \
 		$(INTERFACE_OBJ)/$(i_main).o \
 		$(INTERFACE_OBJ)/$(i_event).o \
+		$(INTERFACE_OBJ)/$(i_system).o \
 		$(INTERFACE_OBJ)/$(i_video).o
 		
 ifdef NDS
@@ -153,17 +157,23 @@ $(INTERFACE_BIN)/$(EXEC_NAME).$(EXEC_EXT): $(OBJ_DIR) $(INTERFACE_OBJ) $(OBJS) $
 	-o $(INTERFACE_BIN)/$(EXEC_NAME).$(EXEC_EXT) $(LIBS)
 	
 # Game-related objs!
-$(OBJ_DIR)/game_main.o: $(SRC_DIR)/game_main.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_main.h
+$(OBJ_DIR)/game_main.o: $(SRC_DIR)/game_main.c $(SRC_DIR)/game_defs.h
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
+	
+$(OBJ_DIR)/game_video.o: $(SRC_DIR)/game_video.c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 # Make the interface objs!
-$(INTERFACE_OBJ)/$(i_main).o: $(INTERFACE_SRC)/$(i_main).c $(INTERFACE_SRC)/$(i_main).h
+$(INTERFACE_OBJ)/$(i_main).o: $(INTERFACE_SRC)/$(i_main).c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
-$(INTERFACE_OBJ)/$(i_event).o: $(INTERFACE_SRC)/$(i_event).c $(SRC_DIR)/i_event.h
+$(INTERFACE_OBJ)/$(i_event).o: $(INTERFACE_SRC)/$(i_event).c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
+	
+$(INTERFACE_OBJ)/$(i_system).o: $(INTERFACE_SRC)/$(i_system).c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 
-$(INTERFACE_OBJ)/$(i_video).o: $(INTERFACE_SRC)/$(i_video).c $(SRC_DIR)/i_video.h
+$(INTERFACE_OBJ)/$(i_video).o: $(INTERFACE_SRC)/$(i_video).c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
