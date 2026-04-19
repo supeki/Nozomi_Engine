@@ -7,5 +7,6 @@
 int I_GetTicks(void);
 int I_GetTime(void);
 void I_Sleep(int ms);
+void I_Error (char *error, ...);
 
 #endif

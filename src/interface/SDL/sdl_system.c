@@ -4,14 +4,15 @@
 
 #include <SDL.h>
 
-#include "../../i_system.h"
+#include "sdl_main.h"
 
+#include "../../i_system.h"
 #include "../../game_defs.h"
 
 int I_GetTicks(void)
 {
-	static Uint32 base_tick = 0;
-	Uint32 ticks = SDL_GetTicks();
+	static uint32_t base_tick = 0;
+	uint32_t ticks = SDL_GetTicks();
 	
 	if (!base_tick)
 		base_tick = ticks;
@@ -31,4 +32,17 @@ int I_GetTime(void)
 void I_Sleep(int ms)
 {
 	SDL_Delay(ms);
+}
+
+void I_Error (char *error, ...)
+{
+    va_list argptr;
+    char txt[512];
+    
+    va_start(argptr,error);
+    vsprintf(txt, error, argptr);
+    va_end(argptr);    
+	
+    SDL_ShowSimpleMessageBox(0, "JADEFRACTURE Error", txt, sdlWnd);
+    exit(-1);
 }

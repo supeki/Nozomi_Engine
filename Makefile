@@ -89,6 +89,8 @@ INTERFACE_BIN = $(BIN_DIR)/$(INTERFACE)
 
 OBJS := $(OBJS) \
 		$(OBJ_DIR)/game_main.o \
+		$(OBJ_DIR)/game_gfx.o \
+		$(OBJ_DIR)/game_misc.o \
 		$(OBJ_DIR)/game_video.o \
 		$(INTERFACE_OBJ)/$(i_main).o \
 		$(INTERFACE_OBJ)/$(i_event).o \
@@ -135,7 +137,7 @@ endif
 # Clean up the directories.
 clean:
 	rm -rf $(OBJ_DIR)/*
-	rm -rf $(BIN_DIR)/*
+	rm -rf $(INTERFACE_BIN)/$(EXEC_NAME).$(EXEC_EXT)
 	
 # Make all required directories!
 $(OBJ_DIR):
@@ -157,14 +159,20 @@ $(INTERFACE_BIN)/$(EXEC_NAME).$(EXEC_EXT): $(OBJ_DIR) $(INTERFACE_OBJ) $(OBJS) $
 	-o $(INTERFACE_BIN)/$(EXEC_NAME).$(EXEC_EXT) $(LIBS)
 	
 # Game-related objs!
-$(OBJ_DIR)/game_main.o: $(SRC_DIR)/game_main.c $(SRC_DIR)/game_defs.h
+$(OBJ_DIR)/game_main.o: $(SRC_DIR)/game_main.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_main.h $(SRC_DIR)/game_video.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
-$(OBJ_DIR)/game_video.o: $(SRC_DIR)/game_video.c
+$(OBJ_DIR)/game_gfx.o: $(SRC_DIR)/game_gfx.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_gfx.h
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
+	
+$(OBJ_DIR)/game_misc.o: $(SRC_DIR)/game_misc.c $(SRC_DIR)/game_defs.h
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
+	
+$(OBJ_DIR)/game_video.o: $(SRC_DIR)/game_video.c $(SRC_DIR)/game_video.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 # Make the interface objs!
-$(INTERFACE_OBJ)/$(i_main).o: $(INTERFACE_SRC)/$(i_main).c
+$(INTERFACE_OBJ)/$(i_main).o: $(INTERFACE_SRC)/$(i_main).c $(INTERFACE_SRC)/$(i_main).h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(INTERFACE_OBJ)/$(i_event).o: $(INTERFACE_SRC)/$(i_event).c

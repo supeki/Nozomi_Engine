@@ -6,13 +6,12 @@
 #include "i_video.h"
 
 #include "game_defs.h"
+#include "game_gfx.h"
 #include "game_main.h"
 #include "game_video.h"
 
 bool game_quit = false;
-static int sand_x = 0;
-static int sand_y = 0;
-static int k = 0;
+gfx_t test;
 
 // Game startup / main function.
 void gameMain(void)
@@ -20,8 +19,13 @@ void gameMain(void)
 	printf("Initializing video...\n");
 	V_Init();
 	
+	printf("Loading palette...\n");
+	V_LoadPalette();
+	
 	printf("Starting graphics backend...\n");
 	I_StartupGraphics();
+	
+	test = GFX_LoadGFX("marilyn.bmp.gfx");
 }
 
 // The main game loop.
@@ -52,7 +56,6 @@ void gameLoop(void)
 		{
 			render_tick = game_tick;
 			
-			V_DrawDot(sand_x, sand_y, (int)(k % (sand_x+1)));
 			I_PushGraphics();
 		}
 	}
@@ -62,15 +65,11 @@ void gameRunTicks(int elapsed)
 {
 	while (elapsed-- > 0)
 	{
-		// run stuff! :3 Nozomi
-		sand_x = k % (vid.width+1);
-		
-		while (sand_x >= vid.width)
-		{
-			sand_y++;
-			sand_x -= vid.width;
-		}
-		
-		k++;
+		// Write some logic here later :3
+		for (int y = 0; y < vid.height; y++)
+			for (int x = 0; x < vid.width; x++)
+				V_DrawDot(x, y, (x+y+I_GetTicks())%38+1);
+			
+		V_DrawSprite(0, 0, test);
 	}
 }
