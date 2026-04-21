@@ -66,10 +66,12 @@ void gameRunTicks(int elapsed)
 	while (elapsed-- > 0)
 	{
 		// Write some logic here later :3
+		
+		// o'tayyy doing this for save
 		for (int y = 0; y < vid.height; y++)
 			for (int x = 0; x < vid.width; x++)
-				V_DrawDot(x, y, (x+y+I_GetTicks())%38+1);
+				V_DrawDot(x, y, 0);
 			
-		V_DrawSprite(0, 0, test);
+		V_DrawCroppedSprite(test, 0, 0, 24, 32, 24, 32);
 	}
 }

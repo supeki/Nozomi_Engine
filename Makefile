@@ -10,9 +10,10 @@ EXEC_NAME = JADEFRACTURE
 EXEC_EXT = exe
 
 # Assume SDL by default Nozomi 04-15-2026
-SDL = 1
+SDL ?= 1
+NDS ?= 0
 
-ifdef SDL
+ifeq ($(SDL),1)
 	# src;obj;bin / SDL :D
 	INTERFACE = SDL
 	i_main = sdl_main
@@ -32,7 +33,7 @@ ifdef SDL
 endif
 
 # Nintendo DS port!
-ifdef NDS
+ifeq ($(NDS),1)
 	export BLOCKSDS			?= /opt/blocksds/core
 	export BLOCKSDSEXT		?= /opt/blocksds/external
 	export WONDERFUL_TOOLCHAIN	?= /opt/wonderful
@@ -97,7 +98,7 @@ OBJS := $(OBJS) \
 		$(INTERFACE_OBJ)/$(i_system).o \
 		$(INTERFACE_OBJ)/$(i_video).o
 		
-ifdef NDS
+ifeq ($(NDS),1)
 # Start Nintendo DS build requirements!
 all: $(INTERFACE_BIN)/$(NDS_NAME)
 
@@ -122,10 +123,9 @@ $(INTERFACE_BIN)/$(NDS_NAME): $(INTERFACE_BIN)/$(ELF_NAME)
 		-b $(GAME_ICON) "$(GAME_FULL_TITLE)" \
 		$(NDSTOOL_ARGS)
 
-
 $(INTERFACE_BIN)/$(ELF_NAME): $(OBJ_DIR) $(OBJS) $(INTERFACE_OBJ) $(INTERFACE_BIN)
 	@echo Linking...
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) $(INTERFACE_OBJ) \
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) \
 	-o $(INTERFACE_BIN)/$(ELF_NAME) $(LIBS)
 
 # End Nintendo DS build requirements!

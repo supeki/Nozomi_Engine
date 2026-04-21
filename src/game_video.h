@@ -5,7 +5,7 @@
 #include "game_gfx.h"
 
 #define BASEVIDWIDTH 256
-#define BASEVIDHEIGHT 160
+#define BASEVIDHEIGHT 192
 
 #ifndef GAME_VIDEO_H
 #define GAME_VIDEO_H
@@ -22,7 +22,8 @@ extern uint16_t* palette;
 
 void V_Init(void);
 void V_LoadPalette(void);
-void V_DrawDot(int x, int y, byte col);
-void V_DrawSprite(int x, int y, gfx_t gfx);
+void V_DrawDot(int x, int y, uint8_t col);
+void V_DrawSprite(gfx_t gfx, int x, int y);
+void V_DrawCroppedSprite(gfx_t gfx, int x, int y, int sx, int sy, int w, int h);
 
 #endif

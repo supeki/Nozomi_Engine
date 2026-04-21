@@ -29,7 +29,8 @@ int main(int argc, char *argv[])
 	printf("Successfully initialized SDL!\n");
 	
 	gameMain();
-	BMPGFX("marilyn.bmp");
+	
+	printf("Starting main game loop!\n");
 	
 	gameLoop();
 	

@@ -61,7 +61,7 @@ void V_DrawDot(int x, int y, uint8_t col)
 	vid.buffer[x+(y*vid.width)] = col;
 }
 
-void V_DrawSprite(int x, int y, gfx_t gfx)
+void V_DrawSprite(gfx_t gfx, int x, int y)
 {
 	if ((gfx.size + gfx.width) <= 0)
         return;
@@ -73,4 +73,21 @@ void V_DrawSprite(int x, int y, gfx_t gfx)
 		
 		V_DrawDot(x + (i % gfx.width) - gfx.xoff, y + (i / gfx.width) - gfx.yoff, PAL_INDEX(gfx.data[i]));
 	}
+}
+
+void V_DrawCroppedSprite(gfx_t gfx, int x, int y, int sx, int sy, int w, int h)
+{
+	if ((gfx.size + gfx.width) <= 0)
+        return;
+	
+	for (int zy = 0; zy < h; zy++)
+		for (int zx = 0; zx < w; zx++)
+		{
+			int i = sx + sy*gfx.width + zx + zy*gfx.width;
+			
+			if (ALPHA_INDEX(gfx.data[i]))
+				continue;
+			
+			V_DrawDot(x + zx - gfx.xoff, y + zy - gfx.yoff, PAL_INDEX(gfx.data[i]));
+		}
 }

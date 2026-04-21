@@ -21,7 +21,7 @@ void I_StartupGraphics(void)
 		SDL_WINDOWPOS_CENTERED,
 		vid.width,
 		vid.height,
-		SDL_WINDOW_SHOWN|SDL_WINDOW_BORDERLESS
+		SDL_WINDOW_SHOWN
 	);
 	
 	if (!sdlWnd) 

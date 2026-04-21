@@ -6,9 +6,12 @@
 #endif
 
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #ifndef GAME_DEFS_H
 #define GAME_DEFS_H
