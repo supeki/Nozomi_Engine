@@ -22,6 +22,7 @@ extern uint16_t* palette;
 
 void V_Init(void);
 void V_LoadPalette(void);
+void V_ClearScreen(void);
 void V_DrawDot(int x, int y, uint8_t col);
 void V_DrawSprite(gfx_t gfx, int x, int y);
 void V_DrawCroppedSprite(gfx_t gfx, int x, int y, int sx, int sy, int w, int h);

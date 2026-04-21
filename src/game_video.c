@@ -50,12 +50,18 @@ void V_LoadPalette(void)
 	fclose(file);
 }
 
+void V_ClearScreen(void)
+{
+	for (int i = 0; i < vid.width*vid.height; i++)
+		vid.buffer[i] = 0;
+}
+
 void V_DrawDot(int x, int y, uint8_t col)
 {
 	if (x < 0 || y < 0 || x >= vid.width || y >= vid.height)
         return;
 	
-	if (col > 37)
+	if (col > 38)
 		col = 38;
 	
 	vid.buffer[x+(y*vid.width)] = col;
@@ -68,15 +74,18 @@ void V_DrawSprite(gfx_t gfx, int x, int y)
 	
 	for (int i = 0; i < gfx.size; i++)
 	{
-		if (ALPHA_INDEX(gfx.data[i]))
+		int vx = x + (i % gfx.width) - gfx.xoff;
+		int vy = y + (i / gfx.width) - gfx.yoff;
+		
+		if (vx < 0 || vy < 0 || vx >= vid.width || vy >= vid.height || ALPHA_INDEX(gfx.data[i]))
 			continue;
 		
-		V_DrawDot(x + (i % gfx.width) - gfx.xoff, y + (i / gfx.width) - gfx.yoff, PAL_INDEX(gfx.data[i]));
+		vid.buffer[vx+(vy*vid.width)] = PAL_INDEX(gfx.data[i]);
 	}
 }
 
 void V_DrawCroppedSprite(gfx_t gfx, int x, int y, int sx, int sy, int w, int h)
-{
+{	
 	if ((gfx.size + gfx.width) <= 0)
         return;
 	
@@ -84,10 +93,12 @@ void V_DrawCroppedSprite(gfx_t gfx, int x, int y, int sx, int sy, int w, int h)
 		for (int zx = 0; zx < w; zx++)
 		{
 			int i = sx + sy*gfx.width + zx + zy*gfx.width;
+			int vx = x + zx - gfx.xoff;
+			int vy = y + zy - gfx.yoff;
 			
-			if (ALPHA_INDEX(gfx.data[i]))
+			if (vx < 0 || vy < 0 || vx >= vid.width || vy >= vid.height || ALPHA_INDEX(gfx.data[i]))
 				continue;
 			
-			V_DrawDot(x + zx - gfx.xoff, y + zy - gfx.yoff, PAL_INDEX(gfx.data[i]));
+			vid.buffer[vx+(vy*vid.width)] = PAL_INDEX(gfx.data[i]);
 		}
 }

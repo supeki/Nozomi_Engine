@@ -7,11 +7,14 @@
 
 #include "game_defs.h"
 #include "game_gfx.h"
+#include "game_input.h"
 #include "game_main.h"
+#include "game_object.h"
 #include "game_video.h"
 
 bool game_quit = false;
 gfx_t test;
+object_t maril;
 
 // Game startup / main function.
 void gameMain(void)
@@ -25,18 +28,23 @@ void gameMain(void)
 	printf("Starting graphics backend...\n");
 	I_StartupGraphics();
 	
+	printf("Setting default controls...\n");
+	G_DefaultControls();
+	
 	test = GFX_LoadGFX("marilyn.bmp.gfx");
+	memset(&maril, 0, sizeof(object_t));
 }
 
 // The main game loop.
 void gameLoop(void)
 {
+	int game_tick, elapsed_tick;
 	int old_tick = I_GetTicks();
 	int render_tick = 0;
 	
 	while (!game_quit) {
-		int game_tick = I_GetTicks();
-		int elapsed_tick = game_tick - old_tick;
+		game_tick = I_GetTicks();
+		elapsed_tick = game_tick - old_tick;
 		old_tick = game_tick;
 		
 		I_PollEvents();
@@ -50,7 +58,11 @@ void gameLoop(void)
 			continue;
 		}
 		
-		gameRunTicks(elapsed_tick);
+		#if defined(__NDS__)
+		gameRunStuff(1);
+		#else
+		gameRunStuff(elapsed_tick);
+		#endif
 		
 		if (game_tick > render_tick)
 		{
@@ -58,20 +70,62 @@ void gameLoop(void)
 			
 			I_PushGraphics();
 		}
+		
+		V_ClearScreen();
 	}
 }
 
-void gameRunTicks(int elapsed)
+static int walk_table[4] = {0, 1, 0, 2};
+
+void gameRunStuff(uint32_t elapsed)
 {
-	while (elapsed-- > 0)
-	{
-		// Write some logic here later :3
-		
+	if (elapsed > 4)
+		elapsed = 1;
+	
+	while (elapsed--)
+	{	
 		// o'tayyy doing this for save
-		for (int y = 0; y < vid.height; y++)
-			for (int x = 0; x < vid.width; x++)
-				V_DrawDot(x, y, 0);
+		bool moving = (
+			G_ControlDown(CON_LEFT, false) 
+			|| G_ControlDown(CON_RIGHT, false) 
+			|| G_ControlDown(CON_UP, false) 
+			|| G_ControlDown(CON_DOWN, false)
+		);
 			
-		V_DrawCroppedSprite(test, 0, 0, 24, 32, 24, 32);
+		if (G_ControlDown(CON_LEFT, false)) {
+			maril.x--;
+			
+			if (!(G_ControlDown(CON_UP, false) || G_ControlDown(CON_DOWN, false)) || maril.dir == 3)
+			maril.dir = 1;
+		}
+		
+		if (G_ControlDown(CON_RIGHT, false)) {
+			maril.x++;
+			
+			if (!(G_ControlDown(CON_UP, false) || G_ControlDown(CON_DOWN, false)) || maril.dir == 1)
+			maril.dir = 3;
+		}
+		
+		if (G_ControlDown(CON_UP, false)) {
+			maril.y--;
+			
+			if (!(G_ControlDown(CON_LEFT, false) || G_ControlDown(CON_RIGHT, false)) || maril.dir == 0)
+			maril.dir = 2;
+		}
+		
+		if (G_ControlDown(CON_DOWN, false)) {
+			maril.y++;
+			
+			if (!(G_ControlDown(CON_LEFT, false) || G_ControlDown(CON_RIGHT, false)) || maril.dir == 2)
+			maril.dir = 0;
+		}
+		
+		if (moving) {
+			maril.anim_timer++;
+			V_DrawCroppedSprite(test, maril.x, maril.y, walk_table[(maril.anim_timer/6) % 4]*24, maril.dir*32, 24, 32);
+		} else {
+			maril.anim_timer = 0;
+			V_DrawCroppedSprite(test, maril.x, maril.y, 0, maril.dir*32, 24, 32);
+		}
 	}
 }

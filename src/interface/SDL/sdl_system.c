@@ -9,7 +9,7 @@
 #include "../../i_system.h"
 #include "../../game_defs.h"
 
-int I_GetTicks(void)
+uint32_t I_GetTicks(void)
 {
 	static uint32_t base_tick = 0;
 	uint32_t ticks = SDL_GetTicks();
@@ -24,12 +24,12 @@ int I_GetTicks(void)
 	return ticks;
 }
 
-int I_GetTime(void)
+uint32_t I_GetTime(void)
 {
 	return SDL_GetTicks();
 }
 
-void I_Sleep(int ms)
+void I_Sleep(uint32_t ms)
 {
 	SDL_Delay(ms);
 }

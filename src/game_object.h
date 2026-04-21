@@ -1,10 +1,10 @@
 // JADEFRACTURE
-// game_player.h
+// game_object.h
 
 #include "game_defs.h"
 
-#ifndef GAME_PLAYER_H
-#define GAME_PLAYER_H
+#ifndef GAME_OBJECT_H
+#define GAME_OBJECT_H
 
 typedef struct
 {
@@ -17,6 +17,6 @@ typedef struct
 	// animation variables
 	int anim_state; // animation state, standing, walking, y'want it y'make it a constant
 	int anim_timer; // animation timer, value depends on the animation and situation
-} player_t;
+} object_t;
 
 #endif

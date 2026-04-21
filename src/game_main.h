@@ -10,6 +10,6 @@ extern bool game_quit;
 
 void gameMain(void);
 void gameLoop(void);
-void gameRunTicks(int elapsed);
+void gameRunStuff(uint32_t elapsed);
 
 #endif

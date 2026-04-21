@@ -9,27 +9,38 @@ EXEC_NAME = JADEFRACTURE
 # Assume it's a Windows Executable by default? :3
 EXEC_EXT = exe
 
-# Assume SDL by default Nozomi 04-15-2026
+# Assume Windows SDL by default Nozomi 04-15-2026
+WINDOWS ?= 1
 SDL ?= 1
 NDS ?= 0
+
+ifeq ($(NDS),1)
+SDL = 0
+WINDOWS = 0
+endif
 
 ifeq ($(SDL),1)
 	# src;obj;bin / SDL :D
 	INTERFACE = SDL
 	i_main = sdl_main
 	i_event = sdl_event
+	i_input = sdl_input
 	i_system = sdl_system
 	i_video = sdl_video
 
 	# Define some stuff!
 	DEFINES = -DSDL
 	OPTS := $(OPTS) -I. -I/mingw64/include -I/mingw64/include/SDL2
-	LIBS = -lmingw32 -lSDL2main -lSDL2 -mwindows
+	LIBS = -lmingw32 -lSDL2main -lSDL2
 	LDFLAGS = -L/mingw64/lib -L/mingw64/lib/SDL2 
 	
 	CFLAGS = $(OPTS) \
 			 $(LIBS) \
 			 $(DEFINES)
+endif
+
+ifeq ($(WINDOWS),1)
+	LIBS := $(LIBS) -mwindows
 endif
 
 # Nintendo DS port!
@@ -45,6 +56,9 @@ ifeq ($(NDS),1)
 	INTERFACE = NDS
 	i_main = nds_main
 	i_event = nds_event
+	
+	# NDS input isn't handled in its own file!
+	#i_input = nds_input
 	i_system = nds_system
 	i_video = nds_video
 
@@ -55,7 +69,7 @@ ifeq ($(NDS),1)
 	GAME_FULL_TITLE := $(GAME_TITLE);$(GAME_SUBTITLE);$(GAME_AUTHOR)
 	NDS_NAME = $(EXEC_NAME).nds
 	ELF_NAME = $(EXEC_NAME).elf
-	NITROFSDIR := src/interface/$(INTERFACE)/nitrofs
+	NITROFSDIR := assets/$(INTERFACE)/nitrofs
 
 	DEFINES	:= -DARM9 -D__NDS__
 	SPECS := $(BLOCKSDS)/sys/crts/ds_arm9.specs
@@ -91,12 +105,17 @@ INTERFACE_BIN = $(BIN_DIR)/$(INTERFACE)
 OBJS := $(OBJS) \
 		$(OBJ_DIR)/game_main.o \
 		$(OBJ_DIR)/game_gfx.o \
+		$(OBJ_DIR)/game_input.o \
 		$(OBJ_DIR)/game_misc.o \
 		$(OBJ_DIR)/game_video.o \
 		$(INTERFACE_OBJ)/$(i_main).o \
 		$(INTERFACE_OBJ)/$(i_event).o \
 		$(INTERFACE_OBJ)/$(i_system).o \
 		$(INTERFACE_OBJ)/$(i_video).o
+		
+ifdef i_input
+OBJS := $(OBJS) $(INTERFACE_OBJ)/$(i_input).o
+endif
 		
 ifeq ($(NDS),1)
 # Start Nintendo DS build requirements!
@@ -165,6 +184,9 @@ $(OBJ_DIR)/game_main.o: $(SRC_DIR)/game_main.c $(SRC_DIR)/game_defs.h $(SRC_DIR)
 $(OBJ_DIR)/game_gfx.o: $(SRC_DIR)/game_gfx.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_gfx.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
+$(OBJ_DIR)/game_input.o: $(SRC_DIR)/game_input.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_input.h
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
+	
 $(OBJ_DIR)/game_misc.o: $(SRC_DIR)/game_misc.c $(SRC_DIR)/game_defs.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
@@ -172,11 +194,16 @@ $(OBJ_DIR)/game_video.o: $(SRC_DIR)/game_video.c $(SRC_DIR)/game_video.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 # Make the interface objs!
-$(INTERFACE_OBJ)/$(i_main).o: $(INTERFACE_SRC)/$(i_main).c $(INTERFACE_SRC)/$(i_main).h
+$(INTERFACE_OBJ)/$(i_main).o: $(INTERFACE_SRC)/$(i_main).c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(INTERFACE_OBJ)/$(i_event).o: $(INTERFACE_SRC)/$(i_event).c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
+
+ifdef i_input	
+$(INTERFACE_OBJ)/$(i_input).o: $(INTERFACE_SRC)/$(i_input).c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
+endif
 	
 $(INTERFACE_OBJ)/$(i_system).o: $(INTERFACE_SRC)/$(i_system).c
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@

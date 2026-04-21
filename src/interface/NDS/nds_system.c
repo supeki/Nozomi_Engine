@@ -12,7 +12,7 @@
 
 #define timers2ms(tlow,thigh) ((tlow>>5)+(thigh<<11))
 
-int I_GetTicks(void)
+uint32_t I_GetTicks(void)
 {
 	static uint32_t base_tick = 0;
 	uint32_t ticks = timers2ms(TIMER0_DATA, TIMER1_DATA);
@@ -27,19 +27,19 @@ int I_GetTicks(void)
 	return ticks;
 }
 
-void Pause(u32 ms)
+void Pause(uint32_t ms)
 {
 	u32 now;
 	now=timers2ms(TIMER0_DATA, TIMER1_DATA);
 	while((u32)timers2ms(TIMER0_DATA, TIMER1_DATA)<now+ms);
 }
 
-int I_GetTime(void)
+uint32_t I_GetTime(void)
 {
 	return timers2ms(TIMER0_DATA, TIMER1_DATA);
 }
 
-void I_Sleep(int ms)
+void I_Sleep(uint32_t ms)
 {
 	Pause(ms/1000);
 }
