@@ -178,7 +178,7 @@ $(INTERFACE_BIN)/$(EXEC_NAME).$(EXEC_EXT): $(OBJ_DIR) $(INTERFACE_OBJ) $(OBJS) $
 	-o $(INTERFACE_BIN)/$(EXEC_NAME).$(EXEC_EXT) $(LIBS)
 	
 # Game-related objs!
-$(OBJ_DIR)/game_main.o: $(SRC_DIR)/game_main.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_main.h $(SRC_DIR)/game_video.h
+$(OBJ_DIR)/game_main.o: $(SRC_DIR)/game_main.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_main.h $(SRC_DIR)/game_object.h $(SRC_DIR)/game_video.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_gfx.o: $(SRC_DIR)/game_gfx.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_gfx.h

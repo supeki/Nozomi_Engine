@@ -85,47 +85,47 @@ void gameRunStuff(uint32_t elapsed)
 	while (elapsed--)
 	{	
 		// o'tayyy doing this for save
-		bool moving = (
-			G_ControlDown(CON_LEFT, false) 
-			|| G_ControlDown(CON_RIGHT, false) 
-			|| G_ControlDown(CON_UP, false) 
-			|| G_ControlDown(CON_DOWN, false)
-		);
+		int8_t xmove = G_ControlDown(CON_RIGHT, false) - G_ControlDown(CON_LEFT, false);
+		int8_t ymove = G_ControlDown(CON_DOWN, false) - G_ControlDown(CON_UP, false);
 			
-		if (G_ControlDown(CON_LEFT, false)) {
-			maril.x--;
-			
+		if (G_ControlDown(CON_LEFT, false) && !G_ControlDown(CON_RIGHT, false)) {
 			if (!(G_ControlDown(CON_UP, false) || G_ControlDown(CON_DOWN, false)) || maril.dir == 3)
 			maril.dir = 1;
 		}
 		
-		if (G_ControlDown(CON_RIGHT, false)) {
-			maril.x++;
-			
+		if (G_ControlDown(CON_RIGHT, false) && !G_ControlDown(CON_LEFT, false)) {
 			if (!(G_ControlDown(CON_UP, false) || G_ControlDown(CON_DOWN, false)) || maril.dir == 1)
 			maril.dir = 3;
 		}
 		
-		if (G_ControlDown(CON_UP, false)) {
-			maril.y--;
-			
+		maril.momx = (xmove*(2<<SUBPIXEL_SHIFT));
+		
+		if (G_ControlDown(CON_UP, false) && !G_ControlDown(CON_DOWN, false)) {
 			if (!(G_ControlDown(CON_LEFT, false) || G_ControlDown(CON_RIGHT, false)) || maril.dir == 0)
 			maril.dir = 2;
 		}
 		
-		if (G_ControlDown(CON_DOWN, false)) {
-			maril.y++;
-			
+		if (G_ControlDown(CON_DOWN, false) && !G_ControlDown(CON_UP, false)) {
 			if (!(G_ControlDown(CON_LEFT, false) || G_ControlDown(CON_RIGHT, false)) || maril.dir == 2)
 			maril.dir = 0;
 		}
 		
-		if (moving) {
+		maril.momy = (ymove*(2<<SUBPIXEL_SHIFT));
+		
+		if (abs(xmove) && abs(ymove)) {
+			maril.momx = (subpixel_t)((float)maril.momx * (1.0f / sqrt(2.0f)));
+			maril.momy = (subpixel_t)((float)maril.momy * (1.0f / sqrt(2.0f)));
+		}
+			
+		if (abs(maril.momx) + abs(maril.momy) > 0) {
+			maril.x += maril.momx;
+			maril.y += maril.momy;
+			
 			maril.anim_timer++;
-			V_DrawCroppedSprite(test, maril.x, maril.y, walk_table[(maril.anim_timer/6) % 4]*24, maril.dir*32, 24, 32);
+			V_DrawCroppedSprite(test, TO_PIXELS(maril.x), TO_PIXELS(maril.y), walk_table[(maril.anim_timer/6) % 4]*24, maril.dir*32, 24, 32);
 		} else {
 			maril.anim_timer = 0;
-			V_DrawCroppedSprite(test, maril.x, maril.y, 0, maril.dir*32, 24, 32);
+			V_DrawCroppedSprite(test, TO_PIXELS(maril.x), TO_PIXELS(maril.y), 0, maril.dir*32, 24, 32);
 		}
 	}
 }

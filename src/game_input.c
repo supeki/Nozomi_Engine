@@ -17,16 +17,6 @@ bool G_ControlDown(uint8_t control, bool pressed)
 	if (control > NUMCONTROLS-1)
 		return false;
 	
-	if (gamecontrols[CON_UP] > gamecontrols[CON_DOWN] && gamecontrols[CON_DOWN] > 0)
-		gamecontrols[CON_DOWN] = 0;
-	else if (gamecontrols[CON_DOWN] > gamecontrols[CON_UP] && gamecontrols[CON_UP] > 0)
-		gamecontrols[CON_UP] = 0;
-	
-	if (gamecontrols[CON_LEFT] > gamecontrols[CON_RIGHT] && gamecontrols[CON_RIGHT] > 0)
-		gamecontrols[CON_RIGHT] = 0;
-	else if (gamecontrols[CON_RIGHT] > gamecontrols[CON_LEFT] && gamecontrols[CON_LEFT] > 0)
-		gamecontrols[CON_LEFT] = 0;
-	
 	if (pressed)
 		return (gamecontrols[control] == 1);
 	else

@@ -16,12 +16,12 @@ void I_UpdateControls(SDL_Event event)
 	
 	switch (event.type) {
 		case SDL_KEYDOWN:
-			for (c = 0; c < NUMCONTROLS; c++)
+			for (c = CON_UP; c < NUMCONTROLS; c++)
 				if (gamecontrolbinds[c][0] == event.key.keysym.sym) // holy fucking shit
-					gamecontrols[c]++;
+					gamecontrols[c] = 1;
 			break;
 		case SDL_KEYUP:
-			for (c = 0; c < NUMCONTROLS; c++)
+			for (c = CON_UP; c < NUMCONTROLS; c++)
 				if (gamecontrolbinds[c][0] == event.key.keysym.sym) // holy fucking shit
 					gamecontrols[c] = 0;
 			break;
