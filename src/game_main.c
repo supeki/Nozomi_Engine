@@ -13,8 +13,6 @@
 #include "game_video.h"
 
 bool game_quit = false;
-gfx_t test;
-object_t maril;
 
 // Game startup / main function.
 void gameMain(void)
@@ -31,16 +29,19 @@ void gameMain(void)
 	printf("Setting default controls...\n");
 	G_DefaultControls();
 	
-	test = GFX_LoadGFX("marilyn.bmp.gfx");
-	memset(&maril, 0, sizeof(object_t));
+	GFX_InitGFX();
+	OBJ_InitObjects();
+	
+	for (int i = 0; i < 5000; i++)
+		OBJ_CreateObject(rand()%(vid.width-24) << SUBPIXEL_SHIFT, rand()%(vid.height-32) << SUBPIXEL_SHIFT, OBJ_MARIL);
 }
 
 // The main game loop.
 void gameLoop(void)
 {
-	int game_tick, elapsed_tick;
-	int old_tick = I_GetTicks();
-	int render_tick = 0;
+	uint32_t game_tick, elapsed_tick;
+	uint32_t old_tick = I_GetTicks();
+	uint32_t render_tick = 0;
 	
 	while (!game_quit) {
 		game_tick = I_GetTicks();
@@ -59,6 +60,7 @@ void gameLoop(void)
 		}
 		
 		#if defined(__NDS__)
+		// Force the game to run a tick on NDS otherwise it cries.
 		gameRunStuff(1);
 		#else
 		gameRunStuff(elapsed_tick);
@@ -75,8 +77,6 @@ void gameLoop(void)
 	}
 }
 
-static int walk_table[4] = {0, 1, 0, 2};
-
 void gameRunStuff(uint32_t elapsed)
 {
 	if (elapsed > 4)
@@ -84,48 +84,6 @@ void gameRunStuff(uint32_t elapsed)
 	
 	while (elapsed--)
 	{	
-		// o'tayyy doing this for save
-		int8_t xmove = G_ControlDown(CON_RIGHT, false) - G_ControlDown(CON_LEFT, false);
-		int8_t ymove = G_ControlDown(CON_DOWN, false) - G_ControlDown(CON_UP, false);
-			
-		if (G_ControlDown(CON_LEFT, false) && !G_ControlDown(CON_RIGHT, false)) {
-			if (!(G_ControlDown(CON_UP, false) || G_ControlDown(CON_DOWN, false)) || maril.dir == 3)
-			maril.dir = 1;
-		}
-		
-		if (G_ControlDown(CON_RIGHT, false) && !G_ControlDown(CON_LEFT, false)) {
-			if (!(G_ControlDown(CON_UP, false) || G_ControlDown(CON_DOWN, false)) || maril.dir == 1)
-			maril.dir = 3;
-		}
-		
-		maril.momx = (xmove*(2<<SUBPIXEL_SHIFT));
-		
-		if (G_ControlDown(CON_UP, false) && !G_ControlDown(CON_DOWN, false)) {
-			if (!(G_ControlDown(CON_LEFT, false) || G_ControlDown(CON_RIGHT, false)) || maril.dir == 0)
-			maril.dir = 2;
-		}
-		
-		if (G_ControlDown(CON_DOWN, false) && !G_ControlDown(CON_UP, false)) {
-			if (!(G_ControlDown(CON_LEFT, false) || G_ControlDown(CON_RIGHT, false)) || maril.dir == 2)
-			maril.dir = 0;
-		}
-		
-		maril.momy = (ymove*(2<<SUBPIXEL_SHIFT));
-		
-		if (abs(xmove) && abs(ymove)) {
-			maril.momx = (subpixel_t)((float)maril.momx * (1.0f / sqrt(2.0f)));
-			maril.momy = (subpixel_t)((float)maril.momy * (1.0f / sqrt(2.0f)));
-		}
-			
-		if (abs(maril.momx) + abs(maril.momy) > 0) {
-			maril.x += maril.momx;
-			maril.y += maril.momy;
-			
-			maril.anim_timer++;
-			V_DrawCroppedSprite(test, TO_PIXELS(maril.x), TO_PIXELS(maril.y), walk_table[(maril.anim_timer/6) % 4]*24, maril.dir*32, 24, 32);
-		} else {
-			maril.anim_timer = 0;
-			V_DrawCroppedSprite(test, TO_PIXELS(maril.x), TO_PIXELS(maril.y), 0, maril.dir*32, 24, 32);
-		}
+		OBJ_RunObjects();
 	}
 }

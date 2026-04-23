@@ -107,6 +107,8 @@ OBJS := $(OBJS) \
 		$(OBJ_DIR)/game_gfx.o \
 		$(OBJ_DIR)/game_input.o \
 		$(OBJ_DIR)/game_misc.o \
+		$(OBJ_DIR)/game_object.o \
+		$(OBJ_DIR)/game_player.o \
 		$(OBJ_DIR)/game_video.o \
 		$(INTERFACE_OBJ)/$(i_main).o \
 		$(INTERFACE_OBJ)/$(i_event).o \
@@ -188,6 +190,12 @@ $(OBJ_DIR)/game_input.o: $(SRC_DIR)/game_input.c $(SRC_DIR)/game_defs.h $(SRC_DI
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_misc.o: $(SRC_DIR)/game_misc.c $(SRC_DIR)/game_defs.h
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
+	
+$(OBJ_DIR)/game_object.o: $(SRC_DIR)/game_object.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_object.h
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
+	
+$(OBJ_DIR)/game_player.o: $(SRC_DIR)/game_player.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_object.h $(SRC_DIR)/game_player.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_video.o: $(SRC_DIR)/game_video.c $(SRC_DIR)/game_video.h

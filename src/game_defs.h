@@ -1,6 +1,9 @@
 // JADEFRACTURE
 // game_defs.h
 
+#ifndef GAME_DEFS_H
+#define GAME_DEFS_H
+
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -12,9 +15,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-
-#ifndef GAME_DEFS_H
-#define GAME_DEFS_H
 
 #define FRAMERATE 30
 

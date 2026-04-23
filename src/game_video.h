@@ -1,14 +1,14 @@
 // JADEFRACTURE
 // game_video.h
 
+#ifndef GAME_VIDEO_H
+#define GAME_VIDEO_H
+
 #include "game_defs.h"
 #include "game_gfx.h"
 
 #define BASEVIDWIDTH 256
 #define BASEVIDHEIGHT 192
-
-#ifndef GAME_VIDEO_H
-#define GAME_VIDEO_H
 
 typedef struct
 {

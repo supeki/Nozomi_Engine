@@ -1,10 +1,10 @@
 // JADEFRACTURE
 // game_input.h
 
-#include "game_defs.h"
-
 #ifndef GAME_INPUT_H
 #define GAME_INPUT_H
+
+#include "game_defs.h"
 
 typedef enum
 {

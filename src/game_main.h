@@ -1,10 +1,10 @@
 // JADEFRACTURE
 // game_main.h
 
-#include "game_defs.h"
-
 #ifndef GAME_MAIN_H
 #define GAME_MAIN_H
+
+#include "game_defs.h"
 
 extern bool game_quit;
 

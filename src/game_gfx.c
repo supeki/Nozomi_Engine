@@ -4,6 +4,13 @@
 #include "game_gfx.h"
 #include "i_system.h"
 
+gfx_t gfx_characters;
+
+void GFX_InitGFX(void)
+{
+	gfx_characters = GFX_LoadGFX("data/characters.gfx");
+}
+
 gfx_t GFX_LoadGFX(const char *filename)
 {
 	FILE *file = fopen(filename, "rb");
