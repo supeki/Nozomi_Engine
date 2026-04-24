@@ -32,7 +32,7 @@ void gameMain(void)
 	GFX_InitGFX();
 	OBJ_InitObjects();
 	
-	for (int i = 0; i < 5000; i++)
+	for (int i = 0; i < 1; i++)
 		OBJ_CreateObject(rand()%(vid.width-24) << SUBPIXEL_SHIFT, rand()%(vid.height-32) << SUBPIXEL_SHIFT, OBJ_MARIL);
 }
 

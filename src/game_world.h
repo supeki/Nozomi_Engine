@@ -8,9 +8,7 @@
 
 typedef struct tile_s
 {
-	struct tile_s *prev; // previous tile
-	struct tile_s *next; // next tile
-
+	uint32_t id; // tileset tile id
 	subpixel_t x; // dynamic tiles? :eyes:
 	subpixel_t y; // :fox:
 } tile_t;
@@ -18,13 +16,19 @@ typedef struct tile_s
 typedef struct
 {
 	gfx_t gfx; // tile graphics
-	uint8_t *data; // tile types 
+	uint16_t *data; // tile types 
 } tileset_t;
 
 typedef struct
 {
 	tileset_t tileset;
-	tile_t tiles;
+	tile_t *tiles;
 } world_t;
+
+extern world_t world; // za warudo!
+
+void W_InitWorld(void);
+tileset_t W_LoadTileset(const char *setname);
+void W_LoadWorld(const char *worldname);
 
 #endif
