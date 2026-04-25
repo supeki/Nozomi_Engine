@@ -36,7 +36,8 @@ ifeq ($(SDL),1)
 	
 	CFLAGS = $(OPTS) \
 			 $(LIBS) \
-			 $(DEFINES)
+			 $(DEFINES) \
+			 -O3
 endif
 
 ifeq ($(WINDOWS),1)
@@ -76,7 +77,6 @@ ifeq ($(NDS),1)
 	OPTS := $(OPTS) -I. -I$(BLOCKSDS)/libs/libnds/include -I$(BLOCKSDS)/libs/maxmod/include
 	LIBS = -lmm9 -lnds9 -lm -lc
 	LDFLAGS = -L$(BLOCKSDS)/libs/libnds/lib -L$(BLOCKSDS)/libs/maxmod/lib
-	SFLAGS=-g $(OPTS)
 
 	ARM7ELF	:= $(BLOCKSDS)/sys/arm7/main_core/arm7_dswifi_maxmod.elf
 
@@ -123,21 +123,14 @@ ifeq ($(NDS),1)
 # Start Nintendo DS build requirements!
 all: $(INTERFACE_BIN)/$(NDS_NAME)
 
-# Start NitroFS!
-ifneq ($(strip $(NITROFSDIR)),)
 # Additional arguments for ndstool
 NDSTOOL_ARGS	:= -d $(NITROFSDIR)
 
 ifneq ($(SOURCES_AUDIO),)
 	NDSTOOL_ARGS	+= -d $(SOUNDBANKDIR)
 endif
-
-# Make the NDS ROM depend on the filesystem only if it is needed
-$(INTERFACE_BIN)/$(NDS_NAME): $(NITROFSDIR)
-endif
-# End NitroFS!
 		
-$(INTERFACE_BIN)/$(NDS_NAME): $(INTERFACE_BIN)/$(ELF_NAME)
+$(INTERFACE_BIN)/$(NDS_NAME): $(INTERFACE_BIN)/$(ELF_NAME) $(NITROFSDIR)
 	@echo "  NDSTOOL $@"
 	$(BLOCKSDS)/tools/ndstool/ndstool -c $@ \
 		-7 $(ARM7ELF) -9 $(INTERFACE_BIN)/$(ELF_NAME) \

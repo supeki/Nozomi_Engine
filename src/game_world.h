@@ -16,7 +16,7 @@ typedef struct tile_s
 typedef struct
 {
 	gfx_t gfx; // tile graphics
-	uint16_t *data; // tile types 
+	uint32_t *data; // tile types 
 } tileset_t;
 
 typedef struct

@@ -71,9 +71,9 @@ void BMPGFX(const char *filename)
 	FILE *file = fopen(va("%s.gfx", filename), "w+b");
 	SDL_Surface *bmp = SDL_ConvertSurfaceFormat(SDL_LoadBMP(filename), SDL_PIXELFORMAT_RGB565, 0);
 	uint32_t size = bmp->w * bmp->h - 1;
-	byte width = bmp->w - 1;
-	byte offx = 0;
-	byte offy = 0;
+	uint8_t width = bmp->w - 1;
+	uint8_t offx = 0;
+	uint8_t offy = 0;
 	
 	fwrite(&size, sizeof(uint16_t), 1, file);
 	fwrite(&width, sizeof(uint8_t), 1, file);
@@ -85,7 +85,7 @@ void BMPGFX(const char *filename)
 	for (int i = 0; i < size; i++)
 		for (int p = 0; p < 39; p++) {
 			if (pixels[i] == palette[p]) {
-				byte h = (p << 1);
+				uint8_t h = (p << 1);
 			
 				if (pixels[i] == 0)
 					h++;
