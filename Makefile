@@ -7,12 +7,17 @@ BIN_DIR = bin
 # Name of the executable (minus the extension!) Nozomi 04-15-2026
 EXEC_NAME = JADEFRACTURE
 # Assume it's a Windows Executable by default? :3
-EXEC_EXT = exe
+EXEC_EXT = .exe
 
 # Assume Windows SDL by default Nozomi 04-15-2026
 WINDOWS ?= 1
+LINUX ?= 0
 SDL ?= 1
 NDS ?= 0
+
+ifeq ($(LINUX),1)
+WINDOWS = 0
+endif
 
 ifeq ($(NDS),1)
 SDL = 0
@@ -30,9 +35,9 @@ ifeq ($(SDL),1)
 
 	# Define some stuff!
 	DEFINES = -DSDL
-	OPTS := $(OPTS) -I. -I/mingw64/include -I/mingw64/include/SDL2
-	LIBS = -lmingw32 -lSDL2main -lSDL2
-	LDFLAGS = -L/mingw64/lib -L/mingw64/lib/SDL2 
+	OPTS := $(OPTS) -I.
+	LIBS = -lSDL2main -lSDL2
+	LDFLAGS =  
 	
 	CFLAGS = $(OPTS) \
 			 $(LIBS) \
@@ -41,7 +46,15 @@ ifeq ($(SDL),1)
 endif
 
 ifeq ($(WINDOWS),1)
-	LIBS := $(LIBS) -mwindows
+	OPTS := $(OPTS) -I/mingw64/include -I/mingw64/include/SDL2
+	LIBS := $(LIBS) -mwindows -lmingw32
+	LDFLAGS := $(LDFLAGS) -L/mingw64/lib -L/mingw64/lib/SDL2
+endif
+
+ifeq ($(LINUX),1)
+	EXEC_EXT = 
+
+	OPTS := $(OPTS) -I/usr/include/SDL2
 endif
 
 # Nintendo DS port!
@@ -145,13 +158,13 @@ $(INTERFACE_BIN)/$(ELF_NAME): $(OBJ_DIR) $(OBJS) $(INTERFACE_OBJ) $(INTERFACE_BI
 # End Nintendo DS build requirements!
 else
 # Start generic build requirements!
-all: $(INTERFACE_BIN)/$(EXEC_NAME).$(EXEC_EXT)
+all: $(INTERFACE_BIN)/$(EXEC_NAME)$(EXEC_EXT)
 endif
 
 # Clean up the directories.
 clean:
 	rm -rf $(OBJ_DIR)/*
-	rm -rf $(INTERFACE_BIN)/$(EXEC_NAME).$(EXEC_EXT)
+	rm -rf $(INTERFACE_BIN)/$(EXEC_NAME)$(EXEC_EXT)
 	
 # Make all required directories!
 $(OBJ_DIR):
@@ -160,17 +173,17 @@ $(OBJ_DIR):
 $(BIN_DIR):
 	@mkdir $(BIN_DIR)
 	
-$(INTERFACE_OBJ):
+$(INTERFACE_OBJ): $(OBJ_DIR)
 	@mkdir $(INTERFACE_OBJ)
 	
-$(INTERFACE_BIN):
+$(INTERFACE_BIN): $(BIN_DIR)
 	@mkdir $(INTERFACE_BIN)
 	
 # The executable file itself? :3
-$(INTERFACE_BIN)/$(EXEC_NAME).$(EXEC_EXT): $(OBJ_DIR) $(INTERFACE_OBJ) $(OBJS) $(INTERFACE_BIN)
+$(INTERFACE_BIN)/$(EXEC_NAME)$(EXEC_EXT): $(OBJ_DIR) $(INTERFACE_OBJ) $(OBJS) $(INTERFACE_BIN)
 	@echo Linking...
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) \
-	-o $(INTERFACE_BIN)/$(EXEC_NAME).$(EXEC_EXT) $(LIBS)
+	-o $(INTERFACE_BIN)/$(EXEC_NAME)$(EXEC_EXT) $(LIBS)
 	
 # Game-related objs!
 $(OBJ_DIR)/game_main.o: $(SRC_DIR)/game_main.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_main.h $(SRC_DIR)/game_object.h $(SRC_DIR)/game_video.h
