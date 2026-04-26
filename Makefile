@@ -12,15 +12,26 @@ EXEC_EXT = .exe
 # Assume Windows SDL by default Nozomi 04-15-2026
 WINDOWS ?= 1
 LINUX ?= 0
+LINUX_WIN ?= 0
 SDL ?= 1
 NDS ?= 0
+PSP ?= 0
 
 ifeq ($(LINUX),1)
 WINDOWS = 0
 endif
 
+ifeq ($(LINUX_WIN),1)
+WINDOWS = 0
+CC = x86_64-w64-mingw32-gcc
+endif
+
 ifeq ($(NDS),1)
 SDL = 0
+WINDOWS = 0
+endif
+
+ifeq ($(PSP),1)
 WINDOWS = 0
 endif
 
@@ -36,7 +47,7 @@ ifeq ($(SDL),1)
 	# Define some stuff!
 	DEFINES = -DSDL
 	OPTS := $(OPTS) -I.
-	LIBS = -lSDL2main -lSDL2
+	LIBS = -lSDL2main -lSDL2 -lSDL2_mixer
 	LDFLAGS =  
 	
 	CFLAGS = $(OPTS) \
@@ -46,21 +57,38 @@ ifeq ($(SDL),1)
 endif
 
 ifeq ($(WINDOWS),1)
-	OPTS := $(OPTS) -I/mingw64/include -I/mingw64/include/SDL2
+	OPTS := $(OPTS) -I/mingw64/include
 	LIBS := $(LIBS) -mwindows -lmingw32
-	LDFLAGS := $(LDFLAGS) -L/mingw64/lib -L/mingw64/lib/SDL2
+	LDFLAGS := $(LDFLAGS) -L/mingw64/lib
 endif
 
 ifeq ($(LINUX),1)
 	EXEC_EXT = 
 
-	OPTS := $(OPTS) -I/usr/include/SDL2
+	CFLAGS := $(CFLAGS) $(pkg-config sdl2 SDL2_mixer --cflags) -w
+	LDFLAGS := $(LDFLAGS) $(pkg-config sdl2 SDL2_mixer --libs)
+endif
+
+ifeq ($(LINUX_WIN),1)
+	OPTS := $(OPTS) -I/usr/local/x86_64-w64-mingw32/include
+	LIBS := $(LIBS) -mwindows -lmingw32
+	LDFLAGS := $(LDFLAGS) -L/usr/local/x86_64-w64-mingw32/lib
+endif
+
+ifeq ($(PSP),1)	
+	CFLAGS := $(CFLAGS) $(shell $(PSPDIR)/bin/sdl2-config --cflags)
+	LIBS = $(shell $(PSPDIR)/bin/sdl2-config --libs) -lGL -lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl -lpspumd -lpsprtc -lpsppower -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpspvram
+	PSPSDK=$(shell psp-config --pspsdk-path)
+	
+	TARGET = JADEFRACTURE
+	EXTRA_TARGETS = EBOOT.PBP
+	PSP_EBOOT_TITLE = JADEFRACTURE
 endif
 
 # Nintendo DS port!
 ifeq ($(NDS),1)
-	export BLOCKSDS			?= /opt/blocksds/core
-	export BLOCKSDSEXT		?= /opt/blocksds/external
+	export BLOCKSDS			?= /opt/wonderful/thirdparty/blocksds/core
+	export BLOCKSDSEXT		?= /opt/wonderful/thirdparty/blocksds/external
 	export WONDERFUL_TOOLCHAIN	?= /opt/wonderful
 	ARM_NONE_EABI_PATH	?= $(WONDERFUL_TOOLCHAIN)/toolchain/gcc-arm-none-eabi/bin/
 
@@ -157,27 +185,30 @@ $(INTERFACE_BIN)/$(ELF_NAME): $(OBJ_DIR) $(OBJS) $(INTERFACE_OBJ) $(INTERFACE_BI
 
 # End Nintendo DS build requirements!
 else
+ifeq ($(PSP),1)
+include $(PSPSDK)/lib/build.mak
+else
 # Start generic build requirements!
 all: $(INTERFACE_BIN)/$(EXEC_NAME)$(EXEC_EXT)
 endif
+endif
 
-# Clean up the directories.
+# Clean up the objects.
 clean:
 	rm -rf $(OBJ_DIR)/*
-	rm -rf $(INTERFACE_BIN)/$(EXEC_NAME)$(EXEC_EXT)
 	
 # Make all required directories!
 $(OBJ_DIR):
-	@mkdir $(OBJ_DIR)
+	@mkdir -p $(OBJ_DIR)
 	
 $(BIN_DIR):
-	@mkdir $(BIN_DIR)
+	@mkdir -p $(BIN_DIR)
 	
 $(INTERFACE_OBJ): $(OBJ_DIR)
-	@mkdir $(INTERFACE_OBJ)
+	@mkdir -p $(INTERFACE_OBJ)
 	
 $(INTERFACE_BIN): $(BIN_DIR)
-	@mkdir $(INTERFACE_BIN)
+	@mkdir -p $(INTERFACE_BIN)
 	
 # The executable file itself? :3
 $(INTERFACE_BIN)/$(EXEC_NAME)$(EXEC_EXT): $(OBJ_DIR) $(INTERFACE_OBJ) $(OBJS) $(INTERFACE_BIN)
@@ -208,21 +239,21 @@ $(OBJ_DIR)/game_video.o: $(SRC_DIR)/game_video.c $(SRC_DIR)/game_video.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 # Make the interface objs!
-$(INTERFACE_OBJ)/$(i_main).o: $(INTERFACE_SRC)/$(i_main).c
+$(INTERFACE_OBJ)/$(i_main).o: $(INTERFACE_SRC)/$(i_main).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
-$(INTERFACE_OBJ)/$(i_event).o: $(INTERFACE_SRC)/$(i_event).c
+$(INTERFACE_OBJ)/$(i_event).o: $(INTERFACE_SRC)/$(i_event).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 
 ifdef i_input	
-$(INTERFACE_OBJ)/$(i_input).o: $(INTERFACE_SRC)/$(i_input).c
+$(INTERFACE_OBJ)/$(i_input).o: $(INTERFACE_SRC)/$(i_input).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 endif
 	
-$(INTERFACE_OBJ)/$(i_system).o: $(INTERFACE_SRC)/$(i_system).c
+$(INTERFACE_OBJ)/$(i_system).o: $(INTERFACE_SRC)/$(i_system).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 
-$(INTERFACE_OBJ)/$(i_video).o: $(INTERFACE_SRC)/$(i_video).c
+$(INTERFACE_OBJ)/$(i_video).o: $(INTERFACE_SRC)/$(i_video).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c

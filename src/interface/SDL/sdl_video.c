@@ -2,68 +2,94 @@
 // SDL2 backend
 // sdl_video.c
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 #include "sdl_main.h"
 
+#include "../../i_system.h"
 #include "../../i_video.h"
 #include "../../game_video.h"
 
 SDL_Window *sdlWnd;
 SDL_Surface *sdlSurf;
-SDL_Surface *wndSurf;
+SDL_Renderer *wndRend;
+SDL_Texture *sdlTex;
+
+uint16_t* pixels;
+float scale;
 
 void I_StartupGraphics(void)
 {	
+	#if defined(PSP)
+	vid.width = 480;
+	vid.height = 272;
+	#endif
+	
+	pixels = malloc(BASEVIDWIDTH * BASEVIDHEIGHT * sizeof(uint16_t));
+	scale = (float)vid.height / (float)BASEVIDHEIGHT;
+
 	sdlWnd = SDL_CreateWindow(
 		"JADEFRACTURE", 
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
 		vid.width,
 		vid.height,
-		SDL_WINDOW_SHOWN
+		SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE
 	);
 	
 	if (!sdlWnd) 
-	{
-		printf("Failed to create window!\n");
-		exit(-1);
-	}
+		I_Error("Failed to create window!\n");
 	
-	wndSurf = SDL_GetWindowSurface(sdlWnd);
+	wndRend = SDL_CreateRenderer(sdlWnd, -1, SDL_RENDERER_ACCELERATED);
 	
-	if (!wndSurf) 
-	{
-		printf("Failed to get window surface!\n");
-		exit(-1);
-	}
+	if (!wndRend) 
+		I_Error("Failed to create renderer!\n");
 	
-	sdlSurf = SDL_CreateRGBSurfaceWithFormat(
-		0,
-		vid.width,
-		vid.height,
-		8,
-		SDL_PIXELFORMAT_RGB565
+	sdlTex = SDL_CreateTexture(
+		wndRend, 
+		SDL_PIXELFORMAT_RGB565, 
+		SDL_TEXTUREACCESS_STREAMING, 
+		BASEVIDWIDTH, 
+		BASEVIDHEIGHT
 	);
 	
-	if (!sdlSurf)
+	if (!sdlTex) 
+		I_Error("Failed to create texture!\n");
+}
+
+void I_UpdateWindow(SDL_Event event)
+{	
+	switch (event.window.event)
 	{
-		printf("Failed to create surface!\n");
-		exit(-1);
+		case SDL_WINDOWEVENT_SIZE_CHANGED:
+			SDL_SetWindowSize(sdlWnd, event.window.data1, event.window.data2);
+			SDL_GetWindowSize(sdlWnd, &vid.width, &vid.height);
+			
+			scale = (float)vid.height / (float)BASEVIDHEIGHT;
+			float xscale = (float)vid.width / (float)BASEVIDWIDTH;
+			if (xscale < scale)
+				scale = xscale;
+			
+			SDL_RenderPresent(wndRend);
+			break;
 	}
 }
 
 void I_PushGraphics(void)
 {
-	uint16_t* pixels = sdlSurf->pixels;
+	int width = (int)(scale*(float)BASEVIDWIDTH);
+	int height = (int)(scale*(float)BASEVIDHEIGHT);
+	SDL_Rect dest_rect[4] = {(vid.width/2) - (width/2), (vid.height/2) - (height/2), width, height};
 
-	for (int i = 0; i < vid.width * vid.height; i++)
+	for (int i = 0; i < BASEVIDWIDTH * BASEVIDHEIGHT; i++)
 	{
 		pixels[i] = palette[vid.buffer[i]];
 	}
 	
-	SDL_BlitScaled(sdlSurf, NULL, wndSurf, NULL);
-	SDL_UpdateWindowSurface(sdlWnd);
+	SDL_RenderClear(wndRend);
+	SDL_UpdateTexture(sdlTex, NULL, pixels, BASEVIDWIDTH * sizeof(uint16_t));
+	SDL_RenderCopy(wndRend, sdlTex, NULL, dest_rect);
+	SDL_RenderPresent(wndRend);
 }
 
 void BMPGFX(const char *filename)

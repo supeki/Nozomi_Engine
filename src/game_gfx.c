@@ -19,7 +19,7 @@ gfx_t GFX_LoadGFX(const char *filename)
 	// check file
 	if (!file)
 	{
-		printf("Failed to open %s!\n", filename);
+		I_Error("Failed to open %s!\n", filename);
 	}
 	
 	// allocate memory for gfx

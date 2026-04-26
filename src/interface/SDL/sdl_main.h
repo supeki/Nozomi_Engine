@@ -5,12 +5,13 @@
 #ifndef SDL_MAIN_H
 #define SDL_MAIN_H
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 extern SDL_Window *sdlWnd;
 extern SDL_Surface *sdlSurf;
 extern SDL_Surface *wndSurf;
 
+void I_UpdateWindow(SDL_Event event);
 void BMPGFX(const char *filename);
 
 #endif

@@ -17,22 +17,22 @@ bool game_quit = false;
 // Game startup / main function.
 void gameMain(void)
 {
-	printf("Initializing video...\n");
+	I_printf("Initializing video...\n");
 	V_Init();
 	
-	printf("Loading palette...\n");
+	I_printf("Loading palette...\n");
 	V_LoadPalette();
 	
-	printf("Starting graphics backend...\n");
+	I_printf("Starting graphics backend...\n");
 	I_StartupGraphics();
 	
-	printf("Setting default controls...\n");
+	I_printf("Setting default controls...\n");
 	G_DefaultControls();
 	
 	GFX_InitGFX();
 	OBJ_InitObjects();
 	
-	OBJ_CreateObject(rand()%(vid.width-24) << SUBPIXEL_SHIFT, rand()%(vid.height-32) << SUBPIXEL_SHIFT, OBJ_MARIL);
+	OBJ_CreateObject(rand()%(BASEVIDWIDTH-24) << SUBPIXEL_SHIFT, rand()%(BASEVIDHEIGHT-32) << SUBPIXEL_SHIFT, OBJ_MARIL);
 }
 
 // The main game loop.

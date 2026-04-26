@@ -8,6 +8,10 @@
 #include <windows.h>
 #endif
 
+#if defined(PSP)
+#include <unistd.h>
+#endif
+
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>

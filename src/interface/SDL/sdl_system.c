@@ -2,7 +2,11 @@
 // SDL2 backend
 // sdl_system.c
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
+
+#if defined(PSP)
+#include <pspdebug.h>
+#endif
 
 #include "sdl_main.h"
 
@@ -34,15 +38,35 @@ void I_Sleep(uint32_t ms)
 	SDL_Delay(ms);
 }
 
+void I_printf (char *text, ...)
+{
+    va_list argptr;
+    char txt[2048];
+    
+    va_start(argptr,text);
+    vsprintf(txt, text, argptr);
+    va_end(argptr);    
+	
+	#if defined(PSP)
+	pspDebugScreenPrintf(txt);
+	#else
+	printf(txt);
+	#endif
+}
+
 void I_Error (char *error, ...)
 {
     va_list argptr;
-    char txt[512];
+    char txt[2048];
     
     va_start(argptr,error);
     vsprintf(txt, error, argptr);
     va_end(argptr);    
 	
-    SDL_ShowSimpleMessageBox(0, "JADEFRACTURE Error", txt, sdlWnd);
+	I_printf("JADEFRACTURE Error: %s", txt);
+	SDL_ShowSimpleMessageBox(0, "JADEFRACTURE Error", txt, sdlWnd);
+	
+	#if !defined(PSP)
     exit(-1);
+	#endif
 }

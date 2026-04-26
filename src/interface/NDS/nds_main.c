@@ -25,16 +25,16 @@ int main(int argc, char *argv[])
 	TIMER0_CR=TIMER_DIV_1024 | TIMER_ENABLE;
 	TIMER1_CR=TIMER_CASCADE | TIMER_ENABLE;
 	
-	printf("Initializing NitroFS!\n");
+	I_printf("Initializing NitroFS!\n");
 	if (!nitroFSInit(NULL))
 		libndsCrash("NitroFS failed to initialize!\nCannot proceed!");
 	
 	gameMain();
 	
-	printf("Starting main game loop!\n");
+	I_printf("Starting main game loop!\n");
 	gameLoop();
 	
-	printf("Quitting JADEFRACTURE...\n");
+	I_printf("Quitting JADEFRACTURE...\n");
 	
 	exit(0);
 }

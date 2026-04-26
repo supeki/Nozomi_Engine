@@ -4,7 +4,7 @@
 #if defined(__NDS__)
 #include <nds.h>
 #elif defined(SDL)
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #endif
 
 #include "game_input.h"
@@ -63,5 +63,19 @@ void G_DefaultControls(void)
 	gamecontrolbinds[CON_Z][0] = 'd';
 	gamecontrolbinds[CON_CONFIRM][0] = 'z';
 	gamecontrolbinds[CON_BACK][0] = 'x';
+	gamecontrolbinds[CON_UP][1] = SDL_CONTROLLER_BUTTON_DPAD_UP;
+	gamecontrolbinds[CON_DOWN][1] = SDL_CONTROLLER_BUTTON_DPAD_DOWN;
+	gamecontrolbinds[CON_LEFT][1] = SDL_CONTROLLER_BUTTON_DPAD_LEFT;
+	gamecontrolbinds[CON_RIGHT][1] = SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
+	gamecontrolbinds[CON_A][1] = SDL_CONTROLLER_BUTTON_B;
+	gamecontrolbinds[CON_B][1] = SDL_CONTROLLER_BUTTON_X;
+	gamecontrolbinds[CON_C][1] = SDL_CONTROLLER_BUTTON_A;
+	gamecontrolbinds[CON_START][1] = SDL_CONTROLLER_BUTTON_START;
+	gamecontrolbinds[CON_SELECT][1] = SDL_CONTROLLER_BUTTON_BACK;
+	gamecontrolbinds[CON_X][1] = SDL_CONTROLLER_BUTTON_LEFTSHOULDER;
+	gamecontrolbinds[CON_Y][1] = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;
+	gamecontrolbinds[CON_Z][1] = SDL_CONTROLLER_BUTTON_Y;
+	gamecontrolbinds[CON_CONFIRM][1] = SDL_CONTROLLER_BUTTON_A;
+	gamecontrolbinds[CON_BACK][1] = SDL_CONTROLLER_BUTTON_B;
 	#endif
 }

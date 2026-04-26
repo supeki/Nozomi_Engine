@@ -44,6 +44,17 @@ void I_Sleep(uint32_t ms)
 	Pause(ms/1000);
 }
 
+void I_printf (char *text, ...)
+{
+    va_list argptr;
+    char txt[2048];
+    
+    va_start(argptr,text);
+    vsprintf(txt, text, argptr);
+    va_end(argptr);    
+
+	printf(txt);
+}
 void I_Error (char *error, ...)
 {
     va_list argptr;

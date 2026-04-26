@@ -1,6 +1,8 @@
 // JADEFRACTURE
 // game_video.c
 
+#include "i_system.h"
+
 #include "game_gfx.h"
 #include "game_video.h"
 
@@ -12,8 +14,8 @@ void V_Init(void)
 	vid.width = BASEVIDWIDTH;
 	vid.height = BASEVIDHEIGHT;
 	
-	vid.buffer = malloc(vid.width*vid.height);
-	memset(vid.buffer, 0, vid.width*vid.height);
+	vid.buffer = malloc(BASEVIDWIDTH*BASEVIDHEIGHT);
+	memset(vid.buffer, 0, BASEVIDWIDTH*BASEVIDHEIGHT);
 }
 
 // Load the palette into vid.palette :3 Nozomi
@@ -24,8 +26,7 @@ void V_LoadPalette(void)
 	
 	if (file == NULL)
 	{
-		printf("Failed to read palette file!\n");
-		exit(-1);
+		I_Error("Failed to read palette file!\n");
 	}
 	
 	fseek(file, 0L, SEEK_END);
@@ -52,19 +53,19 @@ void V_LoadPalette(void)
 
 void V_ClearScreen(void)
 {
-	for (int i = 0; i < vid.width*vid.height; i++)
+	for (int i = 0; i < BASEVIDWIDTH*BASEVIDHEIGHT; i++)
 		vid.buffer[i] = 0;
 }
 
 void V_DrawDot(int x, int y, uint8_t col)
 {
-	if (x < 0 || y < 0 || x >= vid.width || y >= vid.height)
+	if (x < 0 || y < 0 || x >= BASEVIDWIDTH || y >= BASEVIDHEIGHT)
         return;
 	
 	if (col > 38)
 		col = 38;
 	
-	vid.buffer[x+(y*vid.width)] = col;
+	vid.buffer[x+(y*BASEVIDWIDTH)] = col;
 }
 
 void V_DrawSprite(gfx_t gfx, int x, int y)
@@ -77,10 +78,10 @@ void V_DrawSprite(gfx_t gfx, int x, int y)
 		int vx = x + (i % gfx.width) - gfx.xoff;
 		int vy = y + (i / gfx.width) - gfx.yoff;
 		
-		if (vx < 0 || vy < 0 || vx >= vid.width || vy >= vid.height || ALPHA_INDEX(gfx.data[i]))
+		if (vx < 0 || vy < 0 || vx >= BASEVIDWIDTH || vy >= BASEVIDHEIGHT || ALPHA_INDEX(gfx.data[i]))
 			continue;
 		
-		vid.buffer[vx+(vy*vid.width)] = PAL_INDEX(gfx.data[i]);
+		vid.buffer[vx+(vy*BASEVIDWIDTH)] = PAL_INDEX(gfx.data[i]);
 	}
 }
 
@@ -96,9 +97,9 @@ void V_DrawCroppedSprite(gfx_t gfx, int x, int y, int sx, int sy, int w, int h)
 			int vx = x + zx - gfx.xoff;
 			int vy = y + zy - gfx.yoff;
 			
-			if (vx < 0 || vy < 0 || vx >= vid.width || vy >= vid.height || ALPHA_INDEX(gfx.data[i]))
+			if (vx < 0 || vy < 0 || vx >= BASEVIDWIDTH || vy >= BASEVIDHEIGHT || ALPHA_INDEX(gfx.data[i]))
 				continue;
 			
-			vid.buffer[vx+(vy*vid.width)] = PAL_INDEX(gfx.data[i]);
+			vid.buffer[vx+(vy*BASEVIDWIDTH)] = PAL_INDEX(gfx.data[i]);
 		}
 }

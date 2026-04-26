@@ -2,7 +2,11 @@
 // SDL2 backend
 // sdl_main.c
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
+
+#if defined(PSP)
+#include <pspdebug.h>
+#endif
 
 #include "sdl_main.h"
 
@@ -18,26 +22,30 @@ int main(int argc, char *argv[])
 {
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
 	
-	printf("Initializing SDL!\n");
+	I_printf("Initializing SDL!\n");
 	
-	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_GAMECONTROLLER) < 0)
 	{
-		printf("Could not initialize SDL: %s.\n", SDL_GetError());
-        exit(-1);
+		I_Error("Could not initialize SDL: %s.\n", SDL_GetError());
 	}
 	
-	printf("Successfully initialized SDL!\n");
+	I_printf("Successfully initialized SDL!\n");
+	
+	#if defined(PSP)
+	pspDebugScreenInit();
+	chdir("ms0:/PSP/GAME/JADEFRACTURE");
+	#endif
 	
 	gameMain();
 	
-	printf("Starting main game loop!\n");
+	I_printf("Starting main game loop!\n");
 	
 	gameLoop();
 	
-	printf("Quitting SDL!\n");
+	I_printf("Quitting SDL!\n");
 	
 	SDL_Quit();
-	printf("Quitting JADEFRACTURE...\n");
+	I_printf("Quitting JADEFRACTURE...\n");
 	
 	exit(0);
 }

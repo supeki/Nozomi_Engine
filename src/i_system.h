@@ -9,6 +9,7 @@
 uint32_t I_GetTicks(void);
 uint32_t I_GetTime(void);
 void I_Sleep(uint32_t ms);
+void I_printf (char *text, ...);
 void I_Error (char *error, ...);
 
 #endif

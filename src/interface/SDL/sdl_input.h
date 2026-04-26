@@ -5,7 +5,7 @@
 #ifndef SDL_INPUT_H
 #define SDL_INPUT_H
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 void I_UpdateControls(SDL_Event event);
 
