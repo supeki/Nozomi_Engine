@@ -2,6 +2,7 @@
 // game_main.c
 
 #include "i_event.h"
+#include "i_sound.h"
 #include "i_system.h"
 #include "i_video.h"
 
@@ -10,6 +11,7 @@
 #include "game_input.h"
 #include "game_main.h"
 #include "game_object.h"
+#include "game_sound.h"
 #include "game_video.h"
 
 bool game_quit = false;
@@ -26,6 +28,9 @@ void gameMain(void)
 	I_printf("Starting graphics backend...\n");
 	I_StartupGraphics();
 	
+	I_printf("Starting sound backend...\n");
+	I_StartupSound();
+	
 	I_printf("Setting default controls...\n");
 	G_DefaultControls();
 	
@@ -33,6 +38,7 @@ void gameMain(void)
 	OBJ_InitObjects();
 	
 	OBJ_CreateObject(rand()%(BASEVIDWIDTH-24) << SUBPIXEL_SHIFT, rand()%(BASEVIDHEIGHT-32) << SUBPIXEL_SHIFT, OBJ_MARIL);
+	S_PlayMusic(mus_test, true);
 }
 
 // The main game loop.

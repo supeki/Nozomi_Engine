@@ -63,10 +63,8 @@ void I_Error (char *error, ...)
     vsprintf(txt, error, argptr);
     va_end(argptr);    
 	
-	I_printf("JADEFRACTURE Error: %s", txt);
+	I_printf("JADEFRACTURE Error: %s\n", txt);
 	SDL_ShowSimpleMessageBox(0, "JADEFRACTURE Error", txt, sdlWnd);
-	
-	#if !defined(PSP)
+	I_Sleep(5000);
     exit(-1);
-	#endif
 }

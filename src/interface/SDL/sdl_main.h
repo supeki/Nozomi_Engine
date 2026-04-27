@@ -6,6 +6,7 @@
 #define SDL_MAIN_H
 
 #include <SDL2/SDL.h>
+#include "../../game_defs.h"
 
 extern SDL_Window *sdlWnd;
 extern SDL_Surface *sdlSurf;

@@ -41,6 +41,7 @@ ifeq ($(SDL),1)
 	i_main = sdl_main
 	i_event = sdl_event
 	i_input = sdl_input
+	i_sound = sdl_sound
 	i_system = sdl_system
 	i_video = sdl_video
 
@@ -60,6 +61,7 @@ ifeq ($(WINDOWS),1)
 	OPTS := $(OPTS) -I/mingw64/include
 	LIBS := $(LIBS) -mwindows -lmingw32
 	LDFLAGS := $(LDFLAGS) -L/mingw64/lib
+	CFLAGS := $(CFLAGS) -DWINDOWS
 endif
 
 ifeq ($(LINUX),1)
@@ -73,12 +75,13 @@ ifeq ($(LINUX_WIN),1)
 	OPTS := $(OPTS) -I/usr/local/x86_64-w64-mingw32/include
 	LIBS := $(LIBS) -mwindows -lmingw32
 	LDFLAGS := $(LDFLAGS) -L/usr/local/x86_64-w64-mingw32/lib
+	CFLAGS := $(CFLAGS) -DWINDOWS
 endif
 
 ifeq ($(PSP),1)	
-	CFLAGS := $(CFLAGS) $(shell $(PSPDIR)/bin/sdl2-config --cflags)
-	LIBS = $(shell $(PSPDIR)/bin/sdl2-config --libs) -lGL -lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl -lpspumd -lpsprtc -lpsppower -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpspvram
 	PSPSDK=$(shell psp-config --pspsdk-path)
+	CFLAGS := $(CFLAGS) $(shell $(PSPDIR)/bin/sdl2-config --cflags) $(shell ~/pspdev/bin/psp-pkg-config SDL2_mixer --cflags)
+	LIBS = $(shell $(PSPDIR)/bin/sdl2-config --libs) $(shell ~/pspdev/bin/psp-pkg-config SDL2_mixer --libs) -lGL -lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl -lpspumd -lpsprtc -lpsppower -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpspvram
 	
 	TARGET = JADEFRACTURE
 	EXTRA_TARGETS = EBOOT.PBP
@@ -101,6 +104,7 @@ ifeq ($(NDS),1)
 	
 	# NDS input isn't handled in its own file!
 	#i_input = nds_input
+	i_sound = nds_sound
 	i_system = nds_system
 	i_video = nds_video
 
@@ -112,7 +116,8 @@ ifeq ($(NDS),1)
 	NDS_NAME = $(EXEC_NAME).nds
 	ELF_NAME = $(EXEC_NAME).elf
 	NITROFSDIR := assets/$(INTERFACE)/nitrofs
-
+	AUDIODIR := assets/$(INTERFACE)/audio
+	
 	DEFINES	:= -DARM9 -D__NDS__
 	SPECS := $(BLOCKSDS)/sys/crts/ds_arm9.specs
 	OPTS := $(OPTS) -I. -I$(BLOCKSDS)/libs/libnds/include -I$(BLOCKSDS)/libs/maxmod/include
@@ -150,9 +155,11 @@ OBJS := $(OBJS) \
 		$(OBJ_DIR)/game_misc.o \
 		$(OBJ_DIR)/game_object.o \
 		$(OBJ_DIR)/game_player.o \
+		$(OBJ_DIR)/game_sound.o \
 		$(OBJ_DIR)/game_video.o \
 		$(INTERFACE_OBJ)/$(i_main).o \
 		$(INTERFACE_OBJ)/$(i_event).o \
+		$(INTERFACE_OBJ)/$(i_sound).o \
 		$(INTERFACE_OBJ)/$(i_system).o \
 		$(INTERFACE_OBJ)/$(i_video).o
 		
@@ -166,10 +173,6 @@ all: $(INTERFACE_BIN)/$(NDS_NAME)
 
 # Additional arguments for ndstool
 NDSTOOL_ARGS	:= -d $(NITROFSDIR)
-
-ifneq ($(SOURCES_AUDIO),)
-	NDSTOOL_ARGS	+= -d $(SOUNDBANKDIR)
-endif
 		
 $(INTERFACE_BIN)/$(NDS_NAME): $(INTERFACE_BIN)/$(ELF_NAME) $(NITROFSDIR)
 	@echo "  NDSTOOL $@"
@@ -182,6 +185,11 @@ $(INTERFACE_BIN)/$(ELF_NAME): $(OBJ_DIR) $(OBJS) $(INTERFACE_OBJ) $(INTERFACE_BI
 	@echo Linking...
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) \
 	-o $(INTERFACE_BIN)/$(ELF_NAME) $(LIBS)
+
+# Create soundbank
+$(INTERFACE_SRC)/soundbank.h: $(INTERFACE_SRC)
+	$(BLOCKSDS)/tools/mmutil/mmutil -o$(NITROFSDIR)/soundbank.bin -h$(INTERFACE_SRC)/soundbank.h -d \
+	$(AUDIODIR)/presentation.it
 
 # End Nintendo DS build requirements!
 else
@@ -199,16 +207,16 @@ clean:
 	
 # Make all required directories!
 $(OBJ_DIR):
-	@mkdir -p $(OBJ_DIR)
+	mkdir -p $(OBJ_DIR)
 	
 $(BIN_DIR):
-	@mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR)
 	
 $(INTERFACE_OBJ): $(OBJ_DIR)
-	@mkdir -p $(INTERFACE_OBJ)
+	mkdir -p $(INTERFACE_OBJ)
 	
 $(INTERFACE_BIN): $(BIN_DIR)
-	@mkdir -p $(INTERFACE_BIN)
+	mkdir -p $(INTERFACE_BIN)
 	
 # The executable file itself? :3
 $(INTERFACE_BIN)/$(EXEC_NAME)$(EXEC_EXT): $(OBJ_DIR) $(INTERFACE_OBJ) $(OBJS) $(INTERFACE_BIN)
@@ -234,6 +242,9 @@ $(OBJ_DIR)/game_object.o: $(SRC_DIR)/game_object.c $(SRC_DIR)/game_defs.h $(SRC_
 	
 $(OBJ_DIR)/game_player.o: $(SRC_DIR)/game_player.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_object.h $(SRC_DIR)/game_player.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/game_sound.o: $(SRC_DIR)/game_sound.c $(SRC_DIR)/game_sound.h
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_video.o: $(SRC_DIR)/game_video.c $(SRC_DIR)/game_video.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
@@ -247,6 +258,14 @@ $(INTERFACE_OBJ)/$(i_event).o: $(INTERFACE_SRC)/$(i_event).c $(INTERFACE_OBJ)
 
 ifdef i_input	
 $(INTERFACE_OBJ)/$(i_input).o: $(INTERFACE_SRC)/$(i_input).c $(INTERFACE_OBJ)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
+endif
+
+ifeq ($(NDS),1)
+$(INTERFACE_OBJ)/$(i_sound).o: $(INTERFACE_SRC)/$(i_sound).c $(INTERFACE_SRC)/soundbank.h $(INTERFACE_OBJ)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
+else
+$(INTERFACE_OBJ)/$(i_sound).o: $(INTERFACE_SRC)/$(i_sound).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 endif
 	

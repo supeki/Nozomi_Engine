@@ -65,5 +65,6 @@ void I_Error (char *error, ...)
     va_end(argptr);    
 	
     printf("JADEFRACTURE Error:\n%s\n", txt);
-    exit(-1);
+    Pause(5000);
+	exit(-1);
 }
