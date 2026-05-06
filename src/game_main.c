@@ -11,6 +11,7 @@
 #include "game_input.h"
 #include "game_main.h"
 #include "game_object.h"
+#include "game_player.h"
 #include "game_sound.h"
 #include "game_video.h"
 
@@ -37,7 +38,7 @@ void gameMain(void)
 	GFX_InitGFX();
 	OBJ_InitObjects();
 	
-	OBJ_CreateObject(rand()%(BASEVIDWIDTH-24) << SUBPIXEL_SHIFT, rand()%(BASEVIDHEIGHT-32) << SUBPIXEL_SHIFT, OBJ_MARIL);
+	P_CreatePlayer(rand()%(BASEVIDWIDTH-24) << SUBPIXEL_SHIFT, rand()%(BASEVIDHEIGHT-32) << SUBPIXEL_SHIFT, rand()%4);
 	S_PlayMusic(mus_test, true);
 }
 
@@ -75,6 +76,7 @@ void gameLoop(void)
 		{
 			render_tick = game_tick;
 			
+			gameDisplay(); // Run all draw loops before pushing to the screen!
 			I_PushGraphics();
 		}
 		
@@ -89,6 +91,13 @@ void gameRunStuff(uint32_t elapsed)
 	
 	while (elapsed--)
 	{	
+		for (int i = 0; i < num_players; i++)
+			P_PlayerLogic(players[i]);
 		OBJ_RunObjects();
 	}
+}
+
+void gameDisplay(void)
+{
+	
 }

@@ -11,5 +11,6 @@ extern bool game_quit;
 void gameMain(void);
 void gameLoop(void);
 void gameRunStuff(uint32_t elapsed);
+void gameDisplay(void);
 
 #endif

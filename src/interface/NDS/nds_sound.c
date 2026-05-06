@@ -44,7 +44,7 @@ void I_PlayMusic(int id, bool loop)
 	if (loop)
 		mmStart(MOD_PRESENTATION, MM_PLAY_LOOP);
 	else
-		mmStart(MOD_PRESENTATION, MM_PLAY_LOOP);
+		mmStart(MOD_PRESENTATION, MM_PLAY_ONCE);
 }
 
 void I_StopMusic(void)

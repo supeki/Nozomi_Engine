@@ -117,6 +117,7 @@ ifeq ($(NDS),1)
 	ELF_NAME = $(EXEC_NAME).elf
 	NITROFSDIR := assets/$(INTERFACE)/nitrofs
 	AUDIODIR := assets/$(INTERFACE)/audio
+	AUDIOFILES := $(AUDIODIR)/presentation.it
 	
 	DEFINES	:= -DARM9 -D__NDS__
 	SPECS := $(BLOCKSDS)/sys/crts/ds_arm9.specs
@@ -171,7 +172,7 @@ ifeq ($(NDS),1)
 # Start Nintendo DS build requirements!
 all: $(INTERFACE_BIN)/$(NDS_NAME)
 
-# Additional arguments for ndstool
+# Include NitroFS directory!
 NDSTOOL_ARGS	:= -d $(NITROFSDIR)
 		
 $(INTERFACE_BIN)/$(NDS_NAME): $(INTERFACE_BIN)/$(ELF_NAME) $(NITROFSDIR)
@@ -186,10 +187,10 @@ $(INTERFACE_BIN)/$(ELF_NAME): $(OBJ_DIR) $(OBJS) $(INTERFACE_OBJ) $(INTERFACE_BI
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) \
 	-o $(INTERFACE_BIN)/$(ELF_NAME) $(LIBS)
 
-# Create soundbank
+# Create the soundbank!
 $(INTERFACE_SRC)/soundbank.h: $(INTERFACE_SRC)
 	$(BLOCKSDS)/tools/mmutil/mmutil -o$(NITROFSDIR)/soundbank.bin -h$(INTERFACE_SRC)/soundbank.h -d \
-	$(AUDIODIR)/presentation.it
+	$(AUDIOFILES)
 
 # End Nintendo DS build requirements!
 else

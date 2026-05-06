@@ -38,7 +38,7 @@ void I_Sleep(uint32_t ms)
 	SDL_Delay(ms);
 }
 
-void I_printf (char *text, ...)
+void I_printf (const char *text, ...)
 {
     va_list argptr;
     char txt[2048];
@@ -54,7 +54,7 @@ void I_printf (char *text, ...)
 	#endif
 }
 
-void I_Error (char *error, ...)
+void I_Error (const char *error, ...)
 {
     va_list argptr;
     char txt[2048];

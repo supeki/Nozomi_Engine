@@ -46,6 +46,10 @@ void V_LoadPalette(void)
 		fread(&b, 1, 1, file);
 		
 		palette[i+1] = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
+		
+		#if defined(NDS)
+		palette[i+1] = rgb565_to_rgb15(palette[i+1]);
+		#endif
 	}
 	
 	fclose(file);
@@ -68,7 +72,7 @@ void V_DrawDot(int x, int y, uint8_t col)
 	vid.buffer[x+(y*BASEVIDWIDTH)] = col;
 }
 
-void V_DrawSprite(gfx_t gfx, int x, int y)
+void V_Draw(gfx_t gfx, int x, int y)
 {
 	if ((gfx.size + gfx.width) <= 0)
         return;
@@ -85,7 +89,7 @@ void V_DrawSprite(gfx_t gfx, int x, int y)
 	}
 }
 
-void V_DrawCroppedSprite(gfx_t gfx, int x, int y, int sx, int sy, int w, int h)
+void V_DrawCropped(gfx_t gfx, int x, int y, int sx, int sy, int w, int h)
 {	
 	if ((gfx.size + gfx.width) <= 0)
         return;

@@ -71,6 +71,10 @@ cp -r assets/PSP/audio bin/PSP/data/audio
 make -j PSP=1
 mv EBOOT.PBP bin/PSP
 
+# Generate licenses for PSP ver. so my ass doesn't get sued
+psp-create-license-directory sdl2 sdl2-mixer
+mv third-party-licenses bin/PSP
+
 # Clean up misc. files
 rm -rf PARAM.SFO
 rm -rf JADEFRACTURE.elf

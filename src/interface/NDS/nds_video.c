@@ -30,8 +30,6 @@ void I_PushGraphics(void)
 
 	for (int i = 0; i < vid.width * vid.height; i++)
 	{
-		if (pixels[i] == rgb565_to_rgb15(palette[vid.buffer[i]]))
-			continue;
 		pixels[i] = rgb565_to_rgb15(palette[vid.buffer[i]]);
 	}
 }
