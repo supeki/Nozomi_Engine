@@ -6,6 +6,10 @@
 #include "game_gfx.h"
 #include "game_video.h"
 
+#if defined(__NDS__)
+#include "interface/NDS/nds_video.h"
+#endif
+
 vid_t vid;
 uint16_t* palette;
 
@@ -47,7 +51,7 @@ void V_LoadPalette(void)
 		
 		palette[i+1] = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
 		
-		#if defined(NDS)
+		#if defined(__NDS__)
 		palette[i+1] = rgb565_to_rgb15(palette[i+1]);
 		#endif
 	}

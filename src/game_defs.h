@@ -29,5 +29,6 @@ char *va(const char *format, ...);
 typedef int32_t subpixel_t;
 #define SUBPIXEL_SHIFT 16
 #define TO_PIXELS(i) (i/(1<<SUBPIXEL_SHIFT))
+#define TO_SUBPIXELS(i) (i*(1<<SUBPIXEL_SHIFT))
 
 #endif

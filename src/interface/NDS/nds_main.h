@@ -7,6 +7,4 @@
 
 #include <nds.h>
 
-uint16_t rgb565_to_rgb15(uint16_t c);
-
 #endif

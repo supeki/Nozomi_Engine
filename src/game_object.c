@@ -26,8 +26,12 @@ void OBJ_RunObjects(void)
 				break;
 		}
 		
-		if (obj->type == OBJ_NULL)
+		if (obj->type == OBJ_NULL) {
+			object_t *obj2 = obj->next;
 			OBJ_RemoveObject(obj);
+			obj = obj2;
+			continue;
+		}
 		
 		obj = obj->next;
 	}
