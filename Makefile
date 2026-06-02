@@ -54,8 +54,7 @@ ifeq ($(SDL),1)
 	CFLAGS = $(OPTS) \
 			 $(LIBS) \
 			 $(DEFINES) \
-			 -g
-			 #-O3
+			 -O3
 endif
 
 ifeq ($(WINDOWS),1)
