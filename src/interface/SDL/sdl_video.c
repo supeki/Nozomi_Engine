@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // SDL2 backend
 // sdl_video.c
 
@@ -9,6 +9,7 @@
 #include "../../i_system.h"
 #include "../../i_video.h"
 #include "../../game_video.h"
+#include "../../game_defs.h"
 
 SDL_Window *sdlWnd;
 SDL_Surface *sdlSurf;
@@ -29,7 +30,7 @@ void I_StartupGraphics(void)
 	scale = (float)vid.height / (float)BASEVIDHEIGHT;
 
 	sdlWnd = SDL_CreateWindow(
-		"JADEFRACTURE", 
+		GAME_NAME, 
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
 		vid.width,
@@ -40,6 +41,7 @@ void I_StartupGraphics(void)
 	if (!sdlWnd) 
 		I_Error("Failed to create window!\n");
 	
+	//SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
 	wndRend = SDL_CreateRenderer(sdlWnd, -1, SDL_RENDERER_ACCELERATED);
 	
 	if (!wndRend) 
@@ -81,11 +83,8 @@ void I_PushGraphics(void)
 	int height = (int)(scale*(float)BASEVIDHEIGHT);
 	SDL_Rect dest_rect[4] = {(vid.width/2) - (width/2), (vid.height/2) - (height/2), width, height};
 
-	for (int i = 0; i < BASEVIDWIDTH * BASEVIDHEIGHT; i++)
-	{
-		pixels[i] = palette[vid.buffer[i]];
-	}
-	
+	memcpy(pixels, vid.buffer, BASEVIDWIDTH * BASEVIDHEIGHT * sizeof(uint16_t));
+
 	SDL_RenderClear(wndRend);
 	SDL_UpdateTexture(sdlTex, NULL, pixels, BASEVIDWIDTH * sizeof(uint16_t));
 	SDL_RenderCopy(wndRend, sdlTex, NULL, dest_rect);
@@ -94,8 +93,13 @@ void I_PushGraphics(void)
 
 void BMPGFX(const char *filename)
 {
-	FILE *file = fopen(va("%s.gfx", filename), "w+b");
 	SDL_Surface *bmp = SDL_ConvertSurfaceFormat(SDL_LoadBMP(filename), SDL_PIXELFORMAT_RGB565, 0);
+	
+	if (bmp == NULL)
+		return;
+
+	FILE *file = fopen(va("%s.gfx", filename), "w+b");
+	
 	uint32_t size = bmp->w * bmp->h - 1;
 	uint8_t width = bmp->w - 1;
 	uint8_t offx = 0;
@@ -111,12 +115,7 @@ void BMPGFX(const char *filename)
 	for (int i = 0; i < size; i++)
 		for (int p = 0; p < 39; p++) {
 			if (pixels[i] == palette[p]) {
-				uint8_t h = (p << 1);
-			
-				if (pixels[i] == 0)
-					h++;
-				
-				fwrite(&h, sizeof(uint8_t), 1, file);
+				fwrite(&p, sizeof(uint8_t), 1, file);
 			}
 		}
 			

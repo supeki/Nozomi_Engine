@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // game_main.c
 
 #include "i_event.h"

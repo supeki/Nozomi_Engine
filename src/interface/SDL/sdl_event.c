@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // SDL2 backend
 // sdl_event.c
 

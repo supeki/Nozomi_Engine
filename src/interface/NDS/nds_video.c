@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // NDS backend
 // nds_video.c
 
@@ -21,7 +21,7 @@ uint16_t rgb565_to_rgb15(uint16_t c)
     uint16_t g = (c >> 5) & 0x3F;
     uint16_t b =  c & 0x1F;
 	g = g >> 1;
-    return (b << 10) | (g << 5) | r;
+    return RGB15(r, g, b);
 }
 
 void I_PushGraphics(void)
@@ -30,6 +30,6 @@ void I_PushGraphics(void)
 
 	for (int i = 0; i < vid.width * vid.height; i++)
 	{
-		pixels[i] = palette[vid.buffer[i]];
+		pixels[i] = rgb565_to_rgb15(vid.buffer[i]);
 	}
 }

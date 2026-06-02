@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // i_video.h
 
 #ifndef I_VIDEO_H

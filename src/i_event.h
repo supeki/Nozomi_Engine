@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // i_event.h
 
 #ifndef I_EVENT_H

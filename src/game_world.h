@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // game_world.h
 
 #ifndef GAME_WORLD_H
@@ -24,19 +24,15 @@ typedef struct
 	uint8_t *data; // tile types 
 } tileset_t;
 
-typedef struct
-{
-	tile_t tiles;
-	tileset_t tileset;
-} world_t;
-
 extern tile_t tiles;
 extern tileset_t tileset;
 
 void W_InitWorld(void);
-tileset_t W_LoadTileset(const char *filename);
+void W_LoadTileset(const char *filename);
 void W_LoadWorld(const char *filename);
-
+tile_t *W_CreateTile(subpixel_t x, subpixel_t y, uint8_t id, uint8_t layer);
 void W_FreeTiles(void);
+void W_FreeTileset(void);
+void W_SaveWorld(const char *filename);
 
 #endif

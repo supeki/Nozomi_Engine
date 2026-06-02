@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // SDL2 backend
 // sdl_main.c
 
@@ -39,6 +39,8 @@ int main(int argc, char *argv[])
 	gameMain();
 	
 	I_printf("Starting main game loop!\n");
+	
+	BMPGFX("characters.bmp");
 	
 	gameLoop();
 	

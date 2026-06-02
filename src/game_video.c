@@ -1,14 +1,10 @@
-// JADEFRACTURE
+// Nozomi Engine
 // game_video.c
 
 #include "i_system.h"
 
 #include "game_gfx.h"
 #include "game_video.h"
-
-#if defined(__NDS__)
-#include "interface/NDS/nds_video.h"
-#endif
 
 vid_t vid;
 uint16_t* palette;
@@ -18,8 +14,8 @@ void V_Init(void)
 	vid.width = BASEVIDWIDTH;
 	vid.height = BASEVIDHEIGHT;
 	
-	vid.buffer = malloc(BASEVIDWIDTH*BASEVIDHEIGHT);
-	memset(vid.buffer, 0, BASEVIDWIDTH*BASEVIDHEIGHT);
+	vid.buffer = malloc(BASEVIDWIDTH * BASEVIDHEIGHT * sizeof(uint16_t));
+	memset(vid.buffer, 0, BASEVIDWIDTH * BASEVIDHEIGHT * sizeof(uint16_t));
 }
 
 // Load the palette into vid.palette :3 Nozomi
@@ -29,9 +25,7 @@ void V_LoadPalette(void)
 	FILE *file = fopen("data/palette.mpl", "rb");
 	
 	if (file == NULL)
-	{
 		I_Error("Failed to read palette file!\n");
-	}
 	
 	fseek(file, 0L, SEEK_END);
 	size = ftell(file);
@@ -50,10 +44,6 @@ void V_LoadPalette(void)
 		fread(&b, 1, 1, file);
 		
 		palette[i+1] = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
-		
-		#if defined(__NDS__)
-		palette[i+1] = rgb565_to_rgb15(palette[i+1]);
-		#endif
 	}
 	
 	fclose(file);
@@ -62,18 +52,18 @@ void V_LoadPalette(void)
 void V_ClearScreen(void)
 {
 	for (int i = 0; i < BASEVIDWIDTH*BASEVIDHEIGHT; i++)
-		vid.buffer[i] = 0;
+		vid.buffer[i] = palette[0];
 }
 
 void V_DrawDot(int x, int y, uint8_t col)
 {
-	if (x < 0 || y < 0 || x >= BASEVIDWIDTH || y >= BASEVIDHEIGHT)
+	if (x < 0 || y < 0 || x >= BASEVIDWIDTH || y >= BASEVIDHEIGHT || col == 0)
         return;
 	
 	if (col > 38)
 		col = 38;
 	
-	vid.buffer[x+(y*BASEVIDWIDTH)] = col;
+	vid.buffer[x+(y*BASEVIDWIDTH)] = palette[col];
 }
 
 void V_Draw(gfx_t gfx, int x, int y)
@@ -86,10 +76,10 @@ void V_Draw(gfx_t gfx, int x, int y)
 		int vx = x + (i % gfx.width) - gfx.xoff;
 		int vy = y + (i / gfx.width) - gfx.yoff;
 		
-		if (vx < 0 || vy < 0 || vx >= BASEVIDWIDTH || vy >= BASEVIDHEIGHT || ALPHA_INDEX(gfx.data[i]))
+		if (vx < 0 || vy < 0 || vx >= BASEVIDWIDTH || vy >= BASEVIDHEIGHT || gfx.data[i] == 0)
 			continue;
 		
-		vid.buffer[vx+(vy*BASEVIDWIDTH)] = PAL_INDEX(gfx.data[i]);
+		vid.buffer[vx+(vy*BASEVIDWIDTH)] = palette[gfx.data[i]];
 	}
 }
 
@@ -105,9 +95,35 @@ void V_DrawCropped(gfx_t gfx, int x, int y, int sx, int sy, int w, int h)
 			int vx = x + zx - gfx.xoff;
 			int vy = y + zy - gfx.yoff;
 			
-			if (vx < 0 || vy < 0 || vx >= BASEVIDWIDTH || vy >= BASEVIDHEIGHT || ALPHA_INDEX(gfx.data[i]))
+			if (vx < 0 || vy < 0 || vx >= BASEVIDWIDTH || vy >= BASEVIDHEIGHT || gfx.data[i] == 0)
 				continue;
 			
-			vid.buffer[vx+(vy*BASEVIDWIDTH)] = PAL_INDEX(gfx.data[i]);
+			vid.buffer[vx+(vy*BASEVIDWIDTH)] = palette[gfx.data[i]];
+		}
+}
+
+void V_DrawText(const char* string, int x, int y, int flags)
+{
+	// make this later
+}
+
+// Awesome Bitmap stuff too later
+
+void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int x, int y, int sx, int sy, int w, int h)
+{	
+	if ((gfx.width * gfx.height) <= 0)
+        return;
+	
+	for (int zy = 0; zy < h; zy++)
+		for (int zx = 0; zx < w; zx++)
+		{
+			int i = sx + sy*gfx.width + zx + zy*gfx.width;
+			int vx = x + zx;
+			int vy = y + zy;
+			
+			if (vx < 0 || vy < 0 || vx >= BASEVIDWIDTH || vy >= BASEVIDHEIGHT || gfx.data[i] == 0)
+				continue;
+			
+			vid.buffer[vx+(vy*BASEVIDWIDTH)] = gfx.data[i];
 		}
 }

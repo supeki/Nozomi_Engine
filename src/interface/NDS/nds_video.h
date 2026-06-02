@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // NDS backend
 // nds_video.h
 

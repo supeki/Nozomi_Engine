@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // game_player.h
 
 #ifndef GAME_PLAYER_H

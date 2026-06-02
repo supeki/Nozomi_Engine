@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // game_defs.h
 
 #ifndef GAME_DEFS_H
@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+
+#define GAME_NAME "JADEFRACTURE"
 
 #define FRAMERATE 30
 

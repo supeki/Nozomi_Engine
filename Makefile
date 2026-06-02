@@ -54,7 +54,8 @@ ifeq ($(SDL),1)
 	CFLAGS = $(OPTS) \
 			 $(LIBS) \
 			 $(DEFINES) \
-			 -O3
+			 -g
+			 #-O3
 endif
 
 ifeq ($(WINDOWS),1)
@@ -163,7 +164,8 @@ OBJS := $(OBJS) \
 		$(INTERFACE_OBJ)/$(i_event).o \
 		$(INTERFACE_OBJ)/$(i_sound).o \
 		$(INTERFACE_OBJ)/$(i_system).o \
-		$(INTERFACE_OBJ)/$(i_video).o
+		$(INTERFACE_OBJ)/$(i_video).o \
+		$(OBJ_DIR)/bitmap.o
 		
 ifdef i_input
 OBJS := $(OBJS) $(INTERFACE_OBJ)/$(i_input).o
@@ -278,6 +280,11 @@ $(INTERFACE_OBJ)/$(i_system).o: $(INTERFACE_SRC)/$(i_system).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 
 $(INTERFACE_OBJ)/$(i_video).o: $(INTERFACE_SRC)/$(i_video).c $(INTERFACE_OBJ)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
+	
+# Make the helper stuff :3
+
+$(OBJ_DIR)/bitmap.o: $(SRC_DIR)/helpers/bitmap.c $(SRC_DIR)/helpers/bitmap.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c

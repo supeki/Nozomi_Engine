@@ -1,7 +1,9 @@
-// JADEFRACTURE
+// Nozomi Engine
 // game_world.c
 
 #include "i_system.h"
+
+#include "game_defs.h"
 #include "game_world.h"
 
 tile_t tiles;
@@ -68,7 +70,7 @@ void W_LoadTileset(const char *filename)
 		fread(&gfx_name[i], sizeof(char), 1, file);
 	
 	// load the gfx
-	tileset.gfx = GFX_LoadGFX(va("data/tilesets/%s.gfx", strlwr(gfx_name)));
+	tileset.gfx = GFX_LoadGFX(va("data/tilesets/%s.gfx", gfx_name));
 	
 	// get the number of tiles
 	fread(&num_tiles, sizeof(uint8_t), 1, file);
@@ -78,8 +80,6 @@ void W_LoadTileset(const char *filename)
 	
 	for (int i = 0; i < num_tiles; i++)
 		fread(&tileset.data[i], sizeof(uint8_t), 1, file);
-	
-	return tileset;
 }
 
 // Load a world from a .wld file or something
@@ -120,8 +120,8 @@ void W_LoadWorld(const char *filename)
 	fread(&world_size, sizeof(uint32_t), 1, file);
 	
 	// read tile data and make tiles
-	for (int l = 0; l < num_layers) 
-		for (int i = 0; i < world_size;)
+	for (int l = 0; l < num_layers; l++)
+		for (int i = 0; i < world_size; i++)
 		{
 			int16_t x, y;
 			uint8_t id;
@@ -143,7 +143,7 @@ tile_t *W_CreateTile(subpixel_t x, subpixel_t y, uint8_t id, uint8_t layer)
 	tile = malloc(sizeof(tile_t));
 	memset(tile, 0, sizeof(tile_t));
 	
-	tile->type = type;
+	tile->id = id;
 	tile->x = x;
 	tile->y = y;
 	
@@ -163,7 +163,7 @@ void W_FreeTiles(void)
 	
 	while (tile != &tiles)
 	{
-		tile_t *tile2 = tile->next
+		tile_t *tile2 = tile->next;
 		
 		tile->next->prev = tile->prev;
 		tile->prev->next = tile->next;
@@ -179,8 +179,8 @@ void W_FreeTileset(void)
 	if (tileset.data)
 		free(tileset.data);
 	
-	if (tileset.gfx)
-		free(tileset.gfx);
+	if (&tileset.gfx != NULL)
+		free(&tileset.gfx);
 }
 
 // Debug function only so I can make worlds 

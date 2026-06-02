@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // i_sound.h
 
 #ifndef I_SOUND_H

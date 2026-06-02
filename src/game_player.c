@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // game_player.c
 
 #include "game_gfx.h"
@@ -70,9 +70,9 @@ void P_PlayerLogic(player_t player)
 		maril->y += maril->momy;
 		
 		maril->anim_timer++;
-		V_DrawCropped(gfx_characters, TO_PIXELS(maril->x), TO_PIXELS(maril->y), walk_table[(maril->anim_timer/6) % 4]*24, maril->dir*32, 24, 32);
+		V_DrawCroppedBitmap(bmpgfx_characters, TO_PIXELS(maril->x), TO_PIXELS(maril->y), walk_table[(maril->anim_timer/6) % 4]*24, maril->dir*32, 24, 32);
 	} else {
 		maril->anim_timer = 0;
-		V_DrawCropped(gfx_characters, TO_PIXELS(maril->x), TO_PIXELS(maril->y), 0, maril->dir*32, 24, 32);
+		V_DrawCroppedBitmap(bmpgfx_characters, TO_PIXELS(maril->x), TO_PIXELS(maril->y), 0, maril->dir*32, 24, 32);
 	}
 }

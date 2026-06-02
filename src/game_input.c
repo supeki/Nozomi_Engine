@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // game_input.c
 
 #if defined(__NDS__)

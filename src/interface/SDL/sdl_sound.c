@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // SDL2 backend
 // sdl_sound.c
 
@@ -44,6 +44,8 @@ void I_PlayMusic(int id, bool loop)
 {
 	if (music.id != mus_none)
 		Mix_FreeMusic(current_song);
+	
+	return;
 	
 	if (use_midi)
 		current_song = Mix_LoadMUS(va("data/audio/%s.mid", jadefrac_to_sdl[id]));

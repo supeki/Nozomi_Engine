@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // SDL2 backend
 // sdl_system.c
 
@@ -63,8 +63,8 @@ void I_Error (const char *error, ...)
     vsprintf(txt, error, argptr);
     va_end(argptr);    
 	
-	I_printf("JADEFRACTURE Error: %s\n", txt);
-	SDL_ShowSimpleMessageBox(0, "JADEFRACTURE Error", txt, sdlWnd);
+	I_printf("Nozomi Engine Error: %s\n", txt);
+	SDL_ShowSimpleMessageBox(0, "Nozomi Engine Error", txt, sdlWnd);
 	I_Sleep(5000);
     exit(-1);
 }

@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // NDS backend
 // nds_system.c
 
@@ -64,7 +64,7 @@ void I_Error (const char *error, ...)
     vsprintf(txt, error, argptr);
     va_end(argptr);    
 	
-    printf("JADEFRACTURE Error:\n%s\n", txt);
+    printf("Nozomi Engine Error:\n%s\n", txt);
     Pause(5000);
 	exit(-1);
 }

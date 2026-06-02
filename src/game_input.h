@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // game_input.h
 
 #ifndef GAME_INPUT_H

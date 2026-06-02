@@ -1,9 +1,10 @@
-// JADEFRACTURE
+// Nozomi Engine
 // NDS backend
 // nds_main.c
 
 #include <nds.h>
 #include <filesystem.h>
+#include <fat.h>
 
 #include "nds_main.h"
 
@@ -27,14 +28,16 @@ int main(int argc, char *argv[])
 	
 	I_printf("Initializing NitroFS!\n");
 	if (!nitroFSInit(NULL))
-		libndsCrash("NitroFS failed to initialize!\nCannot proceed!");
+		I_Error("NitroFS failed to initialize!\nCannot proceed!\n");
+	if (!fatInitDefault())
+		I_Error("FAT filesystem failed to initialize!\nCannot proceed!\n");
 	
 	gameMain();
 	
 	I_printf("Starting main game loop!\n");
 	gameLoop();
 	
-	I_printf("Quitting JADEFRACTURE...\n");
+	I_printf("Quitting %s...\n", GAME_NAME);
 	
 	exit(0);
 }

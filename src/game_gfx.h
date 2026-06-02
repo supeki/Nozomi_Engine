@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // game_gfx.h
 
 #ifndef GAME_GFX_H
@@ -18,9 +18,19 @@ typedef struct
 	uint8_t *data;
 } gfx_t;
 
+typedef struct
+{
+	int32_t width;  // image width
+	int32_t height; // image height
+	uint16_t *data;	// pixel data
+} bitmap_gfx_t;
+
 void GFX_InitGFX(void);
 gfx_t GFX_LoadGFX(const char *filename);
 
+bitmap_gfx_t BMPGFX_LoadBitmap(const char *filename);
+
 extern gfx_t gfx_characters;
+extern bitmap_gfx_t bmpgfx_characters;
 
 #endif

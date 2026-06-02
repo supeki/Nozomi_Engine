@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // game_misc.c
 
 // Misc functions, variables, etc.

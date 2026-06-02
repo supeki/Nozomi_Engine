@@ -1,4 +1,4 @@
-// JADEFRACTURE
+// Nozomi Engine
 // i_system.h
 
 #ifndef I_SYSTEM_H
