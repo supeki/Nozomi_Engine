@@ -13,6 +13,7 @@ EXEC_EXT = .exe
 WINDOWS ?= 1
 LINUX ?= 0
 LINUX_WIN ?= 0
+GLFW ?= 0
 SDL ?= 1
 NDS ?= 0
 PSP ?= 0
@@ -49,6 +50,26 @@ ifeq ($(SDL),1)
 	DEFINES = -DSDL
 	OPTS := $(OPTS) -I.
 	LIBS = -lSDL2main -lSDL2 -lSDL2_mixer
+	LDFLAGS =  
+	
+	CFLAGS = $(OPTS) \
+			 $(LIBS) \
+			 $(DEFINES) \
+			 -O3
+endif
+
+ifeq ($(GLFW),1)
+	INTERFACE = GLFW
+	i_main = glfw_main
+	i_event = glfw_event
+	#i_input = glfw_input
+	i_sound = glfw_sound
+	i_system = glfw_system
+	i_video = glfw_video
+
+	DEFINES = -DGLFW
+	OPTS := $(OPTS) -I.
+	LIBS = -lglfw -lGL -lGLU -lSDL2 -lSDL2_mixer # lol, need a different audio backend
 	LDFLAGS =  
 	
 	CFLAGS = $(OPTS) \

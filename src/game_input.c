@@ -3,6 +3,8 @@
 
 #if defined(__NDS__)
 #include <nds.h>
+#elif defined(GLFW)
+#include <GLFW/glfw3.h>
 #elif defined(SDL)
 #include <SDL2/SDL.h>
 #endif
@@ -33,7 +35,7 @@ void G_DefaultControls(void)
 		gamecontrolbinds[i][1] = -1;
 	}
 	
-	#if defined(__NDS__)
+#if defined(__NDS__)
 	gamecontrolbinds[CON_UP][1] = KEY_UP;
 	gamecontrolbinds[CON_DOWN][1] = KEY_DOWN;
 	gamecontrolbinds[CON_LEFT][1] = KEY_LEFT;
@@ -48,7 +50,22 @@ void G_DefaultControls(void)
 	gamecontrolbinds[CON_Z][1] = KEY_X;
 	gamecontrolbinds[CON_CONFIRM][1] = KEY_A;
 	gamecontrolbinds[CON_BACK][1] = KEY_B;
-	#elif defined(SDL)
+#elif defined(GLFW)
+	gamecontrolbinds[CON_UP][0] = GLFW_KEY_UP;
+	gamecontrolbinds[CON_DOWN][0] = GLFW_KEY_DOWN;
+	gamecontrolbinds[CON_LEFT][0] = GLFW_KEY_LEFT;
+	gamecontrolbinds[CON_RIGHT][0] = GLFW_KEY_RIGHT;
+	gamecontrolbinds[CON_A][0] = GLFW_KEY_Z;
+	gamecontrolbinds[CON_B][0] = GLFW_KEY_X;
+	gamecontrolbinds[CON_C][0] = GLFW_KEY_Z;
+	gamecontrolbinds[CON_START][0] = GLFW_KEY_ESCAPE;
+	gamecontrolbinds[CON_SELECT][0] = GLFW_KEY_RIGHT_SHIFT;
+	gamecontrolbinds[CON_X][0] = GLFW_KEY_A;
+	gamecontrolbinds[CON_Y][0] = GLFW_KEY_S;
+	gamecontrolbinds[CON_Z][0] = GLFW_KEY_D;
+	gamecontrolbinds[CON_CONFIRM][0] = GLFW_KEY_Z;
+	gamecontrolbinds[CON_BACK][0] = GLFW_KEY_X;
+#elif defined(SDL)
 	gamecontrolbinds[CON_UP][0] = SDLK_UP;
 	gamecontrolbinds[CON_DOWN][0] = SDLK_DOWN;
 	gamecontrolbinds[CON_LEFT][0] = SDLK_LEFT;
@@ -77,5 +94,5 @@ void G_DefaultControls(void)
 	gamecontrolbinds[CON_Z][1] = SDL_CONTROLLER_BUTTON_Y;
 	gamecontrolbinds[CON_CONFIRM][1] = SDL_CONTROLLER_BUTTON_A;
 	gamecontrolbinds[CON_BACK][1] = SDL_CONTROLLER_BUTTON_B;
-	#endif
+#endif
 }

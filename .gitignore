@@ -2,3 +2,6 @@ bin/*/*
 obj/*
 *.Identifier
 *.SFO
+
+# i use vscode
+.vscode/
