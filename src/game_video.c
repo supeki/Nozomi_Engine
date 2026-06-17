@@ -9,6 +9,8 @@
 vid_t vid;
 uint16_t* palette;
 
+gfx_t gfx_font;
+
 void V_Init(void)
 {
 	vid.width = BASEVIDWIDTH;
@@ -16,6 +18,8 @@ void V_Init(void)
 	
 	vid.buffer = malloc(BASEVIDWIDTH * BASEVIDHEIGHT * sizeof(uint16_t));
 	memset(vid.buffer, 0, BASEVIDWIDTH * BASEVIDHEIGHT * sizeof(uint16_t));
+
+	gfx_font = GFX_LoadGFX("data/font.gfx");
 }
 
 // Load the palette into vid.palette :3 Nozomi
@@ -56,7 +60,7 @@ void V_ClearScreen(void)
 }
 
 void V_DrawDot(int x, int y, uint8_t col)
-{
+{	
 	if (x < 0 || y < 0 || x >= BASEVIDWIDTH || y >= BASEVIDHEIGHT || col == 0)
         return;
 	
@@ -104,7 +108,25 @@ void V_DrawCropped(gfx_t gfx, int x, int y, int sx, int sy, int w, int h)
 
 void V_DrawText(const char* string, int x, int y, int flags)
 {
-	// make this later
+	int bx = x, by = y;
+	
+	for (int i = 0; i < strlen(string); i++) {
+		int c = (int)string[i];
+		
+		if (c >= 32) {
+			c -= 33;
+			
+			if (c > -1)
+				V_DrawCropped(gfx_font, x, y, (c % 10) * 8, (c / 10) * 8, 8, 8);
+			
+			x += 8;
+		} 
+		
+		if ((string[i] == '\n') || (x >= vid.width)) {
+			x = bx;
+			y += 8;
+		}
+	}
 }
 
 // Awesome Bitmap stuff too later

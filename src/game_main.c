@@ -99,5 +99,5 @@ void gameRunStuff(uint32_t elapsed)
 
 void gameDisplay(void)
 {
-	
+	V_DrawText("meow\nmeower\n             meowing so hard\n meow meow", 0, 0, 0);
 }

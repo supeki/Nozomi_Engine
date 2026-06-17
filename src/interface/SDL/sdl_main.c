@@ -39,9 +39,7 @@ int main(int argc, char *argv[])
 	gameMain();
 	
 	I_printf("Starting main game loop!\n");
-	
-	BMPGFX("characters.bmp");
-	
+		
 	gameLoop();
 	
 	I_printf("Quitting SDL!\n");
