@@ -28,6 +28,19 @@ cp -r assets/data bin/Linux/data
 make -j LINUX=1
 mv bin/SDL/JADEFRACTURE bin/Linux
 
+# Clean obj directory to prepare for GLFW
+make clean
+
+# Remove pre-existing binaries
+rm -rf bin/GLFW
+mkdir -p bin/GLFW
+
+# Copy game data
+cp -r assets/data bin/GLFW/data
+
+# Make GLFW binary
+make -j SDL=0 LINUX=1 GLFW=1
+
 # Clean obj directory to prepare for NDS
 make clean
 
