@@ -6,15 +6,12 @@
 
 #include "game_defs.h"
 
-#define PAL_INDEX(i) (i >> 1)
-#define ALPHA_INDEX(i) (i & 1)
-
 typedef struct
 {
-	uint16_t size;
-	uint8_t width;
-	int8_t xoff;
-	int8_t yoff;
+	uint16_t size; // updated to uint32_t Nozomi 22-JUN-26
+	uint8_t width; // updated to uint16_t Nozomi 22-JUN-26
+	int16_t xoff; // updated to int16_t Nozomi 22-JUN-26
+	int16_t yoff; // updated to int16_t Nozomi 22-JUN-26
 	uint8_t *data;
 } gfx_t;
 
@@ -24,6 +21,15 @@ typedef struct
 	int32_t height; // image height
 	uint16_t *data;	// pixel data
 } bitmap_gfx_t;
+
+typedef struct
+{
+	gfx_t gfx; // font sheet
+	bitmap_gfx_t bmp_gfx; // bitmap version 
+	uint8_t char_width; // if a single font character is >256 pixels then wtf...
+	uint8_t char_height;
+	uint16_t *char_offsets; // per-character x/y offsets, first 8 bits are x, last 8 bits are y
+} font_t;
 
 void GFX_InitGFX(void);
 gfx_t GFX_LoadGFX(const char *filename);
