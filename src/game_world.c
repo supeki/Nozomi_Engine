@@ -76,7 +76,7 @@ void W_LoadTileset(const char *filename)
 	fread(&num_tiles, sizeof(uint8_t), 1, file);
 	
 	// allocate data for tile types
-	tileset.data = malloc(num_tiles*sizeof(uint8_t));
+	tileset.data = nMalloc(num_tiles*sizeof(uint8_t));
 	
 	for (int i = 0; i < num_tiles; i++)
 		fread(&tileset.data[i], sizeof(uint8_t), 1, file);
@@ -140,7 +140,7 @@ void W_LoadWorld(const char *filename)
 tile_t *W_CreateTile(subpixel_t x, subpixel_t y, uint8_t id, uint8_t layer)
 {
 	tile_t *tile;
-	tile = malloc(sizeof(tile_t));
+	tile = nMalloc(sizeof(tile_t));
 	memset(tile, 0, sizeof(tile_t));
 	
 	tile->id = id;

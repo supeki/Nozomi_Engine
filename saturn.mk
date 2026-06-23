@@ -31,7 +31,7 @@ BUILD_DROP = ./BuildDrop
 SRL_INSTALL_ROOT ?= ../..
 
 # This sucks but if I don't do this it's gonna go in and try to compile every backend
-SOURCES = src/game_gfx.c src/game_input.c src/game_main.c src/game_object.c src/game_player.c src/game_sound.c src/game_video.c src/game_world.c
+SOURCES = src/game_gfx.c src/game_input.c src/game_main.c src/game_object.c src/game_player.c src/game_sound.c src/game_video.c src/game_world.c src/interface/saturn/srl_system.cxx
 
 # Include shared makefile
 SDK_ROOT = $(SRL_INSTALL_ROOT)/saturnringlib
@@ -239,7 +239,7 @@ SYSOBJECTS = $(SYSSOURCES:.c=.o)
 
 # General compilation flags
 CCFLAGS += $(SYSFLAGS) -W -m2 -c -O2 -Wno-strict-aliasing \
-					-I$(DUMMYIDIR) -I$(SATURNMATHPPDIR) -I$(SGLIDIR) -I$(STDDIR) -I$(SDK_ROOT) $(MODULE_EXTRA_INC)
+					-I$(DUMMYIDIR) -I$(SATURNMATHPPDIR) -I$(SGLIDIR) -I$(STDDIR) -I$(SDK_ROOT) $(MODULE_EXTRA_INC) -DSATURN
 LDFLAGS = -m2 -L$(SGLLDIR) -Xlinker -T$(LDFILE) -Xlinker -Map \
 					-Xlinker "$(BUILD_MAP)" -Xlinker -e -Xlinker ___Start -nostartfiles
 

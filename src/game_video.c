@@ -16,7 +16,7 @@ void V_Init(void)
 	vid.width = BASEVIDWIDTH;
 	vid.height = BASEVIDHEIGHT;
 	
-	vid.buffer = malloc(BASEVIDWIDTH * BASEVIDHEIGHT * sizeof(uint16_t));
+	vid.buffer = nMalloc(BASEVIDWIDTH * BASEVIDHEIGHT * sizeof(uint16_t));
 	memset(vid.buffer, 0, BASEVIDWIDTH * BASEVIDHEIGHT * sizeof(uint16_t));
 
 	gfx_font = GFX_LoadGFX("data/font.gfx");
@@ -35,7 +35,7 @@ void V_LoadPalette(void)
 	size = ftell(file);
 	rewind(file);
 	
-	palette = malloc((size/3 + 1) * sizeof(uint16_t));
+	palette = nMalloc((size/3 + 1) * sizeof(uint16_t));
 	
 	palette[0] = 0; // pitch black!
 	

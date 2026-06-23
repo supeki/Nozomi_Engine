@@ -39,7 +39,7 @@ gfx_t GFX_LoadGFX(const char *filename)
 	fread(&gfx.yoff, sizeof(int8_t), 1, file);
 	
 	// allocate memory for pixel data
-	gfx.data = malloc(gfx.size);
+	gfx.data = (uint8_t*) nMalloc(gfx.size);
 	memset(gfx.data, 0, gfx.size);
 	
 	for (int p = 0; p < gfx.size; p++)
@@ -61,7 +61,7 @@ bitmap_gfx_t BMPGFX_LoadBitmap(const char *filename)
 	
 	gfx.width = bitmap.width;
 	gfx.height = bitmap.height;
-	gfx.data = malloc(bitmap.width * bitmap.height * sizeof(uint16_t));
+	gfx.data = (uint16_t*) nMalloc(bitmap.width * bitmap.height * sizeof(uint16_t));
 
 	switch (bitmap.bpp) 
 	{

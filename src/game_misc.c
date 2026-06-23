@@ -18,7 +18,7 @@ char *va(const char *format, ...)
 	
 	if (len < 0) return NULL;
 	
-	char *buffer = malloc(len + 1);
+	char *buffer = nMalloc(len + 1);
 	if (!buffer) return NULL;
 	
 	vsnprintf(buffer, len + 1, format, ap);

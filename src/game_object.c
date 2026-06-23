@@ -40,7 +40,7 @@ void OBJ_RunObjects(void)
 object_t *OBJ_CreateObject(subpixel_t x, subpixel_t y, int type)
 {
 	object_t *obj;
-	obj = malloc(sizeof(object_t));
+	obj = nMalloc(sizeof(object_t));
 	memset(obj, 0, sizeof(object_t));
 	
 	obj->type = type;
