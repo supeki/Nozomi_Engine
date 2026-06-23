@@ -10,13 +10,18 @@ EXEC_NAME = JADEFRACTURE
 EXEC_EXT = .exe
 
 # Assume Windows SDL by default Nozomi 04-15-2026
-WINDOWS ?= 1
+WINDOWS ?= 0
 LINUX ?= 0
 LINUX_WIN ?= 0
 GLFW ?= 0
 SDL ?= 1
 NDS ?= 0
 PSP ?= 0
+SATURN ?= 1
+
+ifeq ($(SATURN),1)
+include saturn.mk
+endif
 
 ifeq ($(LINUX),1)
 WINDOWS = 0
