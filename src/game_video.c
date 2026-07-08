@@ -3,6 +3,7 @@
 
 #include "i_system.h"
 
+#include "game_font.h"
 #include "game_gfx.h"
 #include "game_video.h"
 
