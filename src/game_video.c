@@ -107,6 +107,11 @@ void V_DrawCropped(gfx_t gfx, int x, int y, int sx, int sy, int w, int h)
 		}
 }
 
+void V_DrawTextFromFont(font_t font, const char* string, int x, int y, int flags)
+{
+	
+}
+
 void V_DrawText(const char* string, int x, int y, int flags)
 {
 	int bx = x, by = y;

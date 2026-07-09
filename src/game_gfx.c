@@ -21,9 +21,7 @@ gfx_t GFX_LoadGFX(const char *filename)
 	
 	// check file
 	if (!file)
-	{
 		I_Error("Failed to open %s!\n", filename);
-	}
 	
 	// allocate memory for gfx
 	memset(&gfx, 0, sizeof(gfx_t));

@@ -8,7 +8,7 @@
 
 typedef struct
 {
-	uint32_t size; // updated to uint32_t Nozomi 22-JUN-26
+	uint32_t size; // updated to uint32_t Nozomi 22-JUN-26 // apparently it never actually got done or something Nozomi 08-JUL-26
 	uint16_t width; // updated to uint16_t Nozomi 22-JUN-26
 	int16_t xoff; // updated to int16_t Nozomi 22-JUN-26
 	int16_t yoff; // updated to int16_t Nozomi 22-JUN-26

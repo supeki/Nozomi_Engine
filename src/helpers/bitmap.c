@@ -9,6 +9,9 @@ bitmap_t Bitmap_Load(const char *filename)
 	BMP_Header_t header;
 	BMP_DIBHeader_t dib_header;
 	bitmap_t bitmap;
+
+	if (!fp)
+		I_Error("Failed to open file: %s", filename);
 	
 	fread(&header.ident, sizeof(char), 2, fp);
 	fread(&header.size, sizeof(uint32_t), 1, fp);

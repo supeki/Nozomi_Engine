@@ -1,3 +1,7 @@
+# Nozomi Engine
+# A game engine created by Marilyn Nozomi with assistance from xdf, save_as, and trusted others.
+# See LICENSE.txt for details on outside usage of this engine, the code, and any bundled assets.
+
 CC = gcc
 
 SRC_DIR = src
@@ -173,6 +177,7 @@ INTERFACE_BIN = $(BIN_DIR)/$(INTERFACE)
 OBJS := $(OBJS) \
 		$(OBJ_DIR)/game_main.o \
 		$(OBJ_DIR)/game_gfx.o \
+		$(OBJ_DIR)/game_font.o \
 		$(OBJ_DIR)/game_input.o \
 		$(OBJ_DIR)/game_misc.o \
 		$(OBJ_DIR)/game_object.o \
@@ -255,6 +260,9 @@ $(OBJ_DIR)/game_main.o: $(SRC_DIR)/game_main.c $(SRC_DIR)/game_defs.h $(SRC_DIR)
 $(OBJ_DIR)/game_gfx.o: $(SRC_DIR)/game_gfx.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_gfx.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
+$(OBJ_DIR)/game_font.o: $(SRC_DIR)/game_font.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_font.h $(SRC_DIR)/game_gfx.h
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
+	
 $(OBJ_DIR)/game_input.o: $(SRC_DIR)/game_input.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_input.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
@@ -266,13 +274,13 @@ $(OBJ_DIR)/game_object.o: $(SRC_DIR)/game_object.c $(SRC_DIR)/game_defs.h $(SRC_
 	
 $(OBJ_DIR)/game_player.o: $(SRC_DIR)/game_player.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_object.h $(SRC_DIR)/game_player.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-
+	
 $(OBJ_DIR)/game_sound.o: $(SRC_DIR)/game_sound.c $(SRC_DIR)/game_sound.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_video.o: $(SRC_DIR)/game_video.c $(SRC_DIR)/game_video.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-
+	
 $(OBJ_DIR)/game_world.o: $(SRC_DIR)/game_world.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_gfx.h $(SRC_DIR)/game_world.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
@@ -282,12 +290,12 @@ $(INTERFACE_OBJ)/$(i_main).o: $(INTERFACE_SRC)/$(i_main).c $(INTERFACE_OBJ)
 	
 $(INTERFACE_OBJ)/$(i_event).o: $(INTERFACE_SRC)/$(i_event).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-
+	
 ifdef i_input	
 $(INTERFACE_OBJ)/$(i_input).o: $(INTERFACE_SRC)/$(i_input).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 endif
-
+	
 ifeq ($(NDS),1)
 $(INTERFACE_OBJ)/$(i_sound).o: $(INTERFACE_SRC)/$(i_sound).c $(INTERFACE_SRC)/soundbank.h $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
@@ -298,7 +306,7 @@ endif
 	
 $(INTERFACE_OBJ)/$(i_system).o: $(INTERFACE_SRC)/$(i_system).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-
+	
 $(INTERFACE_OBJ)/$(i_video).o: $(INTERFACE_SRC)/$(i_video).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
