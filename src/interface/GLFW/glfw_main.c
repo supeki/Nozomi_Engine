@@ -17,6 +17,6 @@ int main(int argc, char *argv[])
 
 	gameLoop();
 	
-	I_printf("Quitting JADEFRACTURE...\n");
+	I_printf("Quitting %s...\n", GAME_NAME);
 	exit(0);
 }

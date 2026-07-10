@@ -57,7 +57,7 @@ void G_DefaultControls(void)
 	gamecontrolbinds[CON_RIGHT][0] = GLFW_KEY_RIGHT;
 	gamecontrolbinds[CON_A][0] = GLFW_KEY_Z;
 	gamecontrolbinds[CON_B][0] = GLFW_KEY_X;
-	gamecontrolbinds[CON_C][0] = GLFW_KEY_Z;
+	gamecontrolbinds[CON_C][0] = GLFW_KEY_C;
 	gamecontrolbinds[CON_START][0] = GLFW_KEY_ESCAPE;
 	gamecontrolbinds[CON_SELECT][0] = GLFW_KEY_RIGHT_SHIFT;
 	gamecontrolbinds[CON_X][0] = GLFW_KEY_A;

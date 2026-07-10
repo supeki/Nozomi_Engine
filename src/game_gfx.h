@@ -27,7 +27,4 @@ gfx_t GFX_LoadGFX(const char *filename);
 
 bitmap_gfx_t BMPGFX_LoadBitmap(const char *filename);
 
-extern gfx_t gfx_characters;
-extern bitmap_gfx_t bmpgfx_characters;
-
 #endif

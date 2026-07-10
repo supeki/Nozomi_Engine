@@ -58,8 +58,7 @@ ifeq ($(SDL),1)
 	
 	CFLAGS = $(OPTS) \
 			 $(LIBS) \
-			 $(DEFINES) \
-			 -O3
+			 $(DEFINES)
 endif
 
 ifeq ($(GLFW),1)
@@ -78,8 +77,7 @@ ifeq ($(GLFW),1)
 	
 	CFLAGS = $(OPTS) \
 			 $(LIBS) \
-			 $(DEFINES) \
-			 -O3
+			 $(DEFINES) -g
 endif
 
 ifeq ($(WINDOWS),1)

@@ -8,6 +8,7 @@
 
 #include "game_defs.h"
 #include "game_gfx.h"
+#include "game_font.h"
 #include "game_input.h"
 #include "game_main.h"
 #include "game_object.h"
@@ -38,8 +39,7 @@ void gameMain(void)
 	GFX_InitGFX();
 	OBJ_InitObjects();
 	
-	P_CreatePlayer(rand()%(BASEVIDWIDTH-24) << SUBPIXEL_SHIFT, rand()%(BASEVIDHEIGHT-32) << SUBPIXEL_SHIFT, rand()%4);
-	S_PlayMusic(mus_test, true);
+	FNT_StartFontEdit();
 }
 
 // The main game loop.
@@ -91,13 +91,13 @@ void gameRunStuff(uint32_t elapsed)
 	
 	while (elapsed--)
 	{	
-		for (int i = 0; i < num_players; i++)
-			P_PlayerLogic(players[i]);
-		OBJ_RunObjects();
+		if (font_edit)
+			FNT_FontEditUpdate();
 	}
 }
 
 void gameDisplay(void)
 {
-	V_DrawText("meow\nmeower\n             meowing so hard\n meow meow", 0, 0, 0);
+	if (font_edit)
+		FNT_FontEditDraw();
 }

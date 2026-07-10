@@ -10,17 +10,17 @@
 vid_t vid;
 uint16_t* palette;
 
-gfx_t gfx_font;
+font_t font_default;
 
 void V_Init(void)
 {
 	vid.width = BASEVIDWIDTH;
 	vid.height = BASEVIDHEIGHT;
 	
-	vid.buffer = malloc(BASEVIDWIDTH * BASEVIDHEIGHT * sizeof(uint16_t));
-	memset(vid.buffer, 0, BASEVIDWIDTH * BASEVIDHEIGHT * sizeof(uint16_t));
+	vid.buffer = malloc(vid.width * vid.height * sizeof(uint16_t));
+	memset(vid.buffer, 0, vid.width * vid.height * sizeof(uint16_t));
 
-	gfx_font = GFX_LoadGFX("data/font.gfx");
+	font_default = FNT_LoadFont("data/fonts/default.fnt");
 }
 
 // Load the palette into vid.palette :3 Nozomi
@@ -56,39 +56,39 @@ void V_LoadPalette(void)
 
 void V_ClearScreen(void)
 {
-	for (int i = 0; i < BASEVIDWIDTH*BASEVIDHEIGHT; i++)
+	for (uint16_t i = 0; i < vid.width*vid.height; i++)
 		vid.buffer[i] = palette[0];
 }
 
-void V_DrawDot(int x, int y, uint8_t col)
+void V_DrawDot(int16_t x, int16_t y, uint8_t col)
 {	
-	if (x < 0 || y < 0 || x >= BASEVIDWIDTH || y >= BASEVIDHEIGHT || col == 0)
+	if (x < 0 || y < 0 || x >= vid.width || y >= vid.height || col == 0)
         return;
 	
 	if (col > 38)
 		col = 38;
 	
-	vid.buffer[x+(y*BASEVIDWIDTH)] = palette[col];
+	vid.buffer[x+(y*vid.width)] = palette[col];
 }
 
-void V_Draw(gfx_t gfx, int x, int y)
+void V_Draw(gfx_t gfx, int16_t x, int16_t y)
 {
 	if ((gfx.size + gfx.width) <= 0)
         return;
 	
 	for (int i = 0; i < gfx.size; i++)
 	{
-		int vx = x + (i % gfx.width) - gfx.xoff;
-		int vy = y + (i / gfx.width) - gfx.yoff;
+		int32_t vx = x + (i % gfx.width) - gfx.xoff;
+		int32_t vy = y + (i / gfx.width) - gfx.yoff;
 		
-		if (vx < 0 || vy < 0 || vx >= BASEVIDWIDTH || vy >= BASEVIDHEIGHT || gfx.data[i] == 0)
+		if (vx < 0 || vy < 0 || vx >= vid.width || vy >= vid.height || gfx.data[i] == 0)
 			continue;
 		
-		vid.buffer[vx+(vy*BASEVIDWIDTH)] = palette[gfx.data[i]];
+		vid.buffer[vx+(vy*vid.width)] = palette[gfx.data[i]];
 	}
 }
 
-void V_DrawCropped(gfx_t gfx, int x, int y, int sx, int sy, int w, int h)
+void V_DrawCropped(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h)
 {	
 	if ((gfx.size + gfx.width) <= 0)
         return;
@@ -96,48 +96,40 @@ void V_DrawCropped(gfx_t gfx, int x, int y, int sx, int sy, int w, int h)
 	for (int zy = 0; zy < h; zy++)
 		for (int zx = 0; zx < w; zx++)
 		{
-			int i = sx + sy*gfx.width + zx + zy*gfx.width;
-			int vx = x + zx - gfx.xoff;
-			int vy = y + zy - gfx.yoff;
+			uint32_t i = sx + sy*gfx.width + zx + zy*gfx.width;
+			int32_t vx = x + zx - gfx.xoff;
+			int32_t vy = y + zy - gfx.yoff;
+						
+			if (i >= gfx.size)
+				return;
 			
-			if (vx < 0 || vy < 0 || vx >= BASEVIDWIDTH || vy >= BASEVIDHEIGHT || gfx.data[i] == 0)
+			if (vx < 0 || vy < 0 || vx >= vid.width || vy >= vid.height || gfx.data[i] == 0)
 				continue;
 			
 			vid.buffer[vx+(vy*BASEVIDWIDTH)] = palette[gfx.data[i]];
 		}
 }
 
-void V_DrawTextFromFont(font_t font, const char* string, int x, int y, int flags)
-{
-	
-}
+// Bitmap variants if need be
 
-void V_DrawText(const char* string, int x, int y, int flags)
+void V_DrawBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y)
 {
-	int bx = x, by = y;
+	if ((gfx.width * gfx.height) <= 0)
+		return;
 	
-	for (int i = 0; i < strlen(string); i++) {
-		int c = (int)string[i];
+	for (int i = 0; i < (gfx.width * gfx.height); i++)
+	{
+		int vx = x + (i % gfx.width);
+		int vy = y + (i / gfx.width);
 		
-		if (c >= 32) {
-			c -= 33;
-			
-			if (c > -1)
-				V_DrawCropped(gfx_font, x, y, (c % 10) * 8, (c / 10) * 8, 8, 8);
-			
-			x += 8;
-		} 
+		if (vx < 0 || vy < 0 || vx >= vid.width || vy >= vid.height || gfx.data[i] == 0)
+			continue;
 		
-		if ((string[i] == '\n') || (x >= vid.width)) {
-			x = bx;
-			y += 8;
-		}
+		vid.buffer[vx+(vy*vid.width)] = gfx.data[i];
 	}
 }
 
-// Awesome Bitmap stuff too later
-
-void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int x, int y, int sx, int sy, int w, int h)
+void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h)
 {	
 	if ((gfx.width * gfx.height) <= 0)
         return;
@@ -149,9 +141,48 @@ void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int x, int y, int sx, int sy, int w, 
 			int vx = x + zx;
 			int vy = y + zy;
 			
-			if (vx < 0 || vy < 0 || vx >= BASEVIDWIDTH || vy >= BASEVIDHEIGHT || gfx.data[i] == 0)
+			if (vx < 0 || vy < 0 || vx >= vid.width || vy >= vid.height || gfx.data[i] == 0)
 				continue;
 			
-			vid.buffer[vx+(vy*BASEVIDWIDTH)] = gfx.data[i];
+			vid.buffer[vx+(vy*vid.width)] = gfx.data[i];
 		}
+}
+
+// Text functions
+
+
+void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, int flags)
+{
+	int16_t bx = x, by = y;
+	uint8_t charw = font.charsize >> 8, charh = font.charsize & 0xFF;
+	
+	for (int i = 0; i < strlen(string); i++) {
+		int c = (int)string[i];
+		
+		if (c >= 32) {
+			int8_t xoff = font.offset[c] >> 8, yoff = font.offset[c] & 0xFF;
+			uint8_t w = font.size[c] >> 8, h = font.size[c] & 0xFF;
+			
+			c -= 33;
+				
+			if (c > -1) {
+				if (font.bitmap)
+					V_DrawCroppedBitmap(font.bmpgfx, x + xoff, y + yoff, (c % 16) * charw, (c / 16) * charh, charw, charh);
+				else
+					V_DrawCropped(font.gfx, x + xoff, y + yoff, (c % 10) * charw, (c / 10) * charh, charw, charh);
+			}
+			
+			x += w;
+		}
+		
+		if ((string[i] == '\n') || (x >= vid.width)) {
+			x = bx;
+			y += charh;
+		}
+	}
+}
+
+void V_DrawText(const char* string, int16_t x, int16_t y, int flags)
+{
+	V_DrawTextFromFont(font_default, string, x, y, flags);
 }

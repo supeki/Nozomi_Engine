@@ -10,8 +10,6 @@ bitmap_gfx_t bmpgfx_characters;
 
 void GFX_InitGFX(void)
 {
-	gfx_characters = GFX_LoadGFX("data/characters.gfx");
-	bmpgfx_characters = BMPGFX_LoadBitmap("data/characters.bmp");
 }
 
 gfx_t GFX_LoadGFX(const char *filename)
