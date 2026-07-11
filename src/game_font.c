@@ -50,11 +50,11 @@ void FNT_FontEditUpdate(void)
 	uint8_t lr = G_ControlDown(CON_RIGHT, true) - G_ControlDown(CON_LEFT, true);
 	uint8_t ud = G_ControlDown(CON_DOWN, true) - G_ControlDown(CON_UP, true);
 	
-	int8_t  xoff = temp_font.offset[curchar] >> 8, yoff = temp_font.offset[curchar] & 0xFF;
+	uint8_t  xoff = temp_font.offset[curchar] >> 8, yoff = temp_font.offset[curchar] & 0xFF;
 	uint8_t w = temp_font.size[curchar] >> 8, h = temp_font.size[curchar] & 0xFF;
 	uint8_t charw = temp_font.charsize >> 8, charh = temp_font.charsize & 0xFF;
 	
-	int8_t  txoff = xoff, tyoff = yoff;
+	uint8_t  txoff = xoff, tyoff = yoff;
 	uint8_t tw = w, th = h;
 	uint8_t tcharw = charw, tcharh = charh;
 	uint8_t oldchar = curchar;
@@ -94,7 +94,7 @@ void FNT_FontEditUpdate(void)
 		curchar = 255;
 	
 	uint16_t tsize = (tw << 8) + th;
-	int16_t tcharoffset = (txoff << 8) + tyoff;
+	uint16_t tcharoffset = (txoff << 8) + tyoff;
 	uint16_t tcharsize = (tcharw << 8) + tcharh;
 	
 	if (curchar == oldchar) {
@@ -181,7 +181,7 @@ void FNT_FontEditDraw(void)
 
 void FNT_SaveTempFont(void)
 {
-	FILE *fp = fopen("data/fonts/default.fnt", "wb");
+	FILE *fp = fopen("data/fonts/default.fnt", "wb+");
 	char gfx_name[33];
 	bool bitmap = false;
 
@@ -190,8 +190,10 @@ void FNT_SaveTempFont(void)
 	fwrite(&temp_font.bitmap, sizeof(bool), 1, fp);
 	fwrite(&temp_font.charsize, sizeof(uint16_t), 1, fp);
 	
-	fwrite(&temp_font.offset, sizeof(temp_font.offset), 1, fp);
-	fwrite(&temp_font.size, sizeof(temp_font.size), 1, fp);
+	for (int i = 0; i < 256; i++)
+		fwrite(&temp_font.offset[i], sizeof(int16_t), 1, fp);
+	for (int i = 0; i < 256; i++)
+		fwrite(&temp_font.size[i], sizeof(uint16_t), 1, fp);
 
 	fclose(fp);
 }

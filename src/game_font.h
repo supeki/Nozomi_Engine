@@ -12,7 +12,7 @@ typedef struct
 	gfx_t gfx;
 	bitmap_gfx_t bmpgfx; // bmp is supported (without color-changing)
 	uint16_t charsize;   // upper 8 bits - w, lower 8 bits - h 
-	int16_t *offset;     // upper 8 bits - x, lower 8 bits - y
+	uint16_t *offset;     // upper 8 bits - x, lower 8 bits - y
 	uint16_t *size;      // upper 8 bits - w, lower 8 bits - h
 } font_t;
 

@@ -17,10 +17,7 @@ void I_PollEvents(void)
 	if (glfwWindowShouldClose(window))
 		game_quit = true;
 
-    // not sure if this part works
-	uint8_t c;
-
-	for (c = CON_UP; c < NUMCONTROLS; c++)
+	for (uint8_t c = 0; c < NUMCONTROLS; c++)
 	{
 		uint32_t key = gamecontrolbinds[c][0];
 

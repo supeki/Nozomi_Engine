@@ -54,16 +54,16 @@ void gameLoop(void)
 		elapsed_tick = game_tick - old_tick;
 		old_tick = game_tick;
 		
-		I_PollEvents();
-
-		if (game_quit)
-			break;
-		
 		if (elapsed_tick == 0)
 		{
 			I_Sleep(1);
 			continue;
 		}
+		
+		I_PollEvents();
+
+		if (game_quit)
+			break;
 		
 		#if defined(__NDS__)
 		// Force the game to run a tick on NDS otherwise it cries.
