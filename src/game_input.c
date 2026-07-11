@@ -19,6 +19,9 @@ bool G_ControlDown(uint8_t control, bool pressed)
 	if (control > NUMCONTROLS-1)
 		return false;
 	
+	if (gamecontrols[control] > 0xFFFFFFFE)
+		gamecontrols[control] = 0xFFFFFFFF;
+	
 	if (pressed)
 		return (gamecontrols[control] == 1);
 	else
@@ -31,6 +34,7 @@ void G_DefaultControls(void)
 	
 	for (i = 0; i < NUMCONTROLS; i++)
 	{
+		gamecontrols[i] = 0;
 		gamecontrolbinds[i][0] = -1;
 		gamecontrolbinds[i][1] = -1;
 	}
@@ -58,7 +62,7 @@ void G_DefaultControls(void)
 	gamecontrolbinds[CON_A][0] = GLFW_KEY_Z;
 	gamecontrolbinds[CON_B][0] = GLFW_KEY_X;
 	gamecontrolbinds[CON_C][0] = GLFW_KEY_C;
-	gamecontrolbinds[CON_START][0] = GLFW_KEY_ESCAPE;
+	gamecontrolbinds[CON_START][0] = GLFW_KEY_ENTER;
 	gamecontrolbinds[CON_SELECT][0] = GLFW_KEY_RIGHT_SHIFT;
 	gamecontrolbinds[CON_X][0] = GLFW_KEY_A;
 	gamecontrolbinds[CON_Y][0] = GLFW_KEY_S;

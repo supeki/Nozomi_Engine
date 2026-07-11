@@ -6,6 +6,7 @@
 #include "glfw_video.h"
 
 #include "../../i_event.h"
+#include "../../game_defs.h"
 #include "../../game_main.h"
 #include "../../game_input.h"
 
@@ -17,13 +18,16 @@ void I_PollEvents(void)
 		game_quit = true;
 
     // not sure if this part works
-	int c;
+	uint8_t c;
 
 	for (c = CON_UP; c < NUMCONTROLS; c++)
 	{
-		int key = gamecontrolbinds[c][0];
+		uint32_t key = gamecontrolbinds[c][0];
 
 		if (key >= 0)
-			gamecontrols[c] = (glfwGetKey(window, key) == GLFW_PRESS);
+			if (glfwGetKey(window, key) == GLFW_PRESS)
+				gamecontrols[c]++;
+			else
+				gamecontrols[c] = 0;
 	}
 }

@@ -19,7 +19,6 @@ void I_PollEvents(void)
 		switch (event.type)
 		{
 			case SDL_QUIT:
-			case SDL_CLOSE:
 				game_quit = true;
 				break;
 			case SDL_WINDOWEVENT:

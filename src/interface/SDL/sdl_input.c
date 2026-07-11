@@ -18,7 +18,7 @@ void I_UpdateControls(SDL_Event event)
 		case SDL_KEYDOWN:
 			for (c = CON_UP; c < NUMCONTROLS; c++)
 				if (gamecontrolbinds[c][0] == event.key.keysym.sym) // holy fucking shit
-					gamecontrols[c] = 1;
+					gamecontrols[c]++;
 			break;
 		case SDL_KEYUP:
 			for (c = CON_UP; c < NUMCONTROLS; c++)
@@ -33,7 +33,7 @@ void I_UpdateControls(SDL_Event event)
 		case SDL_CONTROLLERBUTTONDOWN:
 			for (c = CON_UP; c < NUMCONTROLS; c++)
 				if (gamecontrolbinds[c][1] == event.cbutton.button) // holy fucking shit
-					gamecontrols[c] = 1;
+					gamecontrols[c]++;
 			break;
 		case SDL_CONTROLLERBUTTONUP:
 			for (c = CON_UP; c < NUMCONTROLS; c++)

@@ -18,7 +18,7 @@ void I_HandleInput(void)
 	keys = keysHeld();
 	for (c = 0; c < NUMCONTROLS; c++)
 		if (keys & gamecontrolbinds[c][1]) // holy fucking shit
-			gamecontrols[c] = 1;
+			gamecontrols[c]++;
 			
 	keys = keysUp();
 	for (c = 0; c < NUMCONTROLS; c++)

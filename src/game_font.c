@@ -85,6 +85,9 @@ void FNT_FontEditUpdate(void)
 		}
 	}
 	
+	if (G_ControlDown(CON_START, true))
+		FNT_SaveTempFont();
+	
 	if (curchar < 0)
 		curchar = 0;
 	else if (curchar > 255)
@@ -171,5 +174,24 @@ void FNT_FontEditDraw(void)
 	V_DrawText(va("Char Size (wxh): %d, %d", w, h), 0, charw*charh+charh*2, 0);
 	V_DrawText(va("Cell Size (wxh): %d, %d", charw, charh), 0, charw*charh+charh*3, 0);
 	
+	V_DrawTextFromFont(temp_font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nZA 01234567890", 0, vid.height - charh*6, 0);
+	V_DrawTextFromFont(temp_font, "abcdefghijklmnopqrstuvwxyz\nza .,/\\;:\'\"[]{}-_=+!@#$%^&*()~|", 0, vid.height - charh*4, 0);
 	V_DrawTextFromFont(temp_font, "The quick brown fox\njumped over the lazy dog.", 0, vid.height - charh*2, 0);
+}
+
+void FNT_SaveTempFont(void)
+{
+	FILE *fp = fopen("data/fonts/default.fnt", "wb");
+	char gfx_name[33];
+	bool bitmap = false;
+
+	snprintf(gfx_name, 32, "default");
+	fwrite(gfx_name, sizeof(gfx_name)-1, 1, fp);
+	fwrite(&temp_font.bitmap, sizeof(bool), 1, fp);
+	fwrite(&temp_font.charsize, sizeof(uint16_t), 1, fp);
+	
+	fwrite(&temp_font.offset, sizeof(temp_font.offset), 1, fp);
+	fwrite(&temp_font.size, sizeof(temp_font.size), 1, fp);
+
+	fclose(fp);
 }

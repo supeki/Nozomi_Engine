@@ -23,5 +23,6 @@ extern bool font_edit;
 void FNT_StartFontEdit(void);
 void FNT_FontEditUpdate(void);
 void FNT_FontEditDraw(void);
+void FNT_SaveTempFont(void);
 
 #endif
