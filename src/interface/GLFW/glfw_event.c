@@ -18,13 +18,8 @@ void I_PollEvents(void)
 		game_quit = true;
 
 	for (uint8_t c = 0; c < NUMCONTROLS; c++)
-	{
-		uint32_t key = gamecontrolbinds[c][0];
-
-		if (key >= 0)
-			if (glfwGetKey(window, key) == GLFW_PRESS)
-				gamecontrols[c]++;
-			else
-				gamecontrols[c] = 0;
-	}
+		if (glfwGetKey(window, gamecontrolbinds[c][0]) == GLFW_PRESS)
+			gamecontrols[c]++;
+		else if (glfwGetKey(window, gamecontrolbinds[c][0]) == GLFW_RELEASE)
+			gamecontrols[c] = 0;
 }
