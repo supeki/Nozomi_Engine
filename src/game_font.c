@@ -124,13 +124,13 @@ static void FNT_DrawCroppedDouble(gfx_t gfx, int16_t x, int16_t y, int16_t sx, i
 			if (i >= gfx.size)
 				return;
 			
-			if (vx < 0 || vy < 0 || vx >= vid.width || vy >= vid.height || gfx.data[i] == 0)
+			if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT || gfx.data[i] == 0)
 				continue;
 			
-			vid.buffer[vx+(vy*vid.width)] = palette[gfx.data[i]];
-			vid.buffer[vx+(vy*vid.width)+1] = palette[gfx.data[i]];
-			vid.buffer[vx+(vy*vid.width)+vid.width] = palette[gfx.data[i]];
-			vid.buffer[vx+(vy*vid.width)+vid.width+1] = palette[gfx.data[i]];
+			vid.buffer[vx+(vy*VID_WIDTH)] = palette[gfx.data[i]];
+			vid.buffer[vx+(vy*VID_WIDTH)+1] = palette[gfx.data[i]];
+			vid.buffer[vx+(vy*VID_WIDTH)+VID_WIDTH] = palette[gfx.data[i]];
+			vid.buffer[vx+(vy*VID_WIDTH)+VID_WIDTH+1] = palette[gfx.data[i]];
 		}
 }
 
@@ -156,27 +156,27 @@ void FNT_FontEditDraw(void)
 	uint8_t w = temp_font.size[curchar] >> 8, h = temp_font.size[curchar] & 0xFF;
 	
 	for (int x = 0; x < charw*2 + 2; x++) {
-		V_DrawDot(vid.width - charw*4 - 1 + x, 2*charh - 1, col);
-		V_DrawDot(vid.width - charw*4 - 1 + x, 2*charh + 2*charh, col);
+		V_DrawDot(VID_WIDTH - charw*4 - 1 + x, 2*charh - 1, col);
+		V_DrawDot(VID_WIDTH - charw*4 - 1 + x, 2*charh + 2*charh, col);
 	}
 	
 	for (int y = 0; y < charh*2 + 2; y++) {
-		V_DrawDot(vid.width - charw*4 - 1, 2*charh-1 + y, col);
-		V_DrawDot(vid.width - charw*4 + charw*2, 2*charh-1 + y, col);
+		V_DrawDot(VID_WIDTH - charw*4 - 1, 2*charh-1 + y, col);
+		V_DrawDot(VID_WIDTH - charw*4 + charw*2, 2*charh-1 + y, col);
 	}
 	
 	if (curchar >= 33) {
 		int cc = curchar - 33;
-		FNT_DrawCroppedDouble(font_default.gfx, vid.width - charw*4 + xoff*2, 2*charh + yoff*2, (cc % 10) * charw, (cc / 10) * charh, charw, charh);
+		FNT_DrawCroppedDouble(font_default.gfx, VID_WIDTH - charw*4 + xoff*2, 2*charh + yoff*2, (cc % 10) * charw, (cc / 10) * charh, charw, charh);
 	}
 
 	V_DrawText(va("Offsets: %d, %d", xoff, yoff), 0, charw*charh+charh, 0);
 	V_DrawText(va("Char Size (wxh): %d, %d", w, h), 0, charw*charh+charh*2, 0);
 	V_DrawText(va("Cell Size (wxh): %d, %d", charw, charh), 0, charw*charh+charh*3, 0);
 	
-	V_DrawTextFromFont(temp_font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nZA 01234567890", 0, vid.height - charh*6, 0);
-	V_DrawTextFromFont(temp_font, "abcdefghijklmnopqrstuvwxyz\nza .,/\\;:\'\"[]{}-_=+!@#$%^&*()~|", 0, vid.height - charh*4, 0);
-	V_DrawTextFromFont(temp_font, "The quick brown fox\njumped over the lazy dog.", 0, vid.height - charh*2, 0);
+	V_DrawTextFromFont(temp_font, "ABCDEFGHIJKLMNOPQRSTUVWXYZ\nZA 01234567890", 0, VID_HEIGHT - charh*6, 0);
+	V_DrawTextFromFont(temp_font, "abcdefghijklmnopqrstuvwxyz\nza .,/\\;:\'\"[]{}-_=+!@#$%^&*()~|", 0, VID_HEIGHT - charh*4, 0);
+	V_DrawTextFromFont(temp_font, "The quick brown fox\njumped over the lazy dog.", 0, VID_HEIGHT - charh*2, 0);
 }
 
 void FNT_SaveTempFont(void)

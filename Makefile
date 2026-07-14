@@ -76,8 +76,8 @@ ifeq ($(GLFW),1)
 	LDFLAGS =  
 	
 	CFLAGS = $(OPTS) \
-			 $(LIBS) \
-			 $(DEFINES) -g
+		$(LIBS) \
+		$(DEFINES) -g3
 endif
 
 ifeq ($(WINDOWS),1)

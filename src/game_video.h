@@ -8,8 +8,8 @@
 #include "game_gfx.h"  // gfx_t, bitmap_gfx_t
 #include "game_font.h" // font_t
 
-#define BASEVIDWIDTH 256
-#define BASEVIDHEIGHT 192
+#define VID_WIDTH 256
+#define VID_HEIGHT 192
 
 typedef struct
 {

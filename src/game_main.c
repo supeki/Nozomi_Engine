@@ -60,6 +60,13 @@ void gameLoop(void)
 			continue;
 		}
 		
+		// dumbass hack for SDL
+		#if defined(SDL)
+		for (int c = CON_UP; c < NUMCONTROLS; c++)
+			if (gamecontrols[c] > 0)
+				gamecontrols[c]++;
+		#endif
+		
 		I_PollEvents();
 
 		if (game_quit)

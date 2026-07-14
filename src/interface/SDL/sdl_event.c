@@ -13,6 +13,7 @@
 void I_PollEvents(void)
 {
 	SDL_Event event;
+	
     while (SDL_PollEvent(&event)) {
 		I_UpdateControls(event);
 		

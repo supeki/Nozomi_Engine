@@ -19,8 +19,7 @@ void I_StartupGraphics(void)
     if (!glfwInit())
         I_Error("Failed to initialize GLFW");
 
-	window = glfwCreateWindow(vid.width, vid.height, GAME_NAME, NULL, NULL);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+	window = glfwCreateWindow(VID_WIDTH, VID_HEIGHT, GAME_NAME, NULL, NULL);
 	if (!window) 
 		I_Error("Failed to create GLFW window!\n");
 
@@ -34,13 +33,13 @@ void I_StartupGraphics(void)
 
 	// opengl stuff
 	glEnable(GL_TEXTURE_2D);
-	glViewport(0, 0, vid.width, vid.height);
+	glViewport(0, 0, VID_WIDTH, VID_HEIGHT);
 }
 
 void I_PushGraphics(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, vid.width, vid.height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, vid.buffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, VID_WIDTH, VID_HEIGHT, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, vid.buffer);
 
 	// draw a quad covering the entire window
 	glBegin(GL_QUADS);

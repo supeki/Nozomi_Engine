@@ -28,7 +28,7 @@ void I_PushGraphics(void)
 {
 	uint16_t* pixels = (uint16_t*)VRAM_A;
 
-	for (int i = 0; i < vid.width * vid.height; i++)
+	for (int i = 0; i < VID_WIDTH * VID_HEIGHT; i++)
 	{
 		pixels[i] = rgb565_to_rgb15(vid.buffer[i]);
 	}

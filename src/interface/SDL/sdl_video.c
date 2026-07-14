@@ -17,24 +17,20 @@ SDL_Renderer *wndRend;
 SDL_Texture *sdlTex;
 
 uint16_t* pixels;
+uint32_t win_width = VID_WIDTH, win_height = VID_HEIGHT;
 float scale;
 
 void I_StartupGraphics(void)
-{	
-	#if defined(PSP)
-	vid.width = 480;
-	vid.height = 272;
-	#endif
-	
-	pixels = malloc(BASEVIDWIDTH * BASEVIDHEIGHT * sizeof(uint16_t));
-	scale = (float)vid.height / (float)BASEVIDHEIGHT;
+{		
+	pixels = malloc(VID_WIDTH * VID_HEIGHT * sizeof(uint16_t));
+	scale = 1.0f;
 
 	sdlWnd = SDL_CreateWindow(
 		GAME_NAME, 
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		vid.width,
-		vid.height,
+		VID_WIDTH,
+		VID_HEIGHT,
 		SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE
 	);
 	
@@ -51,8 +47,8 @@ void I_StartupGraphics(void)
 		wndRend, 
 		SDL_PIXELFORMAT_RGB565, 
 		SDL_TEXTUREACCESS_STREAMING, 
-		BASEVIDWIDTH, 
-		BASEVIDHEIGHT
+		VID_WIDTH, 
+		VID_HEIGHT
 	);
 	
 	if (!sdlTex) 
@@ -64,11 +60,11 @@ void I_UpdateWindow(SDL_Event event)
 	switch (event.window.event)
 	{
 		case SDL_WINDOWEVENT_SIZE_CHANGED:
-			SDL_SetWindowSize(sdlWnd, event.window.data1, event.window.data2);
-			SDL_GetWindowSize(sdlWnd, &vid.width, &vid.height);
+			SDL_GetWindowSize(sdlWnd, &win_width, &win_height);
 			
-			scale = (float)vid.height / (float)BASEVIDHEIGHT;
-			float xscale = (float)vid.width / (float)BASEVIDWIDTH;
+			scale = (float)win_height / (float)VID_HEIGHT;
+			float xscale = (float)win_width / (float)VID_WIDTH;
+			
 			if (xscale < scale)
 				scale = xscale;
 			
@@ -79,14 +75,14 @@ void I_UpdateWindow(SDL_Event event)
 
 void I_PushGraphics(void)
 {
-	int width = (int)(scale*(float)BASEVIDWIDTH);
-	int height = (int)(scale*(float)BASEVIDHEIGHT);
-	SDL_Rect dest_rect[4] = {(vid.width/2) - (width/2), (vid.height/2) - (height/2), width, height};
+	int width = (int)(scale*(float)VID_WIDTH);
+	int height = (int)(scale*(float)VID_HEIGHT);
+	SDL_Rect dest_rect[4] = {(win_width/2) - (width/2), (win_height/2) - (height/2), width, height};
 
-	memcpy(pixels, vid.buffer, BASEVIDWIDTH * BASEVIDHEIGHT * sizeof(uint16_t));
+	memcpy(pixels, vid.buffer, VID_WIDTH * VID_HEIGHT * sizeof(uint16_t));
 
 	SDL_RenderClear(wndRend);
-	SDL_UpdateTexture(sdlTex, NULL, pixels, BASEVIDWIDTH * sizeof(uint16_t));
+	SDL_UpdateTexture(sdlTex, NULL, pixels, VID_WIDTH * sizeof(uint16_t));
 	SDL_RenderCopy(wndRend, sdlTex, NULL, dest_rect);
 	SDL_RenderPresent(wndRend);
 }

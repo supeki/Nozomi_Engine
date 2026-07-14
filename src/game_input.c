@@ -88,9 +88,9 @@ void G_DefaultControls(void)
 	gamecontrolbinds[CON_DOWN][1] = SDL_CONTROLLER_BUTTON_DPAD_DOWN;
 	gamecontrolbinds[CON_LEFT][1] = SDL_CONTROLLER_BUTTON_DPAD_LEFT;
 	gamecontrolbinds[CON_RIGHT][1] = SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
-	gamecontrolbinds[CON_A][1] = SDL_CONTROLLER_BUTTON_B;
-	gamecontrolbinds[CON_B][1] = SDL_CONTROLLER_BUTTON_X;
-	gamecontrolbinds[CON_C][1] = SDL_CONTROLLER_BUTTON_A;
+	gamecontrolbinds[CON_A][1] = SDL_CONTROLLER_BUTTON_X;
+	gamecontrolbinds[CON_B][1] = SDL_CONTROLLER_BUTTON_A;
+	gamecontrolbinds[CON_C][1] = SDL_CONTROLLER_BUTTON_B;
 	gamecontrolbinds[CON_START][1] = SDL_CONTROLLER_BUTTON_START;
 	gamecontrolbinds[CON_SELECT][1] = SDL_CONTROLLER_BUTTON_BACK;
 	gamecontrolbinds[CON_X][1] = SDL_CONTROLLER_BUTTON_LEFTSHOULDER;

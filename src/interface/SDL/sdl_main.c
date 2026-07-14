@@ -9,6 +9,7 @@
 #endif
 
 #include "sdl_main.h"
+#include "sdl_input.h"
 
 #include "../../i_event.h"
 #include "../../i_system.h"
@@ -24,10 +25,18 @@ int main(int argc, char *argv[])
 	
 	I_printf("Initializing SDL!\n");
 	
-	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_GAMECONTROLLER) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_GAMECONTROLLER|SDL_INIT_JOYSTICK) < 0)
 	{
 		I_Error("Could not initialize SDL: %s.\n", SDL_GetError());
 	}
+	
+	// add our controller mappings for quirky controllers we wanna support
+	SDL_GameControllerAddMappingsFromFile("data/gamecontrollerdb.txt");
+	
+	// open all controllers at startup!!
+	for (int i = 0; i < SDL_NumJoysticks(); i++)
+		if (SDL_IsGameController(i))
+			SDL_GameControllerOpen(i);
 	
 	I_printf("Successfully initialized SDL!\n");
 	
