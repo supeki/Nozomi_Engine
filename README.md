@@ -87,7 +87,7 @@ While Nozomi Engine supports other platforms like the Nintendo DS and Sony Plays
 instructions on how to compile for those platforms will not be a concern as of now.
 
 ## Copyright & Misc. Information
-Nozomi Engine is the intellectual property of Marilyn Nozomi (aka [supeki](https://github.com/supeki)).
+Nozomi Engine is the intellectual property of Marilyn Nozomi (aka [supeki](https://github.com/supeki)).<br>
 Nozomi Engine and other related works are Copyright © 2026 Marilyn Nozomi
 
 All non-original code belongs to their authors, contributors own the rights to their own code until it is merged into Nozomi Engine.
@@ -95,4 +95,4 @@ If you suspect that your code, or other assets are being misused, please contact
 
 I personally also vow that all code in Nozomi Engine is wrote by real people, and that all other misc. assets are also made by hand.
 If you suspect that AI was used in the making of any part of Nozomi Engine, 
-please bring it up to me ASAP, I find GenAI very offensive to the skills of real people who don't do this for free.
+please bring it up to me ASAP, I find GenAI very offensive to the skills of real people who *do and don't* do this for free.
