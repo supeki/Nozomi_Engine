@@ -12,6 +12,7 @@
 
 static GLuint screenTex;
 GLFWwindow *window;
+void window_size_callback(GLFWwindow* window, int width, int height);
 
 void I_StartupGraphics(void)
 {
@@ -34,6 +35,20 @@ void I_StartupGraphics(void)
 	// opengl stuff
 	glEnable(GL_TEXTURE_2D);
 	glViewport(0, 0, VID_WIDTH, VID_HEIGHT);
+	glfwSetWindowSizeCallback(window, window_size_callback);
+}
+
+void window_size_callback(GLFWwindow* window, int width, int height)
+{
+	float scale = (float)height / (float)VID_HEIGHT;
+	float xscale = (float)width / (float)VID_WIDTH;
+	
+	if (xscale < scale)
+		scale = xscale;
+	
+	int s_width = (int)(scale*(float)VID_WIDTH);
+	int s_height = (int)(scale*(float)VID_HEIGHT);
+	glViewport(width/2 - s_width/2, height/2 - s_height/2, s_width, s_height);
 }
 
 void I_PushGraphics(void)
