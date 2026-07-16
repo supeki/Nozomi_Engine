@@ -16,6 +16,7 @@ EXEC_EXT = .exe
 # Assume Windows SDL by default Nozomi 04-15-2026
 WINDOWS ?= 1
 LINUX ?= 0
+LINUX_32 ?= 0
 LINUX_WIN ?= 0
 GLFW ?= 0
 SDL ?= 1
@@ -92,6 +93,10 @@ ifeq ($(LINUX),1)
 
 	CFLAGS := $(CFLAGS) $(pkg-config sdl2 SDL2_mixer --cflags) -w
 	LDFLAGS := $(LDFLAGS) $(pkg-config sdl2 SDL2_mixer --libs)
+endif
+
+ifeq ($(LINUX_32),1)
+	CFLAGS := $(CFLAGS) -m32
 endif
 
 ifeq ($(LINUX_WIN),1)
