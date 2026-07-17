@@ -97,12 +97,12 @@ void BMPGFX(const char *filename)
 	FILE *file = fopen(va("%s.gfx", filename), "w+b");
 	
 	uint32_t size = bmp->w * bmp->h - 1;
-	uint8_t width = bmp->w - 1;
+	uint16_t width = bmp->w - 1;
 	uint8_t offx = 0;
 	uint8_t offy = 0;
 	
-	fwrite(&size, sizeof(uint16_t), 1, file);
-	fwrite(&width, sizeof(uint8_t), 1, file);
+	fwrite(&size, sizeof(uint32_t), 1, file);
+	fwrite(&width, sizeof(uint16_t), 1, file);
 	fwrite(&offx, sizeof(uint8_t), 1, file);
 	fwrite(&offy, sizeof(uint8_t), 1, file);
 	

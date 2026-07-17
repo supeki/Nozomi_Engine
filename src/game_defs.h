@@ -20,7 +20,7 @@
 #include <math.h>
 #include <string.h>
 
-#define GAME_NAME "JADEFRACTURE"
+#define GAME_NAME "Nozomi Engine dev"
 
 #define FRAMERATE 30
 #define MAX_PLAYERS 4

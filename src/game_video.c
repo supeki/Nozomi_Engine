@@ -69,24 +69,7 @@ void V_DrawDot(int16_t x, int16_t y, uint8_t col)
 	vid.buffer[x+(y*VID_WIDTH)] = palette[col];
 }
 
-void V_Draw(gfx_t gfx, int16_t x, int16_t y)
-{
-	if ((gfx.size + gfx.width) <= 0)
-        return;
-	
-	for (int i = 0; i < gfx.size; i++)
-	{
-		int32_t vx = x + (i % gfx.width) - gfx.xoff;
-		int32_t vy = y + (i / gfx.width) - gfx.yoff;
-		
-		if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT || gfx.data[i] == 0)
-			continue;
-		
-		vid.buffer[vx+(vy*VID_WIDTH)] = palette[gfx.data[i]];
-	}
-}
-
-void V_DrawCropped(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h)
+void V_DrawCropped(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
 {	
 	if ((gfx.size + gfx.width) <= 0)
         return;
@@ -97,6 +80,17 @@ void V_DrawCropped(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint
 			uint32_t i = sx + sy*gfx.width + zx + zy*gfx.width;
 			int32_t vx = x + zx - gfx.xoff;
 			int32_t vy = y + zy - gfx.yoff;
+			
+			if (flags & V_WAVY)
+			{
+				vx += abs((game_tick + vy) % FRAMERATE - FRAMERATE/2)/2;
+			}
+			
+			if (flags & V_SMALL)
+			{
+				vx -= (zx/2);
+				vy -= (zy/2);
+			}
 						
 			if (i >= gfx.size)
 				return;
@@ -108,26 +102,14 @@ void V_DrawCropped(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint
 		}
 }
 
-// Bitmap variants if need be
-
-void V_DrawBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y)
+void V_Draw(gfx_t gfx, int16_t x, int16_t y, uint32_t flags)
 {
-	if ((gfx.width * gfx.height) <= 0)
-		return;
-	
-	for (int i = 0; i < (gfx.width * gfx.height); i++)
-	{
-		int vx = x + (i % gfx.width);
-		int vy = y + (i / gfx.width);
-		
-		if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT || gfx.data[i] == 0)
-			continue;
-		
-		vid.buffer[vx+(vy*VID_WIDTH)] = gfx.data[i];
-	}
+	V_DrawCropped(gfx, x, y, 0, 0, gfx.width, gfx.size/gfx.width, flags);
 }
 
-void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h)
+// Bitmap variants if need be
+
+void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
 {	
 	if ((gfx.width * gfx.height) <= 0)
         return;
@@ -139,6 +121,17 @@ void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t sx, int
 			int vx = x + zx;
 			int vy = y + zy;
 			
+			if (flags & V_SMALL)
+			{
+				vx -= zx/2;
+				vy -= zy/2;
+			}
+			
+			if (flags & V_WAVY)
+			{
+				vx += abs((game_tick + vy) % FRAMERATE - FRAMERATE/2)/2;
+			}
+			
 			if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT || gfx.data[i] == 0)
 				continue;
 			
@@ -146,10 +139,15 @@ void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t sx, int
 		}
 }
 
+void V_DrawBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y, uint32_t flags)
+{
+	V_DrawCroppedBitmap(gfx, x, y, 0, 0, gfx.width, gfx.height, flags);
+}
+
 // Text functions
 
 
-void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, int flags)
+void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, uint32_t flags)
 {
 	int16_t bx = x, by = y;
 	uint8_t charw = font.charsize >> 8, charh = font.charsize & 0xFF;
@@ -171,9 +169,9 @@ void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, i
 				
 			if (c > -1) {
 				if (font.bitmap)
-					V_DrawCroppedBitmap(font.bmpgfx, x + xoff, y + yoff, (c % 16) * charw, (c / 16) * charh, charw, charh);
+					V_DrawCroppedBitmap(font.bmpgfx, x + xoff, y + yoff, (c % 16) * charw, (c / 16) * charh, charw, charh, flags);
 				else
-					V_DrawCropped(font.gfx, x + xoff, y + yoff, (c % 10) * charw, (c / 10) * charh, charw, charh);
+					V_DrawCropped(font.gfx, x + xoff, y + yoff, (c % 10) * charw, (c / 10) * charh, charw, charh, flags);
 			}
 			
 			x += w;
@@ -186,7 +184,7 @@ void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, i
 	}
 }
 
-void V_DrawText(const char* string, int16_t x, int16_t y, int flags)
+void V_DrawText(const char* string, int16_t x, int16_t y, uint32_t flags)
 {
 	V_DrawTextFromFont(font_default, string, x, y, flags);
 }
