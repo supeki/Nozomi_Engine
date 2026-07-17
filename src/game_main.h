@@ -7,6 +7,7 @@
 #include "game_defs.h"
 
 extern bool game_quit;
+extern uint32_t game_tick;
 
 void gameMain(void);
 void gameLoop(void);

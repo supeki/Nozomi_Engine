@@ -16,7 +16,7 @@ Mix_Music *current_song;
 
 const char *jadefrac_to_sdl[NUMMUSIC] = {
 	"\0",
-	"presentation"
+	"music"
 };
 
 void I_StartupSound(void)
@@ -33,7 +33,7 @@ void I_StartupSound(void)
 	use_midi = false;
 	#endif
 	
-	Mix_OpenAudio(32000, MIX_DEFAULT_FORMAT, 2, 2048);
+	Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
 }
 
 void I_PlaySound(void)
@@ -45,12 +45,10 @@ void I_PlayMusic(int id, bool loop)
 	if (music.id != mus_none)
 		Mix_FreeMusic(current_song);
 	
-	return;
-	
 	if (use_midi)
 		current_song = Mix_LoadMUS(va("data/audio/%s.mid", jadefrac_to_sdl[id]));
 	else
-		current_song = Mix_LoadMUS(va("data/audio/%s.ogg", jadefrac_to_sdl[id]));
+		current_song = Mix_LoadMUS(va("data/audio/%s.mp3", jadefrac_to_sdl[id]));
 	
 	if (current_song == NULL) {
 		I_printf("Couldn't play song: %s", jadefrac_to_sdl[id]);
@@ -61,6 +59,14 @@ void I_PlayMusic(int id, bool loop)
 		Mix_PlayMusic(current_song, -1);
 	else
 		Mix_PlayMusic(current_song, 0);
+	
+	Mix_VolumeMusic(music_volume);
+}
+
+void I_SetSoundVolume(int8_t value)
+{
+	for (int i = 0; i < MIX_CHANNELS; i++)
+		Mix_Volume(i, value);
 }
 
 void I_StopMusic(void)
@@ -71,4 +77,9 @@ void I_StopMusic(void)
 bool I_MusicPlaying(void)
 {
 	return (Mix_PlayingMusic() > 0);
+}
+
+void I_SetMusicVolume(int8_t value)
+{
+	Mix_VolumeMusic(value);
 }

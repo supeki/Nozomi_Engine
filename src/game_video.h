@@ -33,4 +33,10 @@ void V_DrawText(const char* string, int16_t x, int16_t y, int flags); // use def
 void V_DrawBitmap(bitmap_gfx_t, int16_t x, int16_t y);
 void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h);
 
+typedef enum
+{
+	V_WAVYTEXT = 1,
+	NUMVIDEOFLAGS
+} video_flags;
+
 #endif

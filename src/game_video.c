@@ -5,6 +5,7 @@
 
 #include "game_font.h"
 #include "game_gfx.h"
+#include "game_main.h"
 #include "game_video.h"
 
 vid_t vid;
@@ -153,6 +154,7 @@ void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, i
 	int16_t bx = x, by = y;
 	uint8_t charw = font.charsize >> 8, charh = font.charsize & 0xFF;
 	
+	
 	for (int i = 0; i < strlen(string); i++) {
 		int c = (int)string[i];
 		
@@ -161,6 +163,11 @@ void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, i
 			uint8_t w = font.size[c] >> 8, h = font.size[c] & 0xFF;
 			
 			c -= 33;
+			
+			if (flags & V_WAVYTEXT)
+			{
+				yoff += abs((game_tick + x) % FRAMERATE - FRAMERATE/2)/2 - charw;
+			}
 				
 			if (c > -1) {
 				if (font.bitmap)
@@ -174,7 +181,7 @@ void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, i
 		
 		if ((string[i] == '\n') || (x >= VID_WIDTH)) {
 			x = bx;
-			y += charh;
+			y += charh+1;
 		}
 	}
 }

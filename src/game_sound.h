@@ -20,7 +20,13 @@ typedef struct
 
 extern music_t music;
 extern bool use_midi;
+extern int8_t sound_volume, music_volume;
+
+void S_ChangeSoundVolume(int8_t value);
+void S_SetSoundVolume(int8_t value);
 
 void S_PlayMusic(int id, bool loop);
+void S_ChangeMusicVolume(int8_t value);
+void S_SetMusicVolume(int8_t value);
 
 #endif

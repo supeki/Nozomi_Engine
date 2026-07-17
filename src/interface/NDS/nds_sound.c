@@ -56,3 +56,8 @@ bool I_MusicPlaying(void)
 {
 	return mmActive();
 }
+
+void I_SetMusicVolume(int8_t value)
+{
+	(void)value;
+}

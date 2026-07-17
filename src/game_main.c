@@ -18,6 +18,7 @@
 
 bool game_quit = false;
 bitmap_gfx_t test;
+uint32_t game_tick;
 
 // Game startup / main function.
 void gameMain(void)
@@ -40,16 +41,17 @@ void gameMain(void)
 	GFX_InitGFX();
 	OBJ_InitObjects();
 	
-	test = BMPGFX_LoadBitmap("data/test.bmp");
+	I_PlayMusic(mus_test, true);
 	
-	FNT_StartFontEdit();
+	test = BMPGFX_LoadBitmap("data/test_gfx/test_kitsune.bmp");
+	
+	//FNT_StartFontEdit();
 }
 
 // The main game loop.
 void gameLoop(void)
 {
-	uint32_t game_tick, elapsed_tick;
-	uint32_t old_tick = I_GetTicks();
+	uint32_t elapsed_tick, old_tick = I_GetTicks();
 	uint32_t render_tick = 0;
 	
 	while (!game_quit) {
@@ -112,6 +114,7 @@ void gameDisplay(void)
 	if (font_edit)
 		FNT_FontEditDraw();
 	
-	//V_DrawBitmap(test, 0, 0);
-	//V_DrawText("According to all known laws of aviation, there is no\nway a bee should be able to fly.", 0, 0, 0);
+	V_DrawBitmap(test, 0, 0);
+	V_DrawText("OMG LOOK AT THE KITSUNE :OOO", 0, 0, 0);
+	V_DrawText("ooooo wavyyyyyyyy :D\nmeowwww", 0, 16, V_WAVYTEXT);
 }

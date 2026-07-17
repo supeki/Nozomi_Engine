@@ -16,13 +16,13 @@ Mix_Music *current_song;
 
 const char *jadefrac_to_sdl[NUMMUSIC] = {
 	"\0",
-	"presentation"
+	"music"
 };
 
 void I_StartupSound(void)
 {
 	Mix_Init(MIX_INIT_MID|MIX_INIT_OGG);
-	Mix_OpenAudio(32000, MIX_DEFAULT_FORMAT, 2, 2048);
+	Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
 }
 
 void I_PlaySound(void) {}
@@ -35,16 +35,20 @@ void I_PlayMusic(int id, bool loop)
 	if (use_midi)
 		current_song = Mix_LoadMUS(va("data/audio/%s.mid", jadefrac_to_sdl[id]));
 	else
-		current_song = Mix_LoadMUS(va("data/audio/%s.ogg", jadefrac_to_sdl[id]));
+		current_song = Mix_LoadMUS(va("data/audio/%s.mp3", jadefrac_to_sdl[id]));
 	
 	if (current_song == NULL) {
 		I_printf("Couldn't play song: %s", jadefrac_to_sdl[id]);
 		return;
 	}
 	
-	Mix_PlayMusic(current_song, loop ? -1 : 0);
+	if (loop)
+		Mix_PlayMusic(current_song, -1);
+	else
+		Mix_PlayMusic(current_song, 0);
+	
+	Mix_VolumeMusic(music_volume);
 }
-
 void I_StopMusic(void)
 {
 	Mix_HaltMusic();
@@ -53,4 +57,9 @@ void I_StopMusic(void)
 bool I_MusicPlaying(void)
 {
 	return (Mix_PlayingMusic() > 0);
+}
+
+void I_SetMusicVolume(int8_t value)
+{
+	Mix_VolumeMusic(value);
 }
