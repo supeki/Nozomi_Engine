@@ -42,7 +42,7 @@ void gameMain(void)
 	
 	test = BMPGFX_LoadBitmap("data/test.bmp");
 	
-	//FNT_StartFontEdit();
+	FNT_StartFontEdit();
 }
 
 // The main game loop.
@@ -65,9 +65,10 @@ void gameLoop(void)
 		
 		// dumbass hack for SDL
 		#if defined(SDL)
-		for (int c = CON_UP; c < NUMCONTROLS; c++)
-			if (gamecontrols[c] > 0)
-				gamecontrols[c]++;
+		for (int j = 0; j < MAX_PLAYERS; j++)
+			for (int c = CON_UP; c < NUMCONTROLS; c++)
+				if (gamecontrols[j][c] > 0)
+					gamecontrols[j][c]++;
 		#endif
 		
 		I_PollEvents();
@@ -110,6 +111,7 @@ void gameDisplay(void)
 {
 	if (font_edit)
 		FNT_FontEditDraw();
-	V_DrawBitmap(test, 0, 0);
-	V_DrawText("According to all known laws of aviation, there is no\nway a bee should be able to fly.", 0, 0, 0);
+	
+	//V_DrawBitmap(test, 0, 0);
+	//V_DrawText("According to all known laws of aviation, there is no\nway a bee should be able to fly.", 0, 0, 0);
 }

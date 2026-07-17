@@ -14,6 +14,8 @@ void I_PollEvents(void)
 {
 	SDL_Event event;
 	
+	I_UpdateControllerAxis();
+	
     while (SDL_PollEvent(&event)) {
 		I_UpdateControls(event);
 		

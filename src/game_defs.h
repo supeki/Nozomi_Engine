@@ -23,6 +23,12 @@
 #define GAME_NAME "JADEFRACTURE"
 
 #define FRAMERATE 30
+#define MAX_PLAYERS 4
+
+#define PLAYER_ONE 0
+#define PLAYER_TWO 1
+#define PLAYER_THREE 2
+#define PLAYER_FOUR 3
 
 // useful functions
 char *va(const char *format, ...);

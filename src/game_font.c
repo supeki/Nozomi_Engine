@@ -47,8 +47,8 @@ void FNT_StartFontEdit(void)
 
 void FNT_FontEditUpdate(void)
 {
-	uint8_t lr = G_ControlDown(CON_RIGHT, true) - G_ControlDown(CON_LEFT, true);
-	uint8_t ud = G_ControlDown(CON_DOWN, true) - G_ControlDown(CON_UP, true);
+	uint8_t lr = G_ControlDown(PLAYER_ONE, CON_RIGHT, true) - G_ControlDown(PLAYER_ONE, CON_LEFT, true);
+	uint8_t ud = G_ControlDown(PLAYER_ONE, CON_DOWN, true) - G_ControlDown(PLAYER_ONE, CON_UP, true);
 	
 	uint8_t  xoff = temp_font.offset[curchar] >> 8, yoff = temp_font.offset[curchar] & 0xFF;
 	uint8_t w = temp_font.size[curchar] >> 8, h = temp_font.size[curchar] & 0xFF;
@@ -61,11 +61,11 @@ void FNT_FontEditUpdate(void)
 
 	if (lr != 0)
 	{
-		if (G_ControlDown(CON_A, false)) {
+		if (G_ControlDown(PLAYER_ONE, CON_A, false)) {
 			txoff += lr;
-		} else if (G_ControlDown(CON_B, false)) {
+		} else if (G_ControlDown(PLAYER_ONE, CON_B, false)) {
 			tw += lr;
-		} else if (G_ControlDown(CON_C, false)) {
+		} else if (G_ControlDown(PLAYER_ONE, CON_C, false)) {
 			tcharw += lr;
 		} else {
 			curchar += lr;
@@ -74,18 +74,18 @@ void FNT_FontEditUpdate(void)
 	
 	if (ud != 0)
 	{
-		if (G_ControlDown(CON_A, false)) {
+		if (G_ControlDown(PLAYER_ONE, CON_A, false)) {
 			tyoff += ud;
-		} else if (G_ControlDown(CON_B, false)) {
+		} else if (G_ControlDown(PLAYER_ONE, CON_B, false)) {
 			th += ud;
-		} else if (G_ControlDown(CON_C, false)) {
+		} else if (G_ControlDown(PLAYER_ONE, CON_C, false)) {
 			tcharh += ud;
 		} else {
 			curchar += ud*16;
 		}
 	}
 	
-	if (G_ControlDown(CON_START, true))
+	if (G_ControlDown(PLAYER_ONE, CON_START, true))
 		FNT_SaveTempFont();
 	
 	if (curchar < 0)

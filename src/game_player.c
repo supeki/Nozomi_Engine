@@ -10,7 +10,7 @@
 static int walk_table[4] = {1, 0, 2, 0};
 
 uint8_t num_players;
-player_t players[4];
+player_t players[MAX_PLAYERS];
 
 void P_CreatePlayer(subpixel_t x, subpixel_t y, uint8_t dir)
 {

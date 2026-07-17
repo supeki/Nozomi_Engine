@@ -27,10 +27,21 @@ typedef enum
 	NUMCONTROLS
 } controls_e;
 
-extern uint32_t gamecontrols[NUMCONTROLS];
-extern uint32_t gamecontrolbinds[NUMCONTROLS][2];
+typedef enum
+{
+	AXIS_LEFTX,  // Left Stick X
+	AXIS_LEFTY,  // Left Stick Y
+	AXIS_RIGHTX, // Right Stick X
+	AXIS_RIGHTY, // Right Stick Y
+	NUMAXIS
+} controlaxis_e;
 
-bool G_ControlDown(uint8_t control, bool pressed);
+extern uint32_t gamecontrols[MAX_PLAYERS][NUMCONTROLS];
+extern int16_t  gameaxis[MAX_PLAYERS][NUMAXIS];
+extern uint32_t gamecontrolbinds[MAX_PLAYERS][NUMCONTROLS][2];
+
+bool G_ControlDown(uint8_t player, uint8_t control, bool pressed);
+int16_t G_PlayerAxis(uint8_t player, uint8_t axis);
 void G_DefaultControls(void);
 
 #endif

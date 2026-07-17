@@ -15,7 +15,7 @@ typedef struct player_s
 } player_t;
 
 extern uint8_t num_players;
-extern player_t players[4];
+extern player_t players[MAX_PLAYERS];
 
 // P for Player!
 

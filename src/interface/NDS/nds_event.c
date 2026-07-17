@@ -17,13 +17,13 @@ void I_HandleInput(void)
 	scanKeys();
 	keys = keysHeld();
 	for (c = 0; c < NUMCONTROLS; c++)
-		if (keys & gamecontrolbinds[c][1]) // holy fucking shit
-			gamecontrols[c]++;
+		if (keys & gamecontrolbinds[0][c][1]) // holy fucking shit
+			gamecontrols[0][c]++;
 			
 	keys = keysUp();
 	for (c = 0; c < NUMCONTROLS; c++)
-		if (keys & gamecontrolbinds[c][1]) // holy fucking shit
-			gamecontrols[c] = 0;
+		if (keys & gamecontrolbinds[0][c][1]) // holy fucking shit
+			gamecontrols[0][c] = 0;
 }
 
 void I_PollEvents(void)
