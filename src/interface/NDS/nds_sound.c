@@ -8,12 +8,14 @@
 #include "soundbank.h"
 
 #include "../../i_sound.h"
+#include "../../i_system.h"
 #include "../../game_defs.h"
 #include "../../game_sound.h"
 
 int jadefrac_to_maxmod[NUMMUSIC] = {
 	-1,
-	MOD_PRESENTATION
+	MOD_MYSTIC,
+	MOD_SIRENS
 };
 
 void I_StartupSound(void)
@@ -33,7 +35,7 @@ void I_PlayMusic(int id, bool loop)
 	if (!mmLoad(id)) {
 		mmUnload(jadefrac_to_maxmod[music.id]);
 		if (!mmLoad(id)) {
-			printf("Unable to load music ID %d!\n", id);
+			I_printf("Unable to load music ID %d!\n", id);
 			load = false;
 		}
 	}
@@ -42,9 +44,9 @@ void I_PlayMusic(int id, bool loop)
 		return;
 	
 	if (loop)
-		mmStart(MOD_PRESENTATION, MM_PLAY_LOOP);
+		mmStart(id, MM_PLAY_LOOP);
 	else
-		mmStart(MOD_PRESENTATION, MM_PLAY_ONCE);
+		mmStart(id, MM_PLAY_ONCE);
 }
 
 void I_StopMusic(void)
@@ -58,6 +60,11 @@ bool I_MusicPlaying(void)
 }
 
 void I_SetMusicVolume(int8_t value)
+{
+	(void)value;
+}
+
+void I_SetSoundVolume(int8_t value)
 {
 	(void)value;
 }

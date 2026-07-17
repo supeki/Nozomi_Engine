@@ -23,11 +23,11 @@ int main(int argc, char *argv[])
 {
 	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
 	
-	I_printf("Initializing SDL!\n");
+	I_printf("Initializing SDL...\n");
 	
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_GAMECONTROLLER|SDL_INIT_JOYSTICK) < 0)
 	{
-		I_Error("Could not initialize SDL: %s.\n", SDL_GetError());
+		I_Error("Could not initialize SDL: %s\n", SDL_GetError());
 	}
 	
 	// add our controller mappings for quirky controllers we wanna support
@@ -47,11 +47,11 @@ int main(int argc, char *argv[])
 	
 	gameMain();
 	
-	I_printf("Starting main game loop!\n");
+	I_printf("Starting main game loop...\n");
 		
 	gameLoop();
 	
-	I_printf("Quitting SDL!\n");
+	I_printf("Quitting SDL...\n");
 	
 	SDL_Quit();
 	I_printf("Quitting %s...\n", GAME_NAME);

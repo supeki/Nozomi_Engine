@@ -41,7 +41,7 @@ void gameMain(void)
 	GFX_InitGFX();
 	OBJ_InitObjects();
 	
-	//I_PlayMusic(mus_test, true);
+	I_PlayMusic(mus_test, true);
 	
 	test = BMPGFX_LoadBitmap("data/test_gfx/test_kitsune.bmp");
 	

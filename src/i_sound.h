@@ -14,5 +14,6 @@ void I_PlayMusic(int id, bool loop);
 void I_StopMusic(void);
 bool I_MusicPlaying(void);
 void I_SetMusicVolume(int8_t value);
+void I_SetSoundVolume(int8_t value);
 
 #endif

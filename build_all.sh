@@ -8,6 +8,9 @@ mkdir -p bin/Windows
 # Copy game data
 cp -r assets/data bin/Windows/data
 
+# Copy required licenses/credits
+cp -r assets/credits bin/Windows/credits
+
 # Make and move Windows binary and libaries
 make -j LINUX_WIN=1
 mv bin/SDL/JADEFRACTURE.exe bin/Windows
@@ -24,6 +27,9 @@ mkdir -p bin/Linux
 # Copy game data
 cp -r assets/data bin/Linux/data
 
+# Copy required licenses/credits
+cp -r assets/credits bin/Linux/credits
+
 # Make and move Linux binary
 make -j LINUX=1
 mv bin/SDL/JADEFRACTURE bin/Linux
@@ -37,6 +43,9 @@ mkdir -p bin/GLFW
 
 # Copy game data
 cp -r assets/data bin/GLFW/data
+
+# Copy required licenses/credits
+cp -r assets/credits bin/GLFW/credits
 
 # Make GLFW binary
 make -j SDL=0 LINUX=1 GLFW=1
@@ -58,10 +67,15 @@ cp -r assets/data assets/NDS/nitrofs/data
 rm -rf assets/NDS/nitrofs/data/soundfont.sf2
 # NDS also doesn't need the audio folder!
 rm -rf assets/NDS/nitrofs/data/audio
+# uhhh it also doesn't need gamecontrollerdb.txt lmfaooo
+rm -rf assets/NDS/nitrofs/data/gamecontrollerdb.txt
 
 # Remove pre-existing binaries
 rm -rf bin/NDS
 mkdir -p bin/NDS
+
+# Copy required licenses/credits
+cp -r assets/credits bin/NDS/credits
 
 # Make NDS binary
 make -j NDS=1
@@ -84,7 +98,7 @@ cp -r assets/PSP/audio bin/PSP/data/audio
 make -j PSP=1
 mv EBOOT.PBP bin/PSP
 
-# Generate licenses for PSP ver. so my ass doesn't get sued
+# Generate licenses for PSP ver. so my ass doesn't get sued <3
 psp-create-license-directory sdl2 sdl2-mixer
 mv third-party-licenses bin/PSP
 

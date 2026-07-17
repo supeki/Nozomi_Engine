@@ -13,7 +13,7 @@
 int main(int argc, char *argv[])
 {	
 	gameMain();	
-	I_printf("Starting main game loop!\n");
+	I_printf("Starting main game loop...\n");
 
 	gameLoop();
 	

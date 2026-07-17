@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 	TIMER0_CR=TIMER_DIV_1024 | TIMER_ENABLE;
 	TIMER1_CR=TIMER_CASCADE | TIMER_ENABLE;
 	
-	I_printf("Initializing NitroFS!\n");
+	I_printf("Initializing NitroFS...\n");
 	if (!nitroFSInit(NULL))
 		I_Error("NitroFS failed to initialize!\nCannot proceed!\n");
 	if (!fatInitDefault())
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 	
 	gameMain();
 	
-	I_printf("Starting main game loop!\n");
+	I_printf("Starting main game loop...\n");
 	gameLoop();
 	
 	I_printf("Quitting %s...\n", GAME_NAME);

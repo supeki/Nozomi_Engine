@@ -37,17 +37,19 @@ void I_UpdateControls(SDL_Event event)
 		// Controllers!
 		case SDL_CONTROLLERDEVICEADDED:
 		case SDL_JOYDEVICEADDED:
-			SDL_GameController *gc;
-			if (SDL_IsGameController(event.cdevice.which))
-				gc = SDL_GameControllerOpen(event.cdevice.which);
-			if (SDL_IsGameController(event.jdevice.which))
-				gc = SDL_GameControllerOpen(event.jdevice.which);
-			
-			for (j = 0; j < MAX_PLAYERS; j++)
-				if (player_controllers[j] == -1) {
-					player_controllers[j] = event.cdevice.which;
-					player_gamecontroller[j] = gc;
-				}
+			{
+				SDL_GameController *gc;
+				if (SDL_IsGameController(event.cdevice.which))
+					gc = SDL_GameControllerOpen(event.cdevice.which);
+				if (SDL_IsGameController(event.jdevice.which))
+					gc = SDL_GameControllerOpen(event.jdevice.which);
+				
+				for (j = 0; j < MAX_PLAYERS; j++)
+					if (player_controllers[j] == -1) {
+						player_controllers[j] = event.cdevice.which;
+						player_gamecontroller[j] = gc;
+					}
+			}
 			break;
 		case SDL_CONTROLLERDEVICEREMOVED:
 			for (j = 0; j < MAX_PLAYERS; j++)
