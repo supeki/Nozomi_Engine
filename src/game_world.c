@@ -4,140 +4,98 @@
 #include "i_system.h"
 
 #include "game_defs.h"
+#include "game_object.h"
 #include "game_world.h"
 
+uint16_t world_width, world_height;
+uint16_t tile_width, tile_height;
 tile_t tiles;
-tileset_t tileset;
+tileattr_t tileattr;
+gfx_t tile_gfx;
 
-typedef enum
+void W_InitTiles(void)
 {
-	TS_GRENCOVE,
-	TS_GRENPLAN,
-	TS_GRFOREST,
-	TS_CRIMSCAN,
-	TS_MOLEMINE,
-	TS_FROSTFOR,
-	TS_ICEPALAC,
-	TS_SUNKENPL,
-	TS_OPNOCEAN,
-	TS_JADEREAC,
-	TS_AERGARDE,
-	TS_ARCREALM,
-	NUMBASESETS
-} basesets_e;
-
-const char *basesets[NUMBASESETS] = {
-	"GRENCOVE",
-	"GRENPLAN",
-	"GRFOREST",
-	"CRIMSCAN",
-	"MOLEMINE",
-	"FROSTFOR",
-	"ICEPALAC",
-	"SUNKENPL",
-	"OPNOCEAN",
-	"JADEREAC",
-	"AERGARDE",
-	"ARCREALM"
-};
-
-// Ran in gameMain to initialize stuff.
-void W_InitWorld(void)
-{
-	// load the test world here
-	W_LoadWorld("data/worlds/test.wld");
+	tiles.prev = tiles.next = &tiles;
 }
 
-// Load a tileset with tile type data and a filename for graphics data
-// Tileset format
-// 8 bytes for GFX filename
-// 1 byte for Number of Tiles
-// <Number of Tiles> bytes for Tile Types
-void W_LoadTileset(const char *filename)
+/*
+typedef struct tile_s
 {
-	FILE *file = fopen(filename, "rb");
-	char gfx_name[9];
-	uint8_t num_tiles;
+	struct tile_s *prev, next;
 	
-	// check file
-	if (!file)
-	{
-		I_Error("Failed to open %s!\n", filename);
+	uint32_t id;
+	subpixel_t x, y; // position in the world
+} tile_t;
+
+typedef struct tileattr_s
+{
+	uint32_t num_tiles, tiles_per_row, *type;
+	int8_t *layer;
+} tileattr_t;
+*/
+
+void W_LoadWorld(const char* filename)
+{
+	FILE *fp = fopen(filename, "rb"), *attr_fp;
+	char tilefilename[33];
+	
+	// 2 bytes world width
+	// 2 bytes world height
+	fread(&world_width, sizeof(uint16_t), 1, fp);
+	fread(&world_height, sizeof(uint16_t), 1, fp);
+	
+	// 32 bytes tile gfx filename (and tileattr)
+	fread(&tilefilename, sizeof(char), 32, fp);
+	
+	tile_gfx = GFX_LoadGFX(va("data/tilesets/%s.gfx", tilefilename));
+	attr_fp = fopen(va("data/tilesets/%s.atr", tilefilename), "rb");
+	
+	// tile attributes
+	fread(&tileattr.num_tiles, sizeof(uint32_t), 1, attr_fp);
+	fread(&tileattr.tiles_per_row, sizeof(uint32_t), 1, attr_fp); // used for gfx when drawing
+	
+	tile_height = tile_width = (tile_gfx.width / tileattr.num_tiles); // needs to be divisible by 2 and square ratio?
+	
+	tileattr.type =  malloc(tileattr.num_tiles * sizeof(uint32_t));
+	tileattr.layer = malloc(tileattr.num_tiles * sizeof(uint8_t));
+	
+	for (int i = 0; i < tileattr.num_tiles; i++)
+		fread(&tileattr.type[i], sizeof(uint32_t), 1, attr_fp);
+	for (int i = 0; i < tileattr.num_tiles; i++)
+		fread(&tileattr.layer[i], sizeof(uint8_t), 1, attr_fp);
+	
+	fclose(attr_fp);
+	
+	// 4 bytes object id
+	// 2 bytes x
+	// 2 bytes y
+	for (uint32_t i = 0; i < (world_width * world_height); i++) {
+		uint32_t id;
+		uint16_t x, y;
+		
+		fread(&id, sizeof(uint32_t), 1, fp);
+		fread(&x, sizeof(uint16_t), 1, fp);
+		fread(&y, sizeof(uint16_t), 1, fp);
+		
+		W_CreateTile(TO_SUBPIXELS(x)*16, TO_SUBPIXELS(y)*16, id);
 	}
 	
-	// get the gfx name
-	for (int i = 0; i < 8; i++)
-		fread(&gfx_name[i], sizeof(char), 1, file);
-	
-	// load the gfx
-	tileset.gfx = GFX_LoadGFX(va("data/tilesets/%s.gfx", gfx_name));
-	
-	// get the number of tiles
-	fread(&num_tiles, sizeof(uint8_t), 1, file);
-	
-	// allocate data for tile types
-	tileset.data = malloc(num_tiles*sizeof(uint8_t));
-	
-	for (int i = 0; i < num_tiles; i++)
-		fread(&tileset.data[i], sizeof(uint8_t), 1, file);
+	fclose(fp);
 }
 
-// Load a world from a .wld file or something
-// World format
-// 8 bytes for Tileset filename
-// 1 Byte for Number of Layers
-// 4 bytes for World size
-// <5 * World size * Number of Layers> bytes for Tiles
-// Tile format:
-// T    XX         YY
-// Type X Position Y Position
-// Tile Layers are assumed to be in order.
-void W_LoadWorld(const char *filename)
+void W_HandleTiles(void)
 {
-	FILE *file = fopen(filename, "rb");
-	char tileset_name[9];
-	uint8_t num_layers;
-	uint32_t world_size;
+	tile_t *tile = tiles.next;
+	
+	while (tile != &tiles)
+	{		
+		
 
-	// check file
-	if (!file)
-	{
-		I_Error("Failed to open %s!\n", filename);
+		tile = tile->next;
 	}
-
-	// free everything
-	W_FreeTiles();
-	W_FreeTileset();
-	
-	// get the tileset name
-	for (int i = 0; i < 8; i++)
-		fread(&tileset_name[i], sizeof(char), 1, file);
-	
-	// get the number of tile layers
-	fread(&num_layers, sizeof(uint8_t), 1, file);
-	
-	// get the world size
-	fread(&world_size, sizeof(uint32_t), 1, file);
-	
-	// read tile data and make tiles
-	for (int l = 0; l < num_layers; l++)
-		for (int i = 0; i < world_size; i++)
-		{
-			int16_t x, y;
-			uint8_t id;
-			
-			fread(&id, sizeof(uint8_t), 1, file);
-			fread(&x, sizeof(int16_t), 1, file);
-			fread(&y, sizeof(int16_t), 1, file);
-			
-			x = TO_SUBPIXELS(x*16);
-			y = TO_SUBPIXELS(y*16);
-			
-			W_CreateTile(x, y, id, l);
-		}
 }
 
-tile_t *W_CreateTile(subpixel_t x, subpixel_t y, uint8_t id, uint8_t layer)
+tile_t *W_CreateTile(subpixel_t x, subpixel_t y, uint8_t id)
 {
 	tile_t *tile;
 	tile = malloc(sizeof(tile_t));
@@ -147,7 +105,7 @@ tile_t *W_CreateTile(subpixel_t x, subpixel_t y, uint8_t id, uint8_t layer)
 	tile->x = x;
 	tile->y = y;
 	
-	// add this tile to the list of tiles
+	// add this object to the list of objects
 	tiles.prev->next = tile;
 	tile->next = &tiles;
 	tile->prev = tiles.prev;
@@ -156,36 +114,159 @@ tile_t *W_CreateTile(subpixel_t x, subpixel_t y, uint8_t id, uint8_t layer)
 	return tile;
 }
 
-// Frees all Tiles in the World
-void W_FreeTiles(void)
+void W_RemoveTile(tile_t *tile)
+{
+	tile->next->prev = tile->prev;
+	tile->prev->next = tile->next;
+	free(tile);
+}
+
+void W_FreeWorld(void)
+{
+	tile_t *tile = tiles.next;
+	
+	while (tile != &tiles)
+	{		
+		tile_t *tile2 = tile->next;
+		W_RemoveTile(tile);
+		tile = tile2;
+	}
+	
+	free(&tile_gfx);
+	free(tileattr.type);
+	free(tileattr.layer);
+}
+
+void W_DrawTileLayer(uint8_t layer)
 {
 	tile_t *tile = tiles.next;
 	
 	while (tile != &tiles)
 	{
-		tile_t *tile2 = tile->next;
+		if (tileattr.layer[tile->id] != layer) { // it's not the layer we want
+			tile = tile->next;
+			continue;
+		}
 		
-		tile->next->prev = tile->prev;
-		tile->prev->next = tile->next;
-		free(tile);
+		if ((tile->x + tile_width - camera.x < 0)
+			|| (tile->x - camera.x > VID_WIDTH) 
+			|| (tile->y + tile_height - camera.y < 0)
+			|| (tile->y - camera.y > VID_HEIGHT) )
+		{ // it's not on the screen
+			tile = tile->next;
+			continue;
+		}
+		
+		V_DrawCropped(
+			tile_gfx, // tileset
+			TO_PIXELS(tile->x - camera.x), // x pos
+			TO_PIXELS(tile->y - camera.y), // y pos
+			(tile->id % tileattr.tiles_per_row) * tile_width, // tileset start x pos
+			(tile->id / tileattr.tiles_per_row) * tile_height, // tileset start y pos
+			tile_width, // width
+			tile_height, // height
+			0 // flags mraoww
+		);
 
-		tile = tile2;
+		tile = tile->next;
 	}
 }
 
-// Free all tileset data
-void W_FreeTileset(void)
+// underwater palette map
+
+static uint8_t water_palmap[43] = {
+	00, // 00, black
+	30, // 01, white
+	31, // 02, grey 1
+	32, // 03, grey 2
+	33, // 04, grey 3
+	34, // 05, grey 4
+	40, // 06, carbon
+	36, // 07, pink
+	37, // 08, red
+	38, // 09, red 2
+	39, // 10, crimson 
+	40, // 11, crimson 2
+	24, // 12, peach
+	25, // 13, mustard
+	26, // 14, apricot
+	27, // 15, brown
+	29, // 16, shoe brown
+	26, // 17, lemon
+	27, // 18, lemon 2
+	28, // 19, lemon 3
+	37, // 20, agz 
+	38, // 21, agz 2
+	39, // 22, agz 3
+	40, // 23, agz 4
+	31, // 24, grass 
+	32, // 25, grass 2
+	37, // 26, green 
+	38, // 27, green 2
+	39, // 28, green 3
+	40, // 29, green 4
+	30, // 30, cyan 
+	31, // 31, sky 
+	32, // 32, sky 2
+	33, // 33, sky 3
+	34, // 34, sky 4
+	31, // 35, cloud
+	31, // 36, cloud 2
+	32, // 37, cloud 3
+	33, // 38, cloud 4
+	34, // 39, purple
+	40, // 40, purple 2
+	32, // 41, metal
+	30, // 42, magenta
+};
+
+void W_DrawWaterTiles(void)
 {
-	if (tileset.data)
-		free(tileset.data);
+	tile_t *tile = tiles.next;
 	
-	if (&tileset.gfx != NULL)
-		free(&tileset.gfx);
+	while (tile != &tiles)
+	{
+		if (!(tileattr.type[tile->id] & TILE_WATER))
+		{
+			tile = tile->next;
+			continue;
+		}
+		
+		tile = tile->next;
+	}
 }
 
-// Debug function only so I can make worlds 
-// and save them to a file from within the game itself.
-void W_SaveWorld(const char *filename)
+// when i get to doing water, i need to use
+// vx += abs((game_tick + vy) % gfx.width/4 - gfx.width/4/2)/2;
+
+void W_MakeTileAttrFromGfx(const char *filename, gfx_t gfx, uint16_t cell_size)
+{
+	FILE *attr_fp = fopen(filename, "wb+");
+	uint32_t num_tiles, tiles_per_row;
+	
+	// calculate tiles per row and number of tiles from the gfx size and cell size
+	tiles_per_row = gfx.width / cell_size;
+	num_tiles = tiles_per_row * ((gfx.size / gfx.width) / cell_size);
+	
+	// write the number of tiles, and tiles per row
+	fwrite(&num_tiles, sizeof(uint32_t), 1, attr_fp);
+	fwrite(&tiles_per_row, sizeof(uint32_t), 1, attr_fp);
+
+	// make sure it's a dummy value of 0
+	uint32_t value = 0;
+	
+	// write the attributes
+	for (int i = 0; i < num_tiles; i++)
+		fwrite(&value, sizeof(uint32_t), 1, attr_fp);
+	
+	for (int i = 0; i < num_tiles; i++)
+		fwrite(&value, sizeof(uint8_t), 1, attr_fp);
+	
+	// close file pointer
+	fclose(attr_fp);
+}
+
+void W_SaveWorld(const char* filename)
 {
 	
 }

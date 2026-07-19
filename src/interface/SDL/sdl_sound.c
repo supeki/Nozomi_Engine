@@ -17,7 +17,8 @@ Mix_Music *current_song;
 const char *jadefrac_to_sdl[NUMMUSIC] = {
 	"\0",
 	"mystic.s3m",
-	"sirens.mod"
+	"sirens.mod",
+	"stream.s3m"
 };
 
 void I_StartupSound(void)

@@ -2,14 +2,39 @@
 // game_gfx.c
 
 #include "game_gfx.h"
+#include "game_video.h"
 #include "i_system.h"
 #include "helpers/bitmap.h"
 
-gfx_t gfx_characters;
-bitmap_gfx_t bmpgfx_characters;
+static void BMPGFX(const char *filename)
+{
+	FILE *file = fopen(va("%s.gfx", filename), "wb+");
+	bitmap_gfx_t bmp = BMPGFX_LoadBitmap(filename);
+	uint32_t size = bmp.width * bmp.height - 1;
+	uint16_t width = bmp.width - 1, v = 0;
+	int16_t xoff = 0, yoff = 0;
+	
+	fwrite(&size, sizeof(uint32_t), 1, file);
+	fwrite(&width,sizeof(uint16_t), 1, file);
+	fwrite(&xoff, sizeof(int16_t), 1, file);
+	fwrite(&yoff, sizeof(int16_t), 1, file);
+	
+	for (int i = 0; i < size+1; i++)
+		for (int p = 0; p < 43; p++) {
+			if (bmp.data[i] == palette[p]) {
+				fwrite(&p, sizeof(uint8_t), 1, file);
+				break;
+			} else if (p == 42)
+				fwrite(&v, sizeof(uint8_t), 1, file);
+		}
+	fclose(file);
+}
 
 void GFX_InitGFX(void)
 {
+//	BMPGFX("data/tilesets/tech_demo_tiles.bmp");
+//	BMPGFX("data/tech_demo_sprites.bmp");
+//	BMPGFX("data/fonts/default.bmp");
 }
 
 gfx_t GFX_LoadGFX(const char *filename)
@@ -25,25 +50,22 @@ gfx_t GFX_LoadGFX(const char *filename)
 	memset(&gfx, 0, sizeof(gfx_t));
 	
 	// read gfx header		
-	fread(&gfx.size, sizeof(uint16_t), 1, file);
+	fread(&gfx.size, sizeof(uint32_t), 1, file);
 	gfx.size++;
 	
-	fread(&gfx.width, sizeof(uint8_t), 1, file);
+	fread(&gfx.width, sizeof(uint16_t), 1, file);
 	gfx.width++;
 
-	fread(&gfx.xoff, sizeof(int8_t), 1, file);
-	fread(&gfx.yoff, sizeof(int8_t), 1, file);
+	fread(&gfx.xoff, sizeof(int16_t), 1, file);
+	fread(&gfx.yoff, sizeof(int16_t), 1, file);
 	
 	// allocate memory for pixel data
 	gfx.data = malloc(gfx.size);
 	memset(gfx.data, 0, gfx.size);
 	
-	for (int p = 0; p < gfx.size; p++)
-	{
+	for (int p = 0; p < gfx.size; p++) {
 		fread(&gfx.data[p], sizeof(uint8_t), 1, file);
 	}
-	
-	//I_Error("GFX Info Test:\nSize: %d\nWidth: %d\nX offset: %d\nY offset: %d\n", gfx.size, gfx.width, gfx.xoff, gfx.yoff);
 	
 	fclose(file);
 	return gfx;

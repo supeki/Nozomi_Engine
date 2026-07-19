@@ -11,6 +11,7 @@ typedef enum
 	mus_none,
 	mus_test,
 	mus_more,
+	mus_evenmore,
 	NUMMUSIC
 } music_e;
 

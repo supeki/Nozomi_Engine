@@ -15,9 +15,9 @@
 #include "game_player.h"
 #include "game_sound.h"
 #include "game_video.h"
+#include "game_world.h"
 
 bool game_quit = false;
-bitmap_gfx_t test;
 uint32_t game_tick;
 
 // Game startup / main function.
@@ -40,11 +40,11 @@ void gameMain(void)
 	
 	GFX_InitGFX();
 	OBJ_InitObjects();
+	W_InitTiles();
 	
-	I_PlayMusic(mus_test, true);
+	//W_LoadWorld("data/worlds/test.wld");
 	
-	test = BMPGFX_LoadBitmap("data/test_gfx/test_kitsune.bmp");
-	
+	//I_PlayMusic(mus_test, true);
 	//FNT_StartFontEdit();
 }
 
@@ -89,7 +89,7 @@ void gameLoop(void)
 		{
 			render_tick = game_tick;
 			
-			gameDisplay(); // Run all draw loops before pushing to the screen!
+			gameDisplay(); // Run all draw loops before pushing to the screen.
 			I_PushGraphics();
 		}
 		
@@ -113,10 +113,4 @@ void gameDisplay(void)
 {
 	if (font_edit)
 		FNT_FontEditDraw();
-	
-	V_DrawBitmap(test, 0, 0, 0);
-	V_DrawText("OMG LOOK AT THE KITSUNE :OOO", 0, 0, 0);
-	V_DrawText("ooooo wavyyyyyyyy :D\nmeowwww", 0, 16, V_WAVYTEXT);
-	V_DrawText("omg look at the second kitsune :O", 60, 80, V_WAVY);
-	V_DrawBitmap(test, VID_WIDTH-120, VID_HEIGHT-100, V_WAVY|V_SMALL);
 }

@@ -35,10 +35,11 @@ void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t sx, int
 
 typedef enum
 {
-	V_WAVY = 1,
-	V_WAVYTEXT = 2,
-	V_SMALL = 4,
+	V_WAVYTEXT = 1,
+	V_WAVYTEXTTWO = 2,
+	V_JUMPYTEXT = 4,
+	V_SMALL = 8,
 	NUMVIDEOFLAGS
-} video_flags;
+} video_flags_e;
 
 #endif

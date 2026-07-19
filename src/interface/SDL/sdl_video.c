@@ -86,34 +86,3 @@ void I_PushGraphics(void)
 	SDL_RenderCopy(wndRend, sdlTex, NULL, dest_rect);
 	SDL_RenderPresent(wndRend);
 }
-
-void BMPGFX(const char *filename)
-{
-	SDL_Surface *bmp = SDL_ConvertSurfaceFormat(SDL_LoadBMP(filename), SDL_PIXELFORMAT_RGB565, 0);
-	
-	if (bmp == NULL)
-		return;
-
-	FILE *file = fopen(va("%s.gfx", filename), "w+b");
-	
-	uint32_t size = bmp->w * bmp->h - 1;
-	uint16_t width = bmp->w - 1;
-	uint8_t offx = 0;
-	uint8_t offy = 0;
-	
-	fwrite(&size, sizeof(uint32_t), 1, file);
-	fwrite(&width, sizeof(uint16_t), 1, file);
-	fwrite(&offx, sizeof(uint8_t), 1, file);
-	fwrite(&offy, sizeof(uint8_t), 1, file);
-	
-	uint16_t* pixels = bmp->pixels;
-	
-	for (int i = 0; i < size; i++)
-		for (int p = 0; p < 39; p++) {
-			if (pixels[i] == palette[p]) {
-				fwrite(&p, sizeof(uint8_t), 1, file);
-			}
-		}
-			
-	fclose(file);
-}

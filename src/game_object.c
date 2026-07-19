@@ -63,9 +63,7 @@ void OBJ_RemoveObject(object_t *obj)
 	free(obj);
 }
 
-// Draw all objects to our framebuffer
-// Should be better than trying to draw each of them in their own logic stuffs
-void OBJ_DrawObjects(void)
+void OBJ_DrawObjectLayer(uint8_t layer)
 {
 	
 }

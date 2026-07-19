@@ -63,8 +63,8 @@ void V_DrawDot(int16_t x, int16_t y, uint8_t col)
 	if (x < 0 || y < 0 || x >= VID_WIDTH || y >= VID_HEIGHT || col == 0)
         return;
 	
-	if (col > 38)
-		col = 38;
+	if (col > 42)
+		col = 42;
 	
 	vid.buffer[x+(y*VID_WIDTH)] = palette[col];
 }
@@ -77,14 +77,9 @@ void V_DrawCropped(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint
 	for (int zy = 0; zy < h; zy++)
 		for (int zx = 0; zx < w; zx++)
 		{
-			uint32_t i = sx + sy*gfx.width + zx + zy*gfx.width;
+			uint32_t i = sx + (sy*gfx.width) + zx + (zy*gfx.width);
 			int32_t vx = x + zx - gfx.xoff;
 			int32_t vy = y + zy - gfx.yoff;
-			
-			if (flags & V_WAVY)
-			{
-				vx += abs((game_tick + vy) % FRAMERATE - FRAMERATE/2)/2;
-			}
 			
 			if (flags & V_SMALL)
 			{
@@ -127,10 +122,8 @@ void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t sx, int
 				vy -= zy/2;
 			}
 			
-			if (flags & V_WAVY)
-			{
-				vx += abs((game_tick + vy) % FRAMERATE - FRAMERATE/2)/2;
-			}
+			if (i >= gfx.width * gfx.height)
+				return;
 			
 			if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT || gfx.data[i] == 0)
 				continue;
@@ -152,34 +145,44 @@ void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, u
 	int16_t bx = x, by = y;
 	uint8_t charw = font.charsize >> 8, charh = font.charsize & 0xFF;
 	
-	
 	for (int i = 0; i < strlen(string); i++) {
 		int c = (int)string[i];
+		int8_t xoff = font.offset[c] >> 8, yoff = font.offset[c] & 0xFF;
+		uint8_t w = font.size[c] >> 8, h = font.size[c] & 0xFF;
+		
+		if (y + yoff > VID_HEIGHT)
+			return;
+		
+		if ((string[i] == '\n') || (x+w >= VID_WIDTH && c != 32)) {
+			x = bx;
+			y += charh;
+		}
+		
+		if (y + yoff + charh < 0) {
+			x += w;
+			continue;
+		}
 		
 		if (c >= 32) {
-			int8_t xoff = font.offset[c] >> 8, yoff = font.offset[c] & 0xFF;
-			uint8_t w = font.size[c] >> 8, h = font.size[c] & 0xFF;
-			
 			c -= 33;
 			
 			if (flags & V_WAVYTEXT)
-			{
-				yoff += abs((game_tick + x) % FRAMERATE - FRAMERATE/2)/2 - charw;
-			}
+				yoff += abs((game_tick + x) % FRAMERATE - FRAMERATE/2)/2 - charh/2;
+			
+			if (flags & V_WAVYTEXTTWO)
+				yoff += abs((game_tick + i) % FRAMERATE - FRAMERATE/2)/2 - charh/2;
+			
+			if (flags & V_JUMPYTEXT)
+				yoff += abs((game_tick/2 + x*w) % h - h/2)/2 - charh/2;
 				
 			if (c > -1) {
 				if (font.bitmap)
 					V_DrawCroppedBitmap(font.bmpgfx, x + xoff, y + yoff, (c % 16) * charw, (c / 16) * charh, charw, charh, flags);
 				else
-					V_DrawCropped(font.gfx, x + xoff, y + yoff, (c % 10) * charw, (c / 10) * charh, charw, charh, flags);
+					V_DrawCropped(font.gfx, x + xoff, y + yoff, (c % 16) * charw, (c / 16) * charh, charw, charh, flags);
 			}
 			
 			x += w;
-		}
-		
-		if ((string[i] == '\n') || (x >= VID_WIDTH)) {
-			x = bx;
-			y += charh+1;
 		}
 	}
 }

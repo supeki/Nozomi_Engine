@@ -13,6 +13,5 @@ extern SDL_Surface *sdlSurf;
 extern SDL_Surface *wndSurf;
 
 void I_UpdateWindow(SDL_Event event);
-void BMPGFX(const char *filename);
 
 #endif

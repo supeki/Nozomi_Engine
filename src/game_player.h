@@ -9,7 +9,8 @@
 
 typedef struct player_s
 {
-	uint8_t hp; // total max is 99 soooooo
+	uint16_t rings;
+	
 	
 	object_t *object;
 } player_t;

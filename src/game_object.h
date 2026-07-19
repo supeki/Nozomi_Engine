@@ -27,6 +27,7 @@ typedef struct object_s
 	subpixel_t y; // Y position relative to the world
 	uint8_t dir; // Facing direction 0 is down, 3 is right
 	subpixel_t hit[4]; // Hitbox, index 0 is x offset, 1 is y offset, 2 is width, 3 is height
+	uint8_t layer;
 	
 	// momentum variables
 	subpixel_t momx;
@@ -62,6 +63,7 @@ void OBJ_InitObjects(void);
 void OBJ_RunObjects(void);
 object_t *OBJ_CreateObject(subpixel_t x, subpixel_t y, int type);
 void OBJ_RemoveObject(object_t *obj);
+void OBJ_DrawObjectLayer(uint8_t layer);
 
 typedef enum
 {
