@@ -14,7 +14,8 @@ typedef enum
 	TILE_SEMI = 2,
 	TILE_CRUMBLE = 4,
 	TILE_WATER = 8,
-	TILE_MOVING = 16
+	TILE_MOVING = 16,
+	TILE_MAX = 32
 } tiletype_e;
 
 typedef struct tile_s
@@ -45,5 +46,10 @@ void W_SaveWorld(const char* filename);
 void W_DrawTileLayer(uint8_t layer);
 void W_MakeTileAttrFromGfx(const char *filename, gfx_t gfx, uint16_t cell_size);
 void W_DrawWaterTiles(void);
+void W_InitWorldEdit(uint16_t width, uint16_t height);
+void W_UpdateWorldEdit(void);
+void W_DrawWorldEdit(void);
+
+extern bool world_edit;
 
 #endif

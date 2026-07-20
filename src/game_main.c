@@ -41,8 +41,7 @@ void gameMain(void)
 	GFX_InitGFX();
 	OBJ_InitObjects();
 	W_InitTiles();
-	
-	//W_LoadWorld("data/worlds/test.wld");
+	W_InitWorldEdit(128, 20);
 	
 	//I_PlayMusic(mus_test, true);
 	//FNT_StartFontEdit();
@@ -106,6 +105,8 @@ void gameRunStuff(uint32_t elapsed)
 	{	
 		if (font_edit)
 			FNT_FontEditUpdate();
+		if (world_edit)
+			W_UpdateWorldEdit();
 	}
 }
 
@@ -113,4 +114,6 @@ void gameDisplay(void)
 {
 	if (font_edit)
 		FNT_FontEditDraw();
+	if (world_edit)
+		W_DrawWorldEdit();
 }
