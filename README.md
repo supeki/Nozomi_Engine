@@ -30,9 +30,18 @@ There's also a folder full of assets that you can copy the data folder from to t
 ### Windows
 These instructions were tested under Windows 7 SP1, these may work on older versions of Windows as well, but it is not a guarantee.
 
-In order to compile Nozomi Engine for Windows, you'll want to get [MSYS2](https://www.msys2.org/), and install the packages for SDL2, and SDL2_Mixer, as well as any build tools.<BR>
-To get SDL2 and SDL2_Mixer you can supply it yourself, or run `pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_mixer` in MSYS2 MINGW64, replace `x86_64` with `i686` if using MINGW32.<BR>
-To get the build tools, run `pacman -S git make mingw-w64-x86_64-gcc`, again, replace `x86_64` with `i686` if using MINGW32.
+In order to compile Nozomi Engine for Windows, you'll want to get [MSYS2](https://www.msys2.org/), and install the packages for SDL2, and SDL2_Mixer, as well as any build tools.
+To get SDL2 and SDL2_Mixer you can supply it yourself, or run:
+
+`pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_mixer` 
+
+Replace `x86_64` with `i686` if using MINGW32.
+
+To get the build tools, run:
+
+`pacman -S git make mingw-w64-x86_64-gcc`
+
+Again, replace `x86_64` with `i686` if using MINGW32.
 
 From there it's a matter of cloning the repository, and moving into the root directory of the repository. It should contain folders like `src`, `tools`, and `assets`.
 
