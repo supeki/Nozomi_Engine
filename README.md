@@ -28,25 +28,17 @@ You may use it yourself if you want, but don't expect it to work.
 There's also a folder full of assets that you can copy the data folder from to test the engine executable.
 
 ### Windows
-To compile Nozomi Engine on Windows, you have two options:
-- Compiling with MinGW
-- Compiling with WSL(2)
-#### Compiling with MinGW
-As I no longer daily drive Windows, I cannot ensure that these instructions will work quite exactly, 
-but please bear with me. Do note that I'm not a professional at this either.
+These instructions were tested under Windows 7 SP1, these may work on older versions of Windows as well, but it is not a guarantee.
 
-In order to compile Nozomi Engine with MinGW, you'll want to get [MSYS2](https://www.msys2.org/), and install the packages for SDL2, and SDL_Mixer, as well as any build tools.
+In order to compile Nozomi Engine for Windows, you'll want to get [MSYS2](https://www.msys2.org/), and install the packages for SDL2, and SDL2_Mixer, as well as any build tools.
+To get SDL2 and SDL2_Mixer you can supply it yourself, or run `pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_mixer` in MSYS2 MINGW64, replace `x86_64` with `i686` if using MINGW32.
+To get the build tools, run `pacman -S git make mingw-w64-x86_64-gcc`, again, replace `x86_64` with `i686` if using MINGW32.
 
 From there it's a matter of cloning the repository, and moving into the root directory of the repository. It should contain folders like `src`, `tools`, and `assets`.
 
 Assuming you have all the dependencies, run `make`, it should target Windows/MinGW by default.
+###### If you're compiling for 32-bit/i686 platforms, run `make WIN_32=1`.
 If it compiles successfully, you should have a `<game_name>.exe` executable in the `bin/SDL` folder.
-#### Compiling with WSL(2)
-Compiling with WSL(2) is the preferred method for compiling Nozomi Engine for Windows, but it requires you
-to have WSL(2) to begin with, experience with cross-compiling, and knowing where to put SDL libraries.
-
-Due to the complex nature, I won't go into details on how to compile it, but do know it's possible.
-If you're compiling for Windows under WSL(2), make sure you specify `make LINUX_WIN=1` instead of `make`.
 ### Linux
 To compile Nozomi Engine on Linux, you also have two options:
 - Compiling with SDL

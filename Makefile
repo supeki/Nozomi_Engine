@@ -2,7 +2,7 @@
 # A game engine created by Marilyn Nozomi with assistance from xdf, save_as, and trusted others.
 # See LICENSE.txt for details on outside usage of this engine, the code, and any bundled assets.
 
-CC = gcc
+CC = x86_64-w64-mingw32-gcc
 
 SRC_DIR = src
 OBJ_DIR = obj
@@ -15,21 +15,26 @@ EXEC_EXT = .exe
 
 # Assume Windows SDL by default Nozomi 04-15-2026
 WINDOWS ?= 1
+WIN_32 ?= 0
 LINUX ?= 0
 LINUX_32 ?= 0
-LINUX_WIN ?= 0
 GLFW ?= 0
 SDL ?= 1
 NDS ?= 0
 PSP ?= 0
 
+ifeq ($(WIN_32),1)
+WINDOWS = 0
+endif
+
 ifeq ($(LINUX),1)
 WINDOWS = 0
 endif
 
-ifeq ($(LINUX_WIN),1)
+ifeq ($(GLFW),1)
+SDL = 0
 WINDOWS = 0
-CC = x86_64-w64-mingw32-gcc
+LINUX = 1
 endif
 
 ifeq ($(NDS),1)
@@ -54,7 +59,7 @@ ifeq ($(SDL),1)
 	# Define some stuff!
 	DEFINES = -DSDL
 	OPTS := $(OPTS) -I.
-	LIBS = -lSDL2main -lSDL2 -lSDL2_mixer -lm -lc
+	LIBS = -lSDL2main -lSDL2 -lSDL2_mixer
 	LDFLAGS =  
 	
 	CFLAGS = $(OPTS) \
@@ -82,15 +87,23 @@ ifeq ($(GLFW),1)
 endif
 
 ifeq ($(WINDOWS),1)
-	OPTS := $(OPTS) -I/mingw64/include
+	OPTS := $(OPTS) -I/usr/local/x86_64-w64-mingw32/include
 	LIBS := $(LIBS) -mwindows -lmingw32
-	LDFLAGS := $(LDFLAGS) -L/mingw64/lib
+	LDFLAGS := $(LDFLAGS) -L/usr/local/x86_64-w64-mingw32/lib
 	CFLAGS := $(CFLAGS) -DWINDOWS
+endif
+
+ifeq ($(WIN_32),1)
+	OPTS := $(OPTS) -I/usr/local/i686-w64-mingw32/include
+	LIBS := $(LIBS) -mwindows -lmingw32
+	LDFLAGS := $(LDFLAGS) -L/usr/local/i686-w64-mingw32/lib
+	CFLAGS := $(CFLAGS) -DWINDOWS -m32
 endif
 
 ifeq ($(LINUX),1)
 	EXEC_EXT = 
 
+	LIBS := $(LIBS) -lm -lc
 	CFLAGS := $(CFLAGS) $(pkg-config sdl2 SDL2_mixer --cflags) -w
 	LDFLAGS := $(LDFLAGS) $(pkg-config sdl2 SDL2_mixer --libs)
 endif
@@ -236,6 +249,7 @@ endif
 # Clean up the objects.
 clean:
 	rm -rf $(OBJ_DIR)/*
+	rm -rf $(INTERFACE_BIN)/$(EXEC_NAME)$(EXEC_EXT)
 	
 # Make all required directories!
 $(OBJ_DIR):
