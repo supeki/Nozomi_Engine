@@ -27,4 +27,6 @@ gfx_t GFX_LoadGFX(const char *filename);
 
 bitmap_gfx_t BMPGFX_LoadBitmap(const char *filename);
 
+extern bitmap_gfx_t gfx_her, gfx_tiles, gfx_tree, gfx_tree2, gfx_tree3, gfx_textbox;
+
 #endif

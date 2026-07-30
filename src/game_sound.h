@@ -9,9 +9,7 @@
 typedef enum
 {
 	mus_none,
-	mus_test,
-	mus_more,
-	mus_evenmore,
+	mus_man,
 	NUMMUSIC
 } music_e;
 

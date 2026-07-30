@@ -11,14 +11,13 @@
 #include "../../i_system.h"
 #include "../../game_defs.h"
 #include "../../game_sound.h"
+#include "../../game_video.h"
 
 Mix_Music *current_song;
 
 const char *jadefrac_to_sdl[NUMMUSIC] = {
 	"\0",
-	"mystic.s3m",
-	"sirens.mod",
-	"stream.s3m"
+	"man.mp3"
 };
 
 void I_StartupSound(void)

@@ -14,9 +14,7 @@
 
 int jadefrac_to_maxmod[NUMMUSIC] = {
 	-1,
-	MOD_MYSTIC,
-	MOD_SIRENS,
-	MOD_STREAM
+	MOD_MAN
 };
 
 void I_StartupSound(void)

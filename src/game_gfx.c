@@ -1,10 +1,13 @@
 // Nozomi Engine
 // game_gfx.c
 
+#include "game_defs.h"
 #include "game_gfx.h"
 #include "game_video.h"
 #include "i_system.h"
 #include "helpers/bitmap.h"
+
+bitmap_gfx_t gfx_her, gfx_tiles, gfx_tree, gfx_tree2, gfx_tree3, gfx_textbox;
 
 static void BMPGFX(const char *filename)
 {
@@ -32,9 +35,12 @@ static void BMPGFX(const char *filename)
 
 void GFX_InitGFX(void)
 {
-//	BMPGFX("data/tilesets/tech_demo_tiles.bmp");
-//	BMPGFX("data/tech_demo_sprites.bmp");
-//	BMPGFX("data/fonts/default.bmp");
+	gfx_her = BMPGFX_LoadBitmap("data/her.bmp");
+	gfx_tiles = BMPGFX_LoadBitmap("data/tiles.bmp");
+	gfx_tree = BMPGFX_LoadBitmap("data/tree1.bmp");
+	gfx_tree2 = BMPGFX_LoadBitmap("data/tree2.bmp");
+	gfx_tree3 = BMPGFX_LoadBitmap("data/tree3.bmp");
+	gfx_textbox = BMPGFX_LoadBitmap("data/box.bmp");
 }
 
 gfx_t GFX_LoadGFX(const char *filename)

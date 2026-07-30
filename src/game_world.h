@@ -35,6 +35,7 @@ typedef struct tileattr_s
 extern tile_t tiles;
 extern tileattr_t tileattr;
 extern uint16_t world_width, world_height;
+extern uint16_t tile_width, tile_height;
 
 void W_InitTiles(void);
 void W_LoadWorld(const char* filename);

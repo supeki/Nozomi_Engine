@@ -9,7 +9,7 @@
 #include "game_world.h"
 
 uint16_t world_width = 16, world_height = 16;
-uint16_t tile_width = 8, tile_height = 8;
+uint16_t tile_width = 16, tile_height = 16;
 tile_t tiles;
 tileattr_t tileattr;
 gfx_t tile_gfx;

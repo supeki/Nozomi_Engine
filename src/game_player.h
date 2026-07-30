@@ -11,7 +11,6 @@ typedef struct player_s
 {
 	uint16_t rings;
 	
-	
 	object_t *object;
 } player_t;
 

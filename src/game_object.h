@@ -7,16 +7,6 @@
 #include "game_defs.h"
 #include "game_video.h"
 
-typedef struct state_s
-{
-	uint16_t sprite;
-	uint16_t frame; // starting frame
-	uint16_t numframes; // number of frames
-	uint16_t fps; // number of sprite frames to cycle through per second
-	uint32_t statetime; // how many frames this state lasts for 
-	uint32_t next; // number for next state to go to
-} state_t;
-
 typedef struct object_s
 {
 	// base variables
@@ -64,21 +54,15 @@ void OBJ_RunObjects(void);
 object_t *OBJ_CreateObject(subpixel_t x, subpixel_t y, int type);
 void OBJ_RemoveObject(object_t *obj);
 void OBJ_DrawObjectLayer(uint8_t layer);
+bool OBJ_TryMovement(object_t *obj, subpixel_t x, subpixel_t y);
 
 typedef enum
 {
 	OBJ_NULL, // you can set an object's type to this to remove it :D ... or use OBJ_RemoveObject
 	OBJ_MARIL, // ts bitch playable or something
+	OBJ_MAN, // the man behind the tree
+	OBJ_CHECK, // invis object to check/interact with things
 	NUMOBJTYPES
 } objecttypes_e;
-
-typedef enum
-{
-	S_NULL,
-	S_MARIL_STAND, // she stand
-	S_MARIL_WALK, // she walcc
-	S_MARIL_WIN, // she maybe even do a little pose
-	NUMSTATES
-} states_e;
 
 #endif

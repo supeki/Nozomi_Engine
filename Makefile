@@ -201,6 +201,7 @@ OBJS := $(OBJS) \
 		$(OBJ_DIR)/game_sound.o \
 		$(OBJ_DIR)/game_video.o \
 		$(OBJ_DIR)/game_world.o \
+		$(OBJ_DIR)/game_dialogue.o \
 		$(INTERFACE_OBJ)/$(i_main).o \
 		$(INTERFACE_OBJ)/$(i_event).o \
 		$(INTERFACE_OBJ)/$(i_sound).o \
@@ -299,6 +300,9 @@ $(OBJ_DIR)/game_video.o: $(SRC_DIR)/game_video.c $(SRC_DIR)/game_video.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
 	
 $(OBJ_DIR)/game_world.o: $(SRC_DIR)/game_world.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_gfx.h $(SRC_DIR)/game_world.h
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	
+$(OBJ_DIR)/game_dialogue.o: $(SRC_DIR)/game_dialogue.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_gfx.h $(SRC_DIR)/game_dialogue.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
 	
 # Make the interface objs!
