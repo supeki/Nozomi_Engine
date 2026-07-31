@@ -69,11 +69,47 @@ void V_DrawDot(int16_t x, int16_t y, uint8_t col)
 	vid.buffer[x+(y*VID_WIDTH)] = palette[col];
 }
 
+static void V_DrawCroppedNoCheck(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
+{	
+	for (int zy = 0; zy < h; zy++)
+		for (int zx = 0; zx < w; zx++)
+		{
+			uint32_t i = sx + (sy*gfx.width) + zx + (zy*gfx.width);
+			int32_t vx = x + zx - gfx.xoff;
+			int32_t vy = y + zy - gfx.yoff;
+			
+			if (flags & V_SMALL)
+			{
+				vx -= (zx/2);
+				vy -= (zy/2);
+			}
+						
+			if (i >= gfx.size)
+				return;
+			
+			if (gfx.data[i] == 0)
+				continue;
+			
+			vid.buffer[vx+(vy*VID_WIDTH)] = palette[gfx.data[i]];
+		}
+}
+
 void V_DrawCropped(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
 {	
 	if ((gfx.size + gfx.width) <= 0)
         return;
 	
+	// completely out of bounds
+	if (x >= VID_WIDTH || y >= VID_HEIGHT || x+w < 0 || y+h < 0)
+		return;
+	
+	// completely within bounds
+	if (x >= 0 && y >= 0 && x+w < VID_WIDTH && y+h < VID_HEIGHT) {
+		V_DrawCroppedNoCheck(gfx, x, y, sx, sy, w, h, flags);
+		return;
+	}
+
+	// handle anything else
 	for (int zy = 0; zy < h; zy++)
 		for (int zx = 0; zx < w; zx++)
 		{
@@ -104,10 +140,45 @@ void V_Draw(gfx_t gfx, int16_t x, int16_t y, uint32_t flags)
 
 // Bitmap variants if need be
 
+void V_DrawCroppedBitmapNoCheck(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
+{	
+	for (int zy = 0; zy < h; zy++)
+		for (int zx = 0; zx < w; zx++)
+		{
+			int i = sx + sy*gfx.width + zx + zy*gfx.width;
+			int vx = x + zx;
+			int vy = y + zy;
+			
+			if (flags & V_SMALL)
+			{
+				vx -= zx/2;
+				vy -= zy/2;
+			}
+			
+			if (i >= gfx.width * gfx.height)
+				return;
+			
+			if (gfx.data[i] == 0)
+				continue;
+			
+			vid.buffer[vx+(vy*VID_WIDTH)] = gfx.data[i];
+		}
+}
+
 void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
 {	
 	if ((gfx.width * gfx.height) <= 0)
         return;
+	
+	// completely out of bounds
+	if (x >= VID_WIDTH || y >= VID_HEIGHT || x+w < 0 || y+h < 0)
+		return;
+	
+	// completely within bounds
+	if (x >= 0 && y >= 0 && x+w < VID_WIDTH && y+h < VID_HEIGHT) {
+		V_DrawCroppedBitmapNoCheck(gfx, x, y, sx, sy, w, h, flags);
+		return;
+	}
 	
 	for (int zy = 0; zy < h; zy++)
 		for (int zx = 0; zx < w; zx++)
