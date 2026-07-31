@@ -2,7 +2,7 @@
 # A game engine created by Marilyn Nozomi with assistance from xdf, save_as, and trusted others.
 # See LICENSE.txt for details on outside usage of this engine, the code, and any bundled assets.
 
-CC = x86_64-w64-mingw32-gcc
+CC = gcc
 
 SRC_DIR = src
 OBJ_DIR = obj
@@ -87,6 +87,7 @@ ifeq ($(GLFW),1)
 endif
 
 ifeq ($(WINDOWS),1)
+	CC = x86_64-w64-mingw32-gcc
 	OPTS := $(OPTS) -I/usr/local/x86_64-w64-mingw32/include
 	LIBS := $(LIBS) -mwindows -lmingw32
 	LDFLAGS := $(LDFLAGS) -L/usr/local/x86_64-w64-mingw32/lib
