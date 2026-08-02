@@ -159,7 +159,7 @@ ifeq ($(NDS),1)
 	ELF_NAME = $(EXEC_NAME).elf
 	NITROFSDIR := assets/$(INTERFACE)/nitrofs
 	AUDIODIR := assets/$(INTERFACE)/audio
-	AUDIOFILES := $(AUDIODIR)/mystic.s3m $(AUDIODIR)/sirens.mod $(AUDIODIR)/stream.s3m
+	AUDIOFILES := $(AUDIODIR)/tech_demo_boss.xm
 	
 	DEFINES	:= -DARM9 -D__NDS__
 	SPECS := $(BLOCKSDS)/sys/crts/ds_arm9.specs
