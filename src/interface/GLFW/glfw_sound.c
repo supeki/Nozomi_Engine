@@ -16,7 +16,7 @@ Mix_Music *current_song;
 
 const char *jadefrac_to_sdl[NUMMUSIC] = {
 	"\0",
-	"man.ogg"
+	"tech_demo_boss.xm"
 };
 
 void I_StartupSound(void)
@@ -33,9 +33,9 @@ void I_PlayMusic(int id, bool loop)
 		Mix_FreeMusic(current_song);
 	
 	if (use_midi)
-		current_song = Mix_LoadMUS(va("data/audio/%s.mid", jadefrac_to_sdl[id]));
+		current_song = Mix_LoadMUS(va("data/audio/%s", jadefrac_to_sdl[id]));
 	else
-		current_song = Mix_LoadMUS(va("data/audio/%s.mp3", jadefrac_to_sdl[id]));
+		current_song = Mix_LoadMUS(va("data/audio/%s", jadefrac_to_sdl[id]));
 	
 	if (current_song == NULL) {
 		I_printf("Couldn't play song: %s", jadefrac_to_sdl[id]);

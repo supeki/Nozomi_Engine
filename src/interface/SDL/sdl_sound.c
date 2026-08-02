@@ -17,7 +17,7 @@ Mix_Music *current_song;
 
 const char *jadefrac_to_sdl[NUMMUSIC] = {
 	"\0",
-	"core.xm"
+	"tech_demo_boss.xm"
 };
 
 void I_StartupSound(void)
