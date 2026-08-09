@@ -154,7 +154,7 @@ void V_DrawCroppedBitmapNoCheck(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t 
 				vx -= zx/2;
 				vy -= zy/2;
 			}
-			
+
 			if (i >= gfx.width * gfx.height)
 				return;
 			
