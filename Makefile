@@ -9,7 +9,7 @@ OBJ_DIR = obj
 BIN_DIR = bin
 
 # Name of the executable (minus the extension!) Nozomi 04-15-2026
-EXEC_NAME = JADEFRACTURE
+EXEC_NAME = game
 # Assume it's a Windows Executable by default? :3
 EXEC_EXT = .exe
 
