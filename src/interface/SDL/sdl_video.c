@@ -17,7 +17,11 @@ SDL_Renderer *wndRend;
 SDL_Texture *sdlTex;
 
 uint16_t* pixels;
+#ifdef PSP
+int win_width = VID_WIDTH, win_height = VID_HEIGHT;
+#else
 uint32_t win_width = VID_WIDTH, win_height = VID_HEIGHT;
+#endif
 float scale;
 
 void I_StartupGraphics(void)

@@ -12,7 +12,7 @@ cp -r assets/data bin/Windows/data
 cp -r assets/credits bin/Windows/credits
 
 # Make and move Windows binary and libaries
-make -j LINUX_WIN=1
+make LINUX_WIN=1
 mv bin/SDL/JADEFRACTURE.exe bin/Windows
 cp -r assets/Windows/SDL2.dll bin/Windows/SDL2.dll
 cp -r assets/Windows/SDL2_mixer.dll bin/Windows/SDL2_mixer.dll
@@ -31,7 +31,7 @@ cp -r assets/data bin/Linux/data
 cp -r assets/credits bin/Linux/credits
 
 # Make and move Linux binary
-make -j LINUX=1
+make LINUX=1
 mv bin/SDL/JADEFRACTURE bin/Linux
 
 # Clean obj directory to prepare for GLFW
@@ -48,7 +48,7 @@ cp -r assets/data bin/GLFW/data
 cp -r assets/credits bin/GLFW/credits
 
 # Make GLFW binary
-make -j SDL=0 LINUX=1 GLFW=1
+make SDL=0 LINUX=1 GLFW=1
 
 # Clean obj directory to prepare for NDS
 make clean
@@ -62,6 +62,10 @@ rm -rf src/interface/NDS/soundbank.h
 
 # Copy game data
 cp -r assets/data assets/NDS/nitrofs/data
+
+# Remove and copy audio data
+rm -rf assets/NDS/audio
+cp -r assets/data/audio assets/NDS/audio
 
 # NDS doesn't need a soundfont!
 rm -rf assets/NDS/nitrofs/data/soundfont.sf2
@@ -78,7 +82,7 @@ mkdir -p bin/NDS
 cp -r assets/credits bin/NDS/credits
 
 # Make NDS binary
-make -j NDS=1
+make NDS=1
 
 # Clean obj directory to prepare for PSP
 make clean
@@ -95,7 +99,7 @@ rm -rf bin/PSP/data/audio
 cp -r assets/PSP/audio bin/PSP/data/audio
 
 # Make and move PSP binary
-make -j PSP=1
+make PSP=1
 mv EBOOT.PBP bin/PSP
 
 # Generate licenses for PSP ver. so my ass doesn't get sued <3

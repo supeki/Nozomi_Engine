@@ -66,8 +66,8 @@ void G_DefaultControls(void)
 		gamecontrolbinds[j][CON_DOWN][1] = KEY_DOWN;
 		gamecontrolbinds[j][CON_LEFT][1] = KEY_LEFT;
 		gamecontrolbinds[j][CON_RIGHT][1] = KEY_RIGHT;
-		gamecontrolbinds[j][CON_A][1] = KEY_A;
-		gamecontrolbinds[j][CON_B][1] = KEY_Y;
+		gamecontrolbinds[j][CON_A][1] = KEY_Y;
+		gamecontrolbinds[j][CON_B][1] = KEY_A;
 		gamecontrolbinds[j][CON_C][1] = KEY_B;
 		gamecontrolbinds[j][CON_START][1] = KEY_START;
 		gamecontrolbinds[j][CON_SELECT][1] = KEY_SELECT;
