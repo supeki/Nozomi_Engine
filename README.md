@@ -2,7 +2,7 @@
 My very own game engine, wrote in C with the purpose of being a simpler game engine for me to use for my games.
 
 ## Questions / Answers
-### Why are you writing my own game engine instead of using X, Y, or Z?
+### Why are you writing your own game engine instead of using X, Y, or Z?
 The purpose for me writing my own engine instead of using [Godot](https://godotengine.org/), [Unity](https://unity.com/), [GameMaker](https://gamemaker.io/en), or other engines is
 that I feel that they all over-complicate everything for me and have their own scripting languages that I simply cannot
 work with. Writing my own engine also gives me complete control over what platforms I can support, unlike using other engines.
