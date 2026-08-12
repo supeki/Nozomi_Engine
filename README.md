@@ -92,7 +92,7 @@ Nozomi Engine is the intellectual property of Marilyn Nozomi (aka [supeki](https
 Nozomi Engine and other related works are Copyright © 2026 Marilyn Nozomi
 
 All non-original code belongs to their authors, contributors own the rights to their own code until it is merged into Nozomi Engine.
-If you suspect that your code, or other assets are being misused, please contact me at `admin@maril.dev`<s>, or on Discord at `mysticrealmcommunityedition`.</s>
+If you suspect that your code, or other assets are being misused, please contact me at `admin@maril.dev`, or visit my contacts page at [https://contacts.maril.dev](https://contacts.maril.dev) for other ways to reach out.
 
 I personally also vow that all code in Nozomi Engine is wrote by real people, and that all other misc. assets are also made by hand.
 If you suspect that AI was used in the making of any part of Nozomi Engine, 
