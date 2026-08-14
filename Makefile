@@ -9,9 +9,14 @@ OBJ_DIR = obj
 BIN_DIR = bin
 
 # Name of the executable (minus the extension!) Nozomi 04-15-2026
-EXEC_NAME = game
+EXEC_NAME ?= game
 # Assume it's a Windows Executable by default? :3
-EXEC_EXT = .exe
+EXEC_EXT ?= .exe
+
+# Name of the game Nozomi 08-12-2026
+GAME_TITLE	?= Nozomi Engine
+GAME_SUBTITLE	?= Demo
+GAME_AUTHOR	?= Unknown Author
 
 # Assume Windows SDL by default Nozomi 04-15-2026
 WINDOWS ?= 1
@@ -125,9 +130,9 @@ ifeq ($(PSP),1)
 	CFLAGS := $(CFLAGS) $(shell $(PSPDIR)/bin/sdl2-config --cflags) $(shell ~/pspdev/bin/psp-pkg-config SDL2_mixer --cflags)
 	LIBS = $(shell $(PSPDIR)/bin/sdl2-config --libs) $(shell ~/pspdev/bin/psp-pkg-config SDL2_mixer --libs) -lGL -lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl -lpspumd -lpsprtc -lpsppower -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpspvram
 	
-	TARGET = JADEFRACTURE
+	TARGET = $(EXEC_NAME)
 	EXTRA_TARGETS = EBOOT.PBP
-	PSP_EBOOT_TITLE = JADEFRACTURE
+	PSP_EBOOT_TITLE = $(GAME_TITLE)
 endif
 
 # Nintendo DS port!
@@ -150,11 +155,8 @@ ifeq ($(NDS),1)
 	i_system = nds_system
 	i_video = nds_video
 
-	GAME_TITLE	:= JADEFRACTURE
-	GAME_SUBTITLE	:= An indie RPG by
-	GAME_AUTHOR	:= Marilyn Nozomi
-	GAME_ICON	:= assets/NDS/icon.gif
-	GAME_FULL_TITLE := $(GAME_TITLE);$(GAME_SUBTITLE);$(GAME_AUTHOR)
+	GAME_ICON	?= assets/$(INTERFACE)/icon.gif
+	GAME_FULL_TITLE ?= $(GAME_TITLE);$(GAME_SUBTITLE);$(GAME_AUTHOR)
 	NDS_NAME = $(EXEC_NAME).nds
 	ELF_NAME = $(EXEC_NAME).elf
 	NITROFSDIR := assets/$(INTERFACE)/nitrofs
@@ -190,6 +192,10 @@ endif
 INTERFACE_SRC = $(SRC_DIR)/interface/$(INTERFACE)
 INTERFACE_OBJ = $(OBJ_DIR)/$(INTERFACE)
 INTERFACE_BIN = $(BIN_DIR)/$(INTERFACE)
+
+ifdef GAME_TITLE
+CFLAGS := $(CFLAGS) -DGAME_NAME="\"$(GAME_TITLE)\""
+endif
 
 OBJS := $(OBJS) \
 		$(OBJ_DIR)/game_main.o \

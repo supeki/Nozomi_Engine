@@ -13,7 +13,7 @@ cp -r assets/credits bin/Windows/credits
 
 # Make and move Windows binary and libaries
 make LINUX_WIN=1
-mv bin/SDL/JADEFRACTURE.exe bin/Windows
+mv bin/SDL/game.exe bin/Windows
 cp -r assets/Windows/SDL2.dll bin/Windows/SDL2.dll
 cp -r assets/Windows/SDL2_mixer.dll bin/Windows/SDL2_mixer.dll
 
@@ -32,7 +32,7 @@ cp -r assets/credits bin/Linux/credits
 
 # Make and move Linux binary
 make LINUX=1
-mv bin/SDL/JADEFRACTURE bin/Linux
+mv bin/SDL/game bin/Linux
 
 # Clean obj directory to prepare for GLFW
 make clean
@@ -62,6 +62,8 @@ rm -rf src/interface/NDS/soundbank.h
 
 # Copy game data
 cp -r assets/data assets/NDS/nitrofs/data
+rm -rf assets/NDS/icon.gif
+cp -r assets/icon.gif assets/NDS/icon.gif
 
 # Remove and copy audio data
 rm -rf assets/NDS/audio
@@ -108,5 +110,5 @@ mv third-party-licenses bin/PSP
 
 # Clean up misc. files
 rm -rf PARAM.SFO
-rm -rf JADEFRACTURE.elf
+rm -rf game.elf
 rm -rf bin/SDL

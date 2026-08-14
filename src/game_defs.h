@@ -20,7 +20,9 @@
 #include <math.h>
 #include <string.h>
 
+#ifndef GAME_NAME
 #define GAME_NAME "Nozomi Engine dev"
+#endif
 
 #define FRAMERATE 30
 #define MAX_PLAYERS 4

@@ -1,0 +1,33 @@
+BlocksDS Logo Copyright
+BlocksDS Logo © 2025 by Megan Gozzard is licensed under CC BY-ND 4.0
+
+DSWiFi Copyright
+Copyright (C) 2005-2006 Stephen Stair - sgstair@akkit.org
+Copyright (c) 2006-2018 Dave Murphy (WinterMute)
+Copyright (c) 2021 Max Thomas (ShinyQuagsire)
+Copyright (C) 2025 Antonio Niño Díaz
+
+TLS Copyright
+Copyright The Mbed TLS Contributors
+
+lwIP Copyright
+Copyright (c) 2001, 2004 Swedish Institute of Computer Science.
+
+libnds is provided under the Zlib license.
+FatFs uses a custom license.
+
+Maxmod Copyright
+Copyright (C) 2008-2009 Mukunda Johnson (mukunda@maxmod.org)
+Copyright (C) 2021-2025 Antonio Niño Díaz
+Copyright (C) 2023 Lorenzooone (lollo.lollo.rbiz@gmail.com)
+
+crts is under the Mozilla Public License v2.0: https://www.mozilla.org/en-US/MPL/2.0/
+Source code for crts: https://codeberg.org/blocksds/sdk/src/branch/master/sys/crts
+
+The default ARM7 core is distributed under Zlib, but uses DSWiFi and Maxmod, credits are above.
+
+Please see:
+https://github.com/picolibc/picolibc/blob/main/README.md
+- regarding picolibc's licenses.
+
+libgcc and libstdc++ are used but no license is required to be distributed.
