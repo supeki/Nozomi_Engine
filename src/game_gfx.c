@@ -16,14 +16,15 @@ static void BMPGFX(const char *filename)
 	uint32_t size = bmp.width * bmp.height - 1;
 	uint16_t width = bmp.width - 1, v = 0;
 	int16_t xoff = 0, yoff = 0;
+	int i, p;
 	
 	fwrite(&size, sizeof(uint32_t), 1, file);
 	fwrite(&width,sizeof(uint16_t), 1, file);
 	fwrite(&xoff, sizeof(int16_t), 1, file);
 	fwrite(&yoff, sizeof(int16_t), 1, file);
 	
-	for (int i = 0; i < size+1; i++)
-		for (int p = 0; p < 43; p++) {
+	for (i = 0; i < size+1; i++)
+		for (p = 0; p < 43; p++) {
 			if (bmp.data[i] == palette[p]) {
 				fwrite(&p, sizeof(uint8_t), 1, file);
 				break;
@@ -47,6 +48,7 @@ gfx_t GFX_LoadGFX(const char *filename)
 {
 	FILE *file = fopen(filename, "rb");
 	gfx_t gfx;
+	int p;
 	
 	// check file
 	if (!file)
@@ -69,7 +71,7 @@ gfx_t GFX_LoadGFX(const char *filename)
 	gfx.data = malloc(gfx.size);
 	memset(gfx.data, 0, gfx.size);
 	
-	for (int p = 0; p < gfx.size; p++) {
+	for (p = 0; p < gfx.size; p++) {
 		fread(&gfx.data[p], sizeof(uint8_t), 1, file);
 	}
 	
@@ -80,6 +82,7 @@ gfx_t GFX_LoadGFX(const char *filename)
 // Load a Bitmap and convert it to our Bitmap GFX format
 bitmap_gfx_t BMPGFX_LoadBitmap(const char *filename)
 {
+	int x, y;
 	bitmap_gfx_t gfx;
 	bitmap_t bitmap = Bitmap_Load(filename);
 	
@@ -90,8 +93,8 @@ bitmap_gfx_t BMPGFX_LoadBitmap(const char *filename)
 	switch (bitmap.bpp) 
 	{
 		case 4:
-			for (int y = 0; y < bitmap.height; y++)
-				for (int x = 0; x < bitmap.width; x+=2)
+			for (y = 0; y < bitmap.height; y++)
+				for (x = 0; x < bitmap.width; x+=2)
 				{
 					uint32_t index = y * bitmap.width + x;
 					rgb_t pal = bitmap.palette[bitmap.pixel_data[index>>1] >> 4];
@@ -102,8 +105,8 @@ bitmap_gfx_t BMPGFX_LoadBitmap(const char *filename)
 				}
 			break;
 		case 8:
-			for (int y = 0; y < bitmap.height; y++)
-				for (int x = 0; x < bitmap.width; x++)
+			for (y = 0; y < bitmap.height; y++)
+				for (x = 0; x < bitmap.width; x++)
 				{
 					uint32_t index = y * bitmap.width + x;
 					rgb_t pal = bitmap.palette[bitmap.pixel_data[index]];
@@ -112,8 +115,8 @@ bitmap_gfx_t BMPGFX_LoadBitmap(const char *filename)
 				}
 			break;
 		case 16:
-			for (int y = 0; y < bitmap.height; y++)
-				for (int x = 0; x < bitmap.width*2; x+=2)
+			for (y = 0; y < bitmap.height; y++)
+				for (x = 0; x < bitmap.width*2; x+=2)
 				{
 					uint32_t index = y * (bitmap.width*2) + x;
 					uint16_t color = bitmap.pixel_data[index]|(bitmap.pixel_data[index+1]<<8);
@@ -127,8 +130,8 @@ bitmap_gfx_t BMPGFX_LoadBitmap(const char *filename)
 				}
 			break;
 		case 24:
-			for (int y = 0; y < bitmap.height; y++)
-				for (int x = 0; x < bitmap.width*3; x+=3)
+			for (y = 0; y < bitmap.height; y++)
+				for (x = 0; x < bitmap.width*3; x+=3)
 				{
 					uint32_t index = y * (bitmap.width*3) + x;
 					rgb_t pal;

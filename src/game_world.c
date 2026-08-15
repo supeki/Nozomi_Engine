@@ -41,6 +41,7 @@ typedef struct tileattr_s
 static void W_LoadTileAttr(const char *filename)
 {
 	FILE *attr_fp = fopen(filename, "rb");
+	int i;
 	
 	// tile attributes
 	fread(&tileattr.num_tiles, sizeof(uint32_t), 1, attr_fp);
@@ -51,9 +52,9 @@ static void W_LoadTileAttr(const char *filename)
 	tileattr.type =  malloc(tileattr.num_tiles * sizeof(uint32_t));
 	tileattr.layer = malloc(tileattr.num_tiles * sizeof(uint8_t));
 	
-	for (int i = 0; i < tileattr.num_tiles; i++)
+	for (i = 0; i < tileattr.num_tiles; i++)
 		fread(&tileattr.type[i], sizeof(uint32_t), 1, attr_fp);
-	for (int i = 0; i < tileattr.num_tiles; i++)
+	for (i = 0; i < tileattr.num_tiles; i++)
 		fread(&tileattr.layer[i], sizeof(uint8_t), 1, attr_fp);
 	
 	fclose(attr_fp);
@@ -63,6 +64,7 @@ void W_LoadWorld(const char* filename)
 {
 	FILE *fp = fopen(filename, "rb"), *attr_fp;
 	char tilefilename[33];
+	uint32_t i;
 	
 	// 2 bytes world width
 	// 2 bytes world height
@@ -81,7 +83,7 @@ void W_LoadWorld(const char* filename)
 	// 4 bytes object id
 	// 2 bytes x
 	// 2 bytes y
-	for (uint32_t i = 0; i < (world_width * world_height); i++) {
+	for (i = 0; i < (world_width * world_height); i++) {
 		uint32_t id;
 
 		fread(&id, sizeof(uint32_t), 1, fp);
@@ -154,6 +156,8 @@ void W_FreeWorld(void)
 
 void W_DrawTileLayer(uint8_t layer)
 {
+	uint32_t i;
+
 	if (!world_edit) {
 		tile_t *tile = tiles.next;
 		
@@ -187,14 +191,14 @@ void W_DrawTileLayer(uint8_t layer)
 			tile = tile->next;
 		}
 	} else {
-		for (uint32_t i = 0; i < world_width*world_height; i++)
+		for (i = 0; i < world_width*world_height; i++)
 		{
-			if (tileattr.layer[temp_world_data[i]] != layer)
-				continue;
-			
 			uint16_t x = (i % world_width)*tile_width + EDIT_OFFX;
 			uint16_t y = (i / world_width)*tile_height + EDIT_OFFY + HEADER_OFF;
-			
+					
+			if (tileattr.layer[temp_world_data[i]] != layer)
+				continue;
+		
 			if ((x + tile_width - camera.x < 0)
 				|| (x - camera.x > VID_WIDTH) 
 				|| (y + tile_height - camera.y <= EDIT_OFFY + HEADER_OFF)
@@ -285,7 +289,8 @@ void W_DrawWaterTiles(void)
 void W_MakeTileAttrFromGfx(const char *filename, gfx_t gfx, uint16_t cell_size)
 {
 	FILE *attr_fp = fopen(filename, "wb+");
-	uint32_t num_tiles, tiles_per_row;
+	uint32_t num_tiles, tiles_per_row, value = 0;
+	int i;
 	
 	// calculate tiles per row and number of tiles from the gfx size and cell size
 	tiles_per_row = gfx.width / cell_size;
@@ -294,15 +299,12 @@ void W_MakeTileAttrFromGfx(const char *filename, gfx_t gfx, uint16_t cell_size)
 	// write the number of tiles, and tiles per row
 	fwrite(&num_tiles, sizeof(uint32_t), 1, attr_fp);
 	fwrite(&tiles_per_row, sizeof(uint32_t), 1, attr_fp);
-
-	// make sure it's a dummy value of 0
-	uint32_t value = 0;
 	
 	// write the attributes
-	for (int i = 0; i < num_tiles; i++)
+	for (i = 0; i < num_tiles; i++)
 		fwrite(&value, sizeof(uint32_t), 1, attr_fp);
 	
-	for (int i = 0; i < num_tiles; i++)
+	for (i = 0; i < num_tiles; i++)
 		fwrite(&value, sizeof(uint8_t), 1, attr_fp);
 	
 	// close file pointer
@@ -313,6 +315,7 @@ static void W_MakeTempWorld(void)
 {
 	FILE *fp = fopen("data/worlds/temp.wld", "wb+");
 	char tilefilename[33];
+	uint32_t i;
 	
 	strncpy(tilefilename, "tech_demo_tiles", 32);
 
@@ -325,7 +328,7 @@ static void W_MakeTempWorld(void)
 	// 4 bytes object id
 	// 2 bytes x
 	// 2 bytes y
-	for (uint32_t i = 0; i < (world_width * world_height); i++) {
+	for (i = 0; i < (world_width * world_height); i++) {
 		uint32_t id = 24 * 6 - 1;
 		fwrite(&id, sizeof(uint32_t), 1, fp);
 	}
@@ -353,7 +356,8 @@ void W_UpdateWorldEdit(void)
 {
 	int8_t lr = G_ControlDown(PLAYER_ONE, CON_RIGHT, true) - G_ControlDown(PLAYER_ONE, CON_LEFT, true);
 	int8_t ud = G_ControlDown(PLAYER_ONE, CON_DOWN, true) - G_ControlDown(PLAYER_ONE, CON_UP, true);
-	
+	int32_t curtile_x, curtile_y;
+
 	if (lr != 0)
 	{
 		switch (edit_mode) {
@@ -409,9 +413,9 @@ void W_UpdateWorldEdit(void)
 	if (curtile < 0)
 		curtile = 0;
 	
-	int32_t curtile_x = (curtile % world_width) * tile_width;
-	int32_t curtile_y = (curtile / world_width) * tile_height;
-	
+	curtile_x = (curtile % world_width) * tile_width;
+	curtile_y = (curtile / world_width) * tile_height;
+
 	if (curtile_x - camera.x >= VID_WIDTH)
 		camera.x += tile_width;
 	if (curtile_x - camera.x < 0)
@@ -433,48 +437,54 @@ void W_UpdateWorldEdit(void)
 
 static void W_DrawWorldEditMode(void)
 {
+	uint8_t l;
+	int i, x, y, p;
+	int tile_curxpos, tile_curypos, world_cury, world_curx;
+
 	// draw a unique grid pattern behind all tiles
-	for (int i = (EDIT_OFFY+HEADER_OFF)*VID_WIDTH; i < VID_HEIGHT*VID_WIDTH; i++)
+	for (i = (EDIT_OFFY+HEADER_OFF)*VID_WIDTH; i < VID_HEIGHT*VID_WIDTH; i++)
 		vid.buffer[i] = palette[1 + i % 3];
 	
 	// draw the world
-	for (uint8_t l = 0; l < 5; l++)
+	for (l = 0; l < 5; l++)
 		W_DrawTileLayer(l);
 	
 	// draw the tileset
-	for (int i = 0; i < tileattr.num_tiles; i++) {
+	for (i = 0; i < tileattr.num_tiles; i++) {
 		int xpos = (i % tileattr.tiles_per_row)*tile_width, ypos = (i / tileattr.tiles_per_row)*tile_height;
 		V_DrawCropped(tile_gfx, 2 + xpos + (i % tileattr.tiles_per_row)*2, 2 + ypos + (i / tileattr.tiles_per_row)*2 + HEADER_OFF, xpos, ypos, tile_width, tile_height, 0);
 	}
 	
 	// world tile pos stuff
-	int world_curx = EDIT_OFFX + (curtile % world_width)*tile_width - camera.x;
-	int world_cury = EDIT_OFFY + (curtile / world_width)*tile_height - camera.y;
+	world_curx = EDIT_OFFX + (curtile % world_width)*tile_width - camera.x;
+	world_cury = EDIT_OFFY + (curtile / world_width)*tile_height - camera.y;
 	
+
 	// draw world cursor pos
 	V_DrawText(va("%03d, %03d", (curtile % world_width), (curtile / world_width)), VID_WIDTH - 48, EDIT_OFFY+HEADER_OFF-16, 0);
 	V_DrawText(va("%03d, %03d", camera.x/8, camera.y/8), VID_WIDTH - 48, EDIT_OFFY+HEADER_OFF-8, 0);
 	
 	// tileset pos stuff
-	int tile_curxpos = (seltile % tileattr.tiles_per_row)*tile_width, tile_curypos = (seltile / tileattr.tiles_per_row)*tile_height;
+	tile_curxpos = (seltile % tileattr.tiles_per_row)*tile_width;
+	tile_curypos = (seltile / tileattr.tiles_per_row)*tile_height;
 	tile_curxpos = 2 + tile_curxpos + (seltile % tileattr.tiles_per_row)*2;
 	tile_curypos = 2 + tile_curypos + (seltile / tileattr.tiles_per_row)*2;
 	
 	// draw a box over the currently selected tile in the tileset
-	for (int x = 0; x < tile_width+2; x++) {
+	for (x = 0; x < tile_width+2; x++) {
 		V_DrawDot(tile_curxpos-1+x, HEADER_OFF + tile_curypos-1, global_col);
 		V_DrawDot(tile_curxpos-1+x, HEADER_OFF + tile_curypos+tile_height, global_col);
 	}
 	
-	for (int y = 0; y < tile_height+2; y++) {
+	for (y = 0; y < tile_height+2; y++) {
 		V_DrawDot(tile_curxpos-1, HEADER_OFF + tile_curypos-1+y, global_col);
 		V_DrawDot(tile_curxpos+tile_width, HEADER_OFF + tile_curypos-1+y, global_col);
 	}
 	
 	// draw an overlay on the currently highlighted world tile
-	for (int y = 0; y < tile_height; y++)
-		for (int x = 0; x < tile_width; x++)
-			for (int p = 0; p < 43; p++) {
+	for (y = 0; y < tile_height; y++)
+		for (x = 0; x < tile_width; x++)
+			for (p = 0; p < 43; p++) {
 				int pix = vid.buffer[world_curx + world_cury*VID_WIDTH + x + y*VID_WIDTH + HEADER_OFF*VID_WIDTH];
 				if (pix == palette[p])
 					vid.buffer[world_curx + world_cury*VID_WIDTH + x + y*VID_WIDTH + HEADER_OFF*VID_WIDTH] = palette[water_palmap[p]];
@@ -483,24 +493,27 @@ static void W_DrawWorldEditMode(void)
 
 static void W_DrawTileEditMode(void)
 {
+	int i, x, y, tile_curxpos, tile_curypos;
+
 	// draw the tileset
-	for (int i = 0; i < tileattr.num_tiles; i++) {
+	for (i = 0; i < tileattr.num_tiles; i++) {
 		int xpos = (i % tileattr.tiles_per_row)*tile_width, ypos = (i / tileattr.tiles_per_row)*tile_height;
 		V_DrawCropped(tile_gfx, 2 + xpos + (i % tileattr.tiles_per_row)*2, 2 + ypos + (i / tileattr.tiles_per_row)*2 + HEADER_OFF, xpos, ypos, tile_width, tile_height, 0);
 	}
 	
 	// tileset pos stuff
-	int tile_curxpos = (seltile % tileattr.tiles_per_row)*tile_width, tile_curypos = (seltile / tileattr.tiles_per_row)*tile_height;
+	tile_curxpos = (seltile % tileattr.tiles_per_row)*tile_width;
+	tile_curypos = (seltile / tileattr.tiles_per_row)*tile_height;
 	tile_curxpos = 2 + tile_curxpos + (seltile % tileattr.tiles_per_row)*2;
 	tile_curypos = 2 + tile_curypos + (seltile / tileattr.tiles_per_row)*2;
 	
 	// draw a box over the currently selected tile in the tileset
-	for (int x = 0; x < tile_width+2; x++) {
+	for (x = 0; x < tile_width+2; x++) {
 		V_DrawDot(tile_curxpos-1+x, HEADER_OFF + tile_curypos-1, global_col);
 		V_DrawDot(tile_curxpos-1+x, HEADER_OFF + tile_curypos+tile_height, global_col);
 	}
 	
-	for (int y = 0; y < tile_height+2; y++) {
+	for (y = 0; y < tile_height+2; y++) {
 		V_DrawDot(tile_curxpos-1, HEADER_OFF + tile_curypos-1+y, global_col);
 		V_DrawDot(tile_curxpos+tile_width, HEADER_OFF + tile_curypos-1+y, global_col);
 	}
@@ -542,10 +555,11 @@ static void W_DrawFileEditMode(void)
 
 void W_DrawWorldEdit(void)
 {
-	global_col = abs((I_GetTicks()/10) % 4 - 2) + 31; 
-	
 	// draw edit header
 	uint8_t header_highlight_x, header_highlight_w;
+	int x;
+
+	global_col = abs((I_GetTicks()/10) % 4 - 2) + 31; 
 	
 	V_DrawText("World", 4, 2, 0);
 	V_DrawText("Tile", VID_WIDTH/2 - 10, 2, 0);
@@ -579,7 +593,7 @@ void W_DrawWorldEdit(void)
 			break;
 	}
 	
-	for (int x = header_highlight_x; x < header_highlight_x + header_highlight_w; x++)
+	for (x = header_highlight_x; x < header_highlight_x + header_highlight_w; x++)
 		V_DrawDot(x, 10, global_col);
 }
 

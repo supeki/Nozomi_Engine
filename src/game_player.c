@@ -29,21 +29,19 @@ void P_RemovePlayer(void)
 
 void P_PlayerLogic(player_t player)
 {
-	object_t *maril = player.object;
-	
+	object_t *maril = player.object;	
 	int move_speed = PU/2*3;
-	
-	if (G_ControlDown(PLAYER_ONE, CON_B, false))
-		move_speed = PU/2*5;
-
 	bool moving = (
 		G_ControlDown(PLAYER_ONE, CON_LEFT, false) 
 		|| G_ControlDown(PLAYER_ONE, CON_RIGHT, false) 
 		|| G_ControlDown(PLAYER_ONE, CON_UP, false) 
 		|| G_ControlDown(PLAYER_ONE, CON_DOWN, false)
 	);
-	
+
 	subpixel_t move_x = 0, move_y = 0;
+
+	if (G_ControlDown(PLAYER_ONE, CON_B, false))
+		move_speed = PU/2*5;
 
 	if (G_ControlDown(PLAYER_ONE, CON_LEFT, false)) {
 		move_x-=move_speed;
@@ -79,6 +77,7 @@ void P_PlayerLogic(player_t player)
 	if (G_ControlDown(PLAYER_ONE, CON_A, true)) //only on press
 	{
 		subpixel_t check_x, check_y, move_x, move_y;
+		object_t *check_obj;
 		
 		switch (maril->dir) {
 			case 0: // down
@@ -107,7 +106,7 @@ void P_PlayerLogic(player_t player)
 				break;
 		}
 	
-		object_t *check_obj = OBJ_CreateObject(check_x, check_y, OBJ_CHECK);
+		check_obj = OBJ_CreateObject(check_x, check_y, OBJ_CHECK);
 		OBJ_TryMovement(check_obj, move_x, move_y);
 	}
 	

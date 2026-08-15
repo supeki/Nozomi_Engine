@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Nozomi Engine (CE port)", "Nozomi Engine (CE port).vcproj", "{7AF87596-DD5D-496B-911D-D62E96CD4F89}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Pocket PC 2003 (ARMV4) = Debug|Pocket PC 2003 (ARMV4)
+		Debug|Win32 = Debug|Win32
+		Release|Pocket PC 2003 (ARMV4) = Release|Pocket PC 2003 (ARMV4)
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7AF87596-DD5D-496B-911D-D62E96CD4F89}.Debug|Pocket PC 2003 (ARMV4).ActiveCfg = Debug|Pocket PC 2003 (ARMV4)
+		{7AF87596-DD5D-496B-911D-D62E96CD4F89}.Debug|Pocket PC 2003 (ARMV4).Build.0 = Debug|Pocket PC 2003 (ARMV4)
+		{7AF87596-DD5D-496B-911D-D62E96CD4F89}.Debug|Pocket PC 2003 (ARMV4).Deploy.0 = Debug|Pocket PC 2003 (ARMV4)
+		{7AF87596-DD5D-496B-911D-D62E96CD4F89}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7AF87596-DD5D-496B-911D-D62E96CD4F89}.Debug|Win32.Build.0 = Debug|Win32
+		{7AF87596-DD5D-496B-911D-D62E96CD4F89}.Release|Pocket PC 2003 (ARMV4).ActiveCfg = Release|Pocket PC 2003 (ARMV4)
+		{7AF87596-DD5D-496B-911D-D62E96CD4F89}.Release|Pocket PC 2003 (ARMV4).Build.0 = Release|Pocket PC 2003 (ARMV4)
+		{7AF87596-DD5D-496B-911D-D62E96CD4F89}.Release|Pocket PC 2003 (ARMV4).Deploy.0 = Release|Pocket PC 2003 (ARMV4)
+		{7AF87596-DD5D-496B-911D-D62E96CD4F89}.Release|Win32.ActiveCfg = Release|Win32
+		{7AF87596-DD5D-496B-911D-D62E96CD4F89}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

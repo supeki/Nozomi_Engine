@@ -60,7 +60,7 @@ void gameLoop(void)
 		game_tick = I_GetTicks();
 		elapsed_tick = game_tick - old_tick;
 		old_tick = game_tick;
-		
+
 		if (elapsed_tick == 0)
 		{
 			I_Sleep(1);
@@ -80,7 +80,7 @@ void gameLoop(void)
 		if (game_quit)
 			break;
 		
-		#if defined(__NDS__)
+		#if defined(__NDS__) || defined(WINCE)
 		// Force the game to run a tick on NDS otherwise it cries.
 		gameRunStuff(1);
 		#else
@@ -106,6 +106,8 @@ void gameRunStuff(uint32_t elapsed)
 	
 	while (elapsed--)
 	{	
+		int i;
+
 		if (font_edit)
 			FNT_FontEditUpdate();
 		if (world_edit)
@@ -116,7 +118,7 @@ void gameRunStuff(uint32_t elapsed)
 			return;
 		}
 			
-		for (int i = 0; i < num_players; i++)
+		for (i = 0; i < num_players; i++)
 			P_PlayerLogic(players[i]);
 		
 		OBJ_RunObjects();
@@ -125,18 +127,20 @@ void gameRunStuff(uint32_t elapsed)
 
 void gameDisplay(void)
 {
+	int i, treeoff_1, treeoff_2;
+
 	if (font_edit)
 		FNT_FontEditDraw();
 	if (world_edit)
 		W_DrawWorldEdit();
 	
-	for (int i = 0; i < 576; i++)
+	for (i = 0; i < 576; i++)
 		V_DrawCroppedBitmap(gfx_tiles, (i%16)*16, (i/16)*16 - camera.y, demo_tiles[i]*16, 0, 16, 16, 0);
 	
 	OBJ_DrawObjectLayer(0);
 	
-	int treeoff_1 = abs((I_GetTicks()/30) % 8 - 4) + 4;
-	int treeoff_2 = -abs((I_GetTicks()/15) % 4 - 2) + 2;
+	treeoff_1 = abs((I_GetTicks()/30) % 8 - 4) + 4;
+	treeoff_2 = -abs((I_GetTicks()/15) % 4 - 2) + 2;
 	
 	V_DrawBitmap(gfx_tree2, 128 - gfx_tree.width/2 + treeoff_1, 96 - gfx_tree.height - camera.y + -treeoff_2, 0);
 	V_DrawBitmap(gfx_tree3, 128 - gfx_tree.width/2 + -treeoff_1, 96 - gfx_tree.height - camera.y + treeoff_2, 0);

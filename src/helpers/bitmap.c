@@ -9,9 +9,10 @@ bitmap_t Bitmap_Load(const char *filename)
 	BMP_Header_t header;
 	BMP_DIBHeader_t dib_header;
 	bitmap_t bitmap;
+	int i;
 
 	if (!fp)
-		I_Error("Failed to open file: %s", filename);
+		I_Error("Failed to find bitmap file: %s", filename);
 	
 	fread(&header.ident, sizeof(char), 2, fp);
 	fread(&header.size, sizeof(uint32_t), 1, fp);
@@ -45,7 +46,7 @@ bitmap_t Bitmap_Load(const char *filename)
 	if (bitmap.bpp <= 8) { // >= 16bpp stores color data in the pixel data
  		bitmap.palette = malloc(dib_header.num_colors*sizeof(rgb_t));
 	
-		for (int i = 0; i < dib_header.num_colors; i++)
+		for (i = 0; i < dib_header.num_colors; i++)
 		{
 			uint8_t unused;
 			

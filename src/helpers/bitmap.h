@@ -30,13 +30,13 @@ typedef struct
 #ifndef WINDOWS
 typedef enum
 {
-	BI_RGB,
+	BI_NULL = 0,
 	BI_RLE8,
 	BI_RLE4,
-	BI_BITFIELDS,
+	BI_NULL2,
 	BI_JPEG,
 	BI_PNG,
-	BI_ALPHABITFIELDS,
+	BI_NULL3,
 	BI_CMYK,
 	BI_CMYKRLE8,
 	BI_CMYKRLE4,

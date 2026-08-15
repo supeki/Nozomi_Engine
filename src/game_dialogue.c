@@ -97,10 +97,11 @@ void D_UpdateDialogue(void)
 void D_DrawDialogue(void)
 {
 	char *str = malloc(cur_char+1);
+	int i, x, y;
 	memset(str, 0, cur_char+1);
 	str[cur_char] = '\0'; 
 	
-	for (int i = 0; i < cur_char; i++)
+	for (i = 0; i < cur_char; i++)
 		if (i < strlen(dialogue[curdiag]) && dialogue[curdiag][i] != '#' && dialogue[curdiag][i] != '^')
 			str[i] = dialogue[curdiag][i];
 		
@@ -109,18 +110,18 @@ void D_DrawDialogue(void)
 	V_DrawCroppedBitmap(gfx_textbox, 0, VID_HEIGHT-8, 0, 16, 8, 8, 0);
 	V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-8, 16, 16, 8, 8, 0);
 	
-	for (int i = 0; i < VID_WIDTH/8 - 2; i++) {
+	for (i = 0; i < VID_WIDTH/8 - 2; i++) {
 		V_DrawCroppedBitmap(gfx_textbox, 8 + i*8, VID_HEIGHT-32, 8, 0, 8, 8, 0);
 		V_DrawCroppedBitmap(gfx_textbox, 8 + i*8, VID_HEIGHT-8, 8, 16, 8, 8, 0);
 	}
 	
-	for (int i = 0; i < 2; i++) {
+	for (i = 0; i < 2; i++) {
 		V_DrawCroppedBitmap(gfx_textbox, 0, VID_HEIGHT-24 + i*8, 0, 8, 8, 8, 0);
 		V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-24 + i*8, 16, 8, 8, 8, 0);
 	}
 	
-	for (int y = 0; y < 2; y++)
-		for (int x = 0; x < VID_WIDTH/8 - 2; x++)
+	for (y = 0; y < 2; y++)
+		for (x = 0; x < VID_WIDTH/8 - 2; x++)
 			V_DrawCroppedBitmap(gfx_textbox, 8 + x*8, VID_HEIGHT-24 + y*8, 8, 8, 8, 8, 0);
 	
 	V_DrawText(str, 8, VID_HEIGHT-24, 0);
@@ -133,18 +134,18 @@ void D_DrawDialogue(void)
 			V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-(8*9), VID_HEIGHT-40, 0, 16, 8, 8, 0);
 			V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-40, 16, 16, 8, 8, 0);
 			
-			for (int i = 0; i < 7; i++) {
+			for (i = 0; i < 7; i++) {
 				V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-(8*8) + i*8, VID_HEIGHT-64, 8, 0, 8, 8, 0);
 				V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-(8*8) + i*8, VID_HEIGHT-40, 8, 16, 8, 8, 0);
 			}
 			
-			for (int i = 0; i < 2; i++) {
+			for (i = 0; i < 2; i++) {
 				V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-(8*9), VID_HEIGHT-56 + i*8, 0, 8, 8, 8, 0);
 				V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-56 + i*8, 16, 8, 8, 8, 0);
 			}
 			
-			for (int y = 0; y < 2; y++)
-				for (int x = 0; x < 7; x++)
+			for (y = 0; y < 2; y++)
+				for (x = 0; x < 7; x++)
 					V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-(8*8) + x*8, VID_HEIGHT-56 + y*8, 8, 8, 8, 8, 0);
 			
 			V_DrawText("Accept\nDeny", VID_WIDTH-(8*6), VID_HEIGHT-56, 0);
