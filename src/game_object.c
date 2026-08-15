@@ -156,19 +156,23 @@ static bool OBJ_InObject(object_t *obj, object_t *obj2)
 bool OBJ_TryMovement(object_t *obj, subpixel_t x, subpixel_t y)
 {	
 	subpixel_t step_x = (x > 0 ? 1 : -1)*PU, step_y = (y > 0 ? 1 : -1)*PU;
+	uint32_t x2, y2;
 
 	if (x == 0 && y == 0)
 		return false;
 	
 	if (x != 0)
-		for (uint32_t x2 = 0; x2 < abs(x/PU); x2++)
+		for (x2 = 0; x2 < abs(x/PU); x2++)
 		{
+			subpixel_t hit_x, hit_y, hit_x2, hit_y2;
+			object_t *obj2;
+			int i, i2, i3, i4, res;
 			obj->x += step_x;
 			
-			subpixel_t hit_x = obj->x + obj->hit[0];
-			subpixel_t hit_y = obj->y + obj->hit[1];
-			subpixel_t hit_x2 = hit_x + obj->hit[2];
-			subpixel_t hit_y2 = hit_y + obj->hit[3];
+			hit_x = obj->x + obj->hit[0];
+			hit_y = obj->y + obj->hit[1];
+			hit_x2 = hit_x + obj->hit[2];
+			hit_y2 = hit_y + obj->hit[3];
 			
 			if ( // hardcoded tree,,,,
 				hit_x2 - 1 >= 112*PU &&
@@ -181,7 +185,7 @@ bool OBJ_TryMovement(object_t *obj, subpixel_t x, subpixel_t y)
 				break;
 			}
 			
-			object_t *obj2 = objects.next;
+			obj2 = objects.next;
 	
 			while (obj2 != &objects)
 			{
@@ -209,11 +213,11 @@ bool OBJ_TryMovement(object_t *obj, subpixel_t x, subpixel_t y)
 			if (x == 0)
 				break;
 			
-			int i = obj->x/PU/16 + (obj->y/PU/16)*16 + 16;
-			int i2 = obj->x/PU/16 + (obj->y/PU/16)*16 + 17;
-			int i3 = obj->x/PU/16 + (obj->y/PU/16)*16 + 32;
-			int i4 = obj->x/PU/16 + (obj->y/PU/16)*16 + 33;
-			int res = 0;
+			i = obj->x/PU/16 + (obj->y/PU/16)*16 + 16;
+			i2 = obj->x/PU/16 + (obj->y/PU/16)*16 + 17;
+			i3 = obj->x/PU/16 + (obj->y/PU/16)*16 + 32;
+			i4 = obj->x/PU/16 + (obj->y/PU/16)*16 + 33;
+			res = 0;
 			
 			if (OBJ_InTile(obj, (i%16)*(16*PU), (i/16)*(16*PU)))
 				res+=1;
@@ -253,14 +257,17 @@ bool OBJ_TryMovement(object_t *obj, subpixel_t x, subpixel_t y)
 		}
 		
 	if (y != 0)
-		for (uint32_t y2 = 0; y2 < abs(y/PU); y2++)
+		for (y2 = 0; y2 < abs(y/PU); y2++)
 		{
+			subpixel_t hit_x, hit_y, hit_x2, hit_y2;
+			object_t *obj2;
+			int i, i2, i3, i4, res;
 			obj->y += step_y;
 			
-			subpixel_t hit_x = obj->x + obj->hit[0];
-			subpixel_t hit_y = obj->y + obj->hit[1];
-			subpixel_t hit_x2 = hit_x + obj->hit[2];
-			subpixel_t hit_y2 = hit_y + obj->hit[3];
+			hit_x = obj->x + obj->hit[0];
+			hit_y = obj->y + obj->hit[1];
+			hit_x2 = hit_x + obj->hit[2];
+			hit_y2 = hit_y + obj->hit[3];
 			
 			if ( // hardcoded tree,,,,
 				hit_x2 - 1 >= 112*PU &&
@@ -273,7 +280,7 @@ bool OBJ_TryMovement(object_t *obj, subpixel_t x, subpixel_t y)
 				break;
 			}
 			
-			object_t *obj2 = objects.next;
+			obj2 = objects.next;
 	
 			while (obj2 != &objects)
 			{
@@ -301,11 +308,11 @@ bool OBJ_TryMovement(object_t *obj, subpixel_t x, subpixel_t y)
 			if (y == 0)
 				break;
 			
-			int i = obj->x/PU/16 + (obj->y/PU/16)*16 + 16;
-			int i2 = obj->x/PU/16 + (obj->y/PU/16)*16 + 17;
-			int i3 = obj->x/PU/16 + (obj->y/PU/16)*16 + 32;
-			int i4 = obj->x/PU/16 + (obj->y/PU/16)*16 + 33;
-			int res = 0;
+			i = obj->x/PU/16 + (obj->y/PU/16)*16 + 16;
+			i2 = obj->x/PU/16 + (obj->y/PU/16)*16 + 17;
+			i3 = obj->x/PU/16 + (obj->y/PU/16)*16 + 32;
+			i4 = obj->x/PU/16 + (obj->y/PU/16)*16 + 33;
+			res = 0;
 			
 			if (OBJ_InTile(obj, (i%16)*(16*PU), (i/16)*(16*PU)))
 				res+=1;

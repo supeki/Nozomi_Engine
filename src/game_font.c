@@ -14,8 +14,10 @@ font_t FNT_LoadFont(const char *filename)
 	FILE *fp = fopen(filename, "rb");
 	font_t font;
 	char gfx_name[33];
+	int i;
 	
 	fread(gfx_name, sizeof(char), 32, fp);
+	gfx_name[32] = '\0';
 	fread(&font.bitmap, sizeof(bool), 1, fp);
 
 	if (font.bitmap)
@@ -27,9 +29,9 @@ font_t FNT_LoadFont(const char *filename)
 	font.offset = malloc(256*sizeof(int16_t));
 	font.size = malloc(256*sizeof(uint16_t));
 	
-	for (int i = 0; i < 256; i++)
+	for (i = 0; i < 256; i++)
 		fread(&font.offset[i], sizeof(int16_t), 1, fp);
-	for (int i = 0; i < 256; i++)
+	for (i = 0; i < 256; i++)
 		fread(&font.size[i], sizeof(uint16_t), 1, fp);
 
 	return font;
@@ -58,6 +60,8 @@ void FNT_FontEditUpdate(void)
 	uint8_t tw = w, th = h;
 	uint8_t tcharw = charw, tcharh = charh;
 	uint8_t oldchar = curchar;
+
+	uint16_t tsize, tcharoffset, tcharsize;
 
 	if (lr != 0)
 	{
@@ -93,10 +97,10 @@ void FNT_FontEditUpdate(void)
 	else if (curchar > 255)
 		curchar = 255;
 	
-	uint16_t tsize = (tw << 8) + th;
-	uint16_t tcharoffset = (txoff << 8) + tyoff;
-	uint16_t tcharsize = (tcharw << 8) + tcharh;
-	
+	tsize = (tw << 8) + th;
+	tcharoffset = (txoff << 8) + tyoff;
+	tcharsize = (tcharw << 8) + tcharh;
+
 	if (curchar == oldchar) {
 		if (tsize != temp_font.size[curchar])
 			temp_font.size[curchar] = tsize;
@@ -111,11 +115,13 @@ void FNT_FontEditUpdate(void)
 
 static void FNT_DrawCroppedDouble(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h)
 {	
+	int zx, zy;
+
 	if ((gfx.size + gfx.width) <= 0)
         return;
 	
-	for (int zy = 0; zy < h; zy++)
-		for (int zx = 0; zx < w; zx++)
+	for (zy = 0; zy < h; zy++)
+		for (zx = 0; zx < w; zx++)
 		{
 			uint32_t i = sx + sy*gfx.width + zx + zy*gfx.width;
 			int32_t vx = x + zx*2 - gfx.xoff*2;
@@ -137,30 +143,34 @@ static void FNT_DrawCroppedDouble(gfx_t gfx, int16_t x, int16_t y, int16_t sx, i
 void FNT_FontEditDraw(void)
 {
 	uint8_t charw = temp_font.charsize >> 8, charh = temp_font.charsize & 0xFF;
-	
+	int8_t  xoff, yoff;
+	uint8_t w, h;
 	uint8_t col = abs((I_GetTicks()/10) % 4 - 2) + 8; 
-	
-	for (int i = 0; i < 256; i++)
+	int i, y, x;
+
+	for (i = 0; i < 256; i++)
 	{
 		V_DrawTextFromFont(temp_font, 
 			va("%c", i),
 			(i % 16) * charw, (i / 16) * charh, 0);
 	}
 	
-	for (int y = 0; y < charh-1; y++)
+	for (y = 0; y < charh-1; y++)
 		V_DrawDot((curchar % 16) * charw + charw/2-1, (curchar / 16) * charh + y, col);
-	for (int x = 0; x < charw-1; x++)
+	for (x = 0; x < charw-1; x++)
 		V_DrawDot((curchar % 16) * charw + x, (curchar / 16) * charh + charh/2-1, col);
 	
-	int8_t  xoff = temp_font.offset[curchar] >> 8, yoff = temp_font.offset[curchar] & 0xFF;
-	uint8_t w = temp_font.size[curchar] >> 8, h = temp_font.size[curchar] & 0xFF;
+	xoff = temp_font.offset[curchar] >> 8;
+	yoff = temp_font.offset[curchar] & 0xFF;
+	w = temp_font.size[curchar] >> 8;
+	h = temp_font.size[curchar] & 0xFF;
 	
-	for (int x = 0; x < charw*2 + 2; x++) {
+	for (x = 0; x < charw*2 + 2; x++) {
 		V_DrawDot(VID_WIDTH - charw*4 - 1 + x, 2*charh - 1, col);
 		V_DrawDot(VID_WIDTH - charw*4 - 1 + x, 2*charh + 2*charh, col);
 	}
 	
-	for (int y = 0; y < charh*2 + 2; y++) {
+	for (y = 0; y < charh*2 + 2; y++) {
 		V_DrawDot(VID_WIDTH - charw*4 - 1, 2*charh-1 + y, col);
 		V_DrawDot(VID_WIDTH - charw*4 + charw*2, 2*charh-1 + y, col);
 	}
@@ -184,15 +194,16 @@ void FNT_SaveTempFont(void)
 	FILE *fp = fopen("data/fonts/default.fnt", "wb+");
 	char gfx_name[33];
 	bool bitmap = false;
+	int i;
 
 	snprintf(gfx_name, 32, "default");
 	fwrite(gfx_name, sizeof(gfx_name)-1, 1, fp);
 	fwrite(&temp_font.bitmap, sizeof(bool), 1, fp);
 	fwrite(&temp_font.charsize, sizeof(uint16_t), 1, fp);
 	
-	for (int i = 0; i < 256; i++)
+	for (i = 0; i < 256; i++)
 		fwrite(&temp_font.offset[i], sizeof(int16_t), 1, fp);
-	for (int i = 0; i < 256; i++)
+	for (i = 0; i < 256; i++)
 		fwrite(&temp_font.size[i], sizeof(uint16_t), 1, fp);
 
 	fclose(fp);

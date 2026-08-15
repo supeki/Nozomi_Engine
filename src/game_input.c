@@ -7,6 +7,8 @@
 #include <GLFW/glfw3.h>
 #elif defined(SDL)
 #include <SDL2/SDL.h>
+#elif defined(WINCE)
+#include <windows.h>
 #endif
 
 #include "game_input.h"
@@ -120,6 +122,12 @@ void G_DefaultControls(void)
 		gamecontrolbinds[j][CON_Z][1] = SDL_CONTROLLER_BUTTON_Y;
 		gamecontrolbinds[j][CON_CONFIRM][1] = SDL_CONTROLLER_BUTTON_A;
 		gamecontrolbinds[j][CON_BACK][1] = SDL_CONTROLLER_BUTTON_B;
+	#elif defined(WINCE)
+		gamecontrolbinds[j][CON_UP][0] = VK_UP;
+		gamecontrolbinds[j][CON_DOWN][0] = VK_DOWN;
+		gamecontrolbinds[j][CON_LEFT][0] = VK_LEFT;
+		gamecontrolbinds[j][CON_RIGHT][0] = VK_RIGHT;
+		gamecontrolbinds[j][CON_A][0] = VK_RETURN;
 	#endif
 	}
 }
