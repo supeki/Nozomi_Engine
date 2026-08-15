@@ -2,8 +2,8 @@
 // GBC backend
 // gbc_main.h
 
-#ifndef NDS_MAIN_H
-#define NDS_MAIN_H
+#ifndef GBC_MAIN_H
+#define GBC_MAIN_H
 
 #include <gb/gb.h>
 #include <gb/sgb.h>
