@@ -22,6 +22,7 @@ const char *jadefrac_to_sdl[NUMMUSIC] = {
 void I_StartupSound(void)
 {
 	Mix_Init(MIX_INIT_MID|MIX_INIT_OGG);
+	Mix_SetSoundFonts("data/soundfont.sf2");
 	Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
 }
 
@@ -32,10 +33,7 @@ void I_PlayMusic(int id, bool loop)
 	if (music.id != mus_none)
 		Mix_FreeMusic(current_song);
 	
-	if (use_midi)
-		current_song = Mix_LoadMUS(va("data/audio/%s", jadefrac_to_sdl[id]));
-	else
-		current_song = Mix_LoadMUS(va("data/audio/%s", jadefrac_to_sdl[id]));
+	current_song = Mix_LoadMUS(va("data/audio/%s", jadefrac_to_sdl[id]));
 	
 	if (current_song == NULL) {
 		I_printf("Couldn't play song: %s", jadefrac_to_sdl[id]);
@@ -49,6 +47,13 @@ void I_PlayMusic(int id, bool loop)
 	
 	Mix_VolumeMusic(music_volume);
 }
+
+void I_SetSoundVolume(int8_t value)
+{
+	for (int i = 0; i < MIX_CHANNELS; i++)
+		Mix_Volume(i, value);
+}
+
 void I_StopMusic(void)
 {
 	Mix_HaltMusic();
