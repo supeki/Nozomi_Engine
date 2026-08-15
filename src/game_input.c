@@ -9,6 +9,8 @@
 #include <SDL2/SDL.h>
 #elif defined(WINCE)
 #include <windows.h>
+#elif defined(GBC)
+#include "interface/GBC/gbc_main.h"
 #endif
 
 #include "game_input.h"
@@ -128,6 +130,15 @@ void G_DefaultControls(void)
 		gamecontrolbinds[j][CON_LEFT][0] = VK_LEFT;
 		gamecontrolbinds[j][CON_RIGHT][0] = VK_RIGHT;
 		gamecontrolbinds[j][CON_A][0] = VK_RETURN;
+	#elif defined(GBC)
+		gamecontrolbinds[j][CON_UP][0] = J_UP;
+		gamecontrolbinds[j][CON_DOWN][0] = J_DOWN;
+		gamecontrolbinds[j][CON_LEFT][0] = J_LEFT;
+		gamecontrolbinds[j][CON_RIGHT][0] = J_RIGHT;
+		gamecontrolbinds[j][CON_A][0] = J_A;
+		gamecontrolbinds[j][CON_B][0] = J_B;
+		gamecontrolbinds[j][CON_C][0] = J_SELECT;
+		gamecontrolbinds[j][CON_START][0] = J_START;
 	#endif
 	}
 }

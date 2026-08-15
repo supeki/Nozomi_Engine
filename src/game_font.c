@@ -11,8 +11,12 @@
 
 font_t FNT_LoadFont(const char *filename)
 {
-	FILE *fp = fopen(filename, "rb");
 	font_t font;
+
+	#if defined(GBC)
+
+	#else
+	FILE *fp = fopen(filename, "rb");
 	char gfx_name[33];
 	int i;
 	
@@ -33,6 +37,7 @@ font_t FNT_LoadFont(const char *filename)
 		fread(&font.offset[i], sizeof(int16_t), 1, fp);
 	for (i = 0; i < 256; i++)
 		fread(&font.size[i], sizeof(uint16_t), 1, fp);
+	#endif
 
 	return font;
 }
@@ -191,6 +196,9 @@ void FNT_FontEditDraw(void)
 
 void FNT_SaveTempFont(void)
 {
+	#if defined(GBC)
+
+	#else
 	FILE *fp = fopen("data/fonts/default.fnt", "wb+");
 	char gfx_name[33];
 	bool bitmap = false;
@@ -207,4 +215,5 @@ void FNT_SaveTempFont(void)
 		fwrite(&temp_font.size[i], sizeof(uint16_t), 1, fp);
 
 	fclose(fp);
+	#endif
 }

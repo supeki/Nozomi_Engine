@@ -9,6 +9,7 @@
 
 bitmap_gfx_t gfx_her, gfx_tiles, gfx_tree, gfx_tree2, gfx_tree3, gfx_textbox;
 
+#if !defined(GBC)
 static void BMPGFX(const char *filename)
 {
 	FILE *file = fopen(va("%s.gfx", filename), "wb+");
@@ -33,6 +34,7 @@ static void BMPGFX(const char *filename)
 		}
 	fclose(file);
 }
+#endif
 
 void GFX_InitGFX(void)
 {
@@ -46,8 +48,12 @@ void GFX_InitGFX(void)
 
 gfx_t GFX_LoadGFX(const char *filename)
 {
-	FILE *file = fopen(filename, "rb");
 	gfx_t gfx;
+	
+	#if defined(GBC)
+
+	#else
+	FILE *file = fopen(filename, "rb");
 	int p;
 	
 	// check file
@@ -76,14 +82,20 @@ gfx_t GFX_LoadGFX(const char *filename)
 	}
 	
 	fclose(file);
+	#endif
+
 	return gfx;
 }
 
 // Load a Bitmap and convert it to our Bitmap GFX format
 bitmap_gfx_t BMPGFX_LoadBitmap(const char *filename)
 {
-	int x, y;
 	bitmap_gfx_t gfx;
+
+	#if defined(GBC)
+
+	#else
+	int x, y;
 	bitmap_t bitmap = Bitmap_Load(filename);
 	
 	gfx.width = bitmap.width;
@@ -147,6 +159,7 @@ bitmap_gfx_t BMPGFX_LoadBitmap(const char *filename)
 			I_printf("Unsupported Bitmap BitsPerPixel!\n");
 			return gfx;
 	}
+	#endif
 	
 	return gfx;
 }

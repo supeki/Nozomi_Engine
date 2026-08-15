@@ -24,6 +24,9 @@ void V_Init(void)
 // Load the palette into vid.palette :3 Nozomi
 void V_LoadPalette(void)
 {
+	#if defined(GBC)
+
+	#else
 	int i;
 	long size;
 	FILE *file = fopen("data/palette.mpl", "rb");
@@ -51,6 +54,7 @@ void V_LoadPalette(void)
 	}
 	
 	fclose(file);
+	#endif
 }
 
 void V_ClearScreen(void)

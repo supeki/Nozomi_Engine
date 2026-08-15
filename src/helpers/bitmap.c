@@ -5,10 +5,14 @@
 
 bitmap_t Bitmap_Load(const char *filename)
 {
+	bitmap_t bitmap;
+
+	#if defined(GBC)
+
+	#else
 	FILE *fp = fopen(filename, "rb");
 	BMP_Header_t header;
 	BMP_DIBHeader_t dib_header;
-	bitmap_t bitmap;
 	int i;
 
 	if (!fp)
@@ -61,6 +65,7 @@ bitmap_t Bitmap_Load(const char *filename)
 	fseek(fp, header.data_offset, SEEK_SET);
 	fread(bitmap.pixel_data, sizeof(uint8_t), dib_header.image_size, fp);
 	fclose(fp);
+	#endif
 	
 	return bitmap;
 }

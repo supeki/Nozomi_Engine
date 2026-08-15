@@ -40,6 +40,9 @@ typedef struct tileattr_s
 
 static void W_LoadTileAttr(const char *filename)
 {
+	#if defined(GBC)
+
+	#else
 	FILE *attr_fp = fopen(filename, "rb");
 	int i;
 	
@@ -58,10 +61,14 @@ static void W_LoadTileAttr(const char *filename)
 		fread(&tileattr.layer[i], sizeof(uint8_t), 1, attr_fp);
 	
 	fclose(attr_fp);
+	#endif
 }
 
 void W_LoadWorld(const char* filename)
 {
+	#if defined(GBC)
+
+	#else
 	FILE *fp = fopen(filename, "rb"), *attr_fp;
 	char tilefilename[33];
 	uint32_t i;
@@ -94,6 +101,7 @@ void W_LoadWorld(const char* filename)
 	}
 	
 	fclose(fp);
+	#endif
 }
 
 void W_HandleTiles(void)
@@ -288,6 +296,9 @@ void W_DrawWaterTiles(void)
 
 void W_MakeTileAttrFromGfx(const char *filename, gfx_t gfx, uint16_t cell_size)
 {
+	#if defined(GBC)
+
+	#else
 	FILE *attr_fp = fopen(filename, "wb+");
 	uint32_t num_tiles, tiles_per_row, value = 0;
 	int i;
@@ -309,10 +320,14 @@ void W_MakeTileAttrFromGfx(const char *filename, gfx_t gfx, uint16_t cell_size)
 	
 	// close file pointer
 	fclose(attr_fp);
+	#endif
 }
 
 static void W_MakeTempWorld(void)
 {
+	#if defined(GBC)
+
+	#else
 	FILE *fp = fopen("data/worlds/temp.wld", "wb+");
 	char tilefilename[33];
 	uint32_t i;
@@ -336,6 +351,7 @@ static void W_MakeTempWorld(void)
 	W_MakeTileAttrFromGfx("data/tilesets/tech_demo_tiles.atr", tile_gfx, 8);
 	
 	fclose(fp);
+	#endif
 }
 
 int8_t edit_mode = 0;
