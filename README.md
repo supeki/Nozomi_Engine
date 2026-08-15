@@ -83,6 +83,10 @@ When it's done, move into the repo folder and build Nozomi Engine for GLFW:
 `cd Nozomi_Engine && make LINUX=1 GLFW=1 SDL=0`
 
 Unlike SDL builds, GLFW builds should show under `bin/GLFW`.
+### Windows CE (Windows Mobile 5)
+You can compile Nozomi Engine for Windows CE provided you have a copy of Visual Studio 2005, and have the Windows Mobile 5.0 SDK installed. Just open `NozomiCE.vcproj` and build the project.
+
+You can find the executable in `bin/WinCE` after building.
 ### Other Platforms
 While Nozomi Engine supports other platforms like the Nintendo DS and Sony Playstation Portable,
 instructions on how to compile for those platforms will not be a concern as of now.
