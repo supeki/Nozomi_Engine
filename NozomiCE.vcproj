@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="Nozomi Engine (CE port)"
+	Name="NozomiCE"
 	ProjectGUID="{7AF87596-DD5D-496B-911D-D62E96CD4F89}"
-	RootNamespace="Nozomi Engine (CE port)"
+	RootNamespace="NozomiCE"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -19,7 +19,7 @@
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
+			Name="Nozomi|Win32"
 			OutputDirectory="Debug"
 			IntermediateDirectory="Debug"
 			ConfigurationType="1"
@@ -93,10 +93,11 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Debug|Pocket PC 2003 (ARMV4)"
-			OutputDirectory="$(SolutionDir)Pocket PC 2003 (ARMV4)\$(ConfigurationName)"
-			IntermediateDirectory="Pocket PC 2003 (ARMV4)\$(ConfigurationName)"
+			Name="Nozomi|Pocket PC 2003 (ARMV4)"
+			OutputDirectory="$(SolutionDir)\bin\WinCE"
+			IntermediateDirectory="obj\WinCE\$(ConfigurationName)"
 			ConfigurationType="1"
+			BuildLogFile="$(SolutionDir)\obj\BuildLog.htm"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -116,9 +117,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
+				FavorSizeOrSpeed="1"
 				PreprocessorDefinitions="ARM;ARMV4;UNDER_CE;WINCE;_WIN32_WCE=$(CEVER);$(ARCHFAM);$(_ARCHFAM_);UNICODE"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\vc80.pdb"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -132,6 +136,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/SECTION:.rdata,R"
+				OutputFile="$(OutDir)\game.exe"
+				ManifestFile="$(ProjectDir)\obj\$(TargetFileName).intermediate.manifest"
 				SubSystem="9"
 				BaseAddress="0x00010000"
 				FixedBaseAddress="2"
@@ -162,8 +168,6 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -183,12 +187,6 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINCE"
-				RuntimeLibrary="2"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -201,12 +199,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				LinkIncremental="2"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -235,7 +227,10 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Pocket PC 2003 (ARMV4)"
+			OutputDirectory="$(SolutionDir)Pocket PC 2003 (ARMV4)\$(ConfigurationName)"
+			IntermediateDirectory="Pocket PC 2003 (ARMV4)\$(ConfigurationName)"
 			ConfigurationType="1"
+			CharacterSet="0"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -255,6 +250,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
+				ImproveFloatingPointConsistency="false"
+				FavorSizeOrSpeed="1"
+				PreprocessorDefinitions="ARM;ARMV4;UNDER_CE;WINCE;_WIN32_WCE=$(CEVER);$(ARCHFAM);$(_ARCHFAM_);UNICODE"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				ObjectFile="$(SolutionDir)/obj"
+				ProgramDataBaseFileName="$(SolutionDir)/obj/vc80.pdb"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -267,6 +269,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				SubSystem="9"
 			/>
 			<Tool
 				Name="VCALinkTool"
