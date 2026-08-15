@@ -2,6 +2,9 @@ bin/*/*
 obj/*
 *.Identifier
 *.SFO
+*.elf
+*.ncb
+*.out
 
 # i use vscode
 .vscode/
