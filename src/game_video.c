@@ -22,6 +22,7 @@ void V_Init(void)
 }
 
 // Load the palette into vid.palette :3 Nozomi
+// UPDATE: Only used for LEGACY GFX now!!
 void V_LoadPalette(void)
 {
 	int i;
@@ -57,95 +58,18 @@ void V_ClearScreen(void)
 {
 	uint16_t i;
 	for (i = 0; i < VID_WIDTH*VID_HEIGHT; i++)
-		vid.buffer[i] = palette[0];
+		vid.buffer[i] = 0;
 }
 
-void V_DrawDot(int16_t x, int16_t y, uint8_t col)
+void V_DrawDot(int16_t x, int16_t y, uint16_t col)
 {	
 	if (x < 0 || y < 0 || x >= VID_WIDTH || y >= VID_HEIGHT || col == 0)
         return;
 	
-	if (col > 42)
-		col = 42;
-	
-	vid.buffer[x+(y*VID_WIDTH)] = palette[col];
+	vid.buffer[x+(y*VID_WIDTH)] = col;
 }
 
-static void V_DrawCroppedNoCheck(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
-{	
-	int zx, zy;
-	for (zy = 0; zy < h; zy++)
-		for (zx = 0; zx < w; zx++)
-		{
-			uint32_t i = sx + (sy*gfx.width) + zx + (zy*gfx.width);
-			int32_t vx = x + zx - gfx.xoff;
-			int32_t vy = y + zy - gfx.yoff;
-			
-			if (flags & V_SMALL)
-			{
-				vx -= (zx/2);
-				vy -= (zy/2);
-			}
-						
-			if (i >= gfx.size)
-				return;
-			
-			if (gfx.data[i] == 0)
-				continue;
-			
-			vid.buffer[vx+(vy*VID_WIDTH)] = palette[gfx.data[i]];
-		}
-}
-
-void V_DrawCropped(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
-{	
-	int zx, zy;
-
-	if ((gfx.size + gfx.width) <= 0)
-        return;
-	
-	// completely out of bounds
-	if (x >= VID_WIDTH || y >= VID_HEIGHT || x+w < 0 || y+h < 0)
-		return;
-	
-	// completely within bounds
-	if (x >= 0 && y >= 0 && x+w < VID_WIDTH && y+h < VID_HEIGHT) {
-		V_DrawCroppedNoCheck(gfx, x, y, sx, sy, w, h, flags);
-		return;
-	}
-
-	// handle anything else
-	for (zy = 0; zy < h; zy++)
-		for (zx = 0; zx < w; zx++)
-		{
-			uint32_t i = sx + (sy*gfx.width) + zx + (zy*gfx.width);
-			int32_t vx = x + zx - gfx.xoff;
-			int32_t vy = y + zy - gfx.yoff;
-			
-			if (flags & V_SMALL)
-			{
-				vx -= (zx/2);
-				vy -= (zy/2);
-			}
-						
-			if (i >= gfx.size)
-				return;
-			
-			if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT || gfx.data[i] == 0)
-				continue;
-			
-			vid.buffer[vx+(vy*VID_WIDTH)] = palette[gfx.data[i]];
-		}
-}
-
-void V_Draw(gfx_t gfx, int16_t x, int16_t y, uint32_t flags)
-{
-	V_DrawCropped(gfx, x, y, 0, 0, gfx.width, gfx.size/gfx.width, flags);
-}
-
-// Bitmap variants if need be
-
-void V_DrawCroppedBitmapNoCheck(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
+void V_DrawCroppedNoCheck(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
 {	
 	int zx, zy;
 
@@ -172,7 +96,7 @@ void V_DrawCroppedBitmapNoCheck(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t 
 		}
 }
 
-void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
+void V_DrawCropped(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
 {	
 	int zx, zy;
 
@@ -185,7 +109,7 @@ void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t sx, int
 	
 	// completely within bounds
 	if (x >= 0 && y >= 0 && x+w < VID_WIDTH && y+h < VID_HEIGHT) {
-		V_DrawCroppedBitmapNoCheck(gfx, x, y, sx, sy, w, h, flags);
+		V_DrawCroppedNoCheck(gfx, x, y, sx, sy, w, h, flags);
 		return;
 	}
 	
@@ -212,9 +136,9 @@ void V_DrawCroppedBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y, int16_t sx, int
 		}
 }
 
-void V_DrawBitmap(bitmap_gfx_t gfx, int16_t x, int16_t y, uint32_t flags)
+void V_Draw(gfx_t gfx, int16_t x, int16_t y, uint32_t flags)
 {
-	V_DrawCroppedBitmap(gfx, x, y, 0, 0, gfx.width, gfx.height, flags);
+	V_DrawCropped(gfx, x, y, 0, 0, gfx.width, gfx.height, flags);
 }
 
 // Text functions
@@ -255,12 +179,8 @@ void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, u
 			if (flags & V_JUMPYTEXT)
 				yoff += abs((game_tick/2 + x*w) % h - h/2)/2 - charh/2;
 				
-			if (c > -1) {
-				if (font.bitmap)
-					V_DrawCroppedBitmap(font.bmpgfx, x + xoff, y + yoff, (c % 16) * charw, (c / 16) * charh, charw, charh, flags);
-				else
-					V_DrawCropped(font.gfx, x + xoff, y + yoff, (c % 16) * charw, (c / 16) * charh, charw, charh, flags);
-			}
+			if (c > -1)
+				V_DrawCropped(font.gfx, x + xoff, y + yoff, (c % 16) * charw, (c / 16) * charh, charw, charh, flags);
 			
 			x += w;
 		}

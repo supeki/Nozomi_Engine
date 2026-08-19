@@ -105,48 +105,48 @@ void D_DrawDialogue(void)
 		if (i < strlen(dialogue[curdiag]) && dialogue[curdiag][i] != '#' && dialogue[curdiag][i] != '^')
 			str[i] = dialogue[curdiag][i];
 
-	V_DrawCroppedBitmap(gfx_textbox, 0, VID_HEIGHT-32, 0, 0, 8, 8, 0);
-	V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-32, 16, 0, 8, 8, 0);
-	V_DrawCroppedBitmap(gfx_textbox, 0, VID_HEIGHT-8, 0, 16, 8, 8, 0);
-	V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-8, 16, 16, 8, 8, 0);
+	V_DrawCropped(gfx_textbox, 0, VID_HEIGHT-32, 0, 0, 8, 8, 0);
+	V_DrawCropped(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-32, 16, 0, 8, 8, 0);
+	V_DrawCropped(gfx_textbox, 0, VID_HEIGHT-8, 0, 16, 8, 8, 0);
+	V_DrawCropped(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-8, 16, 16, 8, 8, 0);
 	
 	for (i = 0; i < VID_WIDTH/8 - 2; i++) {
-		V_DrawCroppedBitmap(gfx_textbox, 8 + i*8, VID_HEIGHT-32, 8, 0, 8, 8, 0);
-		V_DrawCroppedBitmap(gfx_textbox, 8 + i*8, VID_HEIGHT-8, 8, 16, 8, 8, 0);
+		V_DrawCropped(gfx_textbox, 8 + i*8, VID_HEIGHT-32, 8, 0, 8, 8, 0);
+		V_DrawCropped(gfx_textbox, 8 + i*8, VID_HEIGHT-8, 8, 16, 8, 8, 0);
 	}
 	
 	for (i = 0; i < 2; i++) {
-		V_DrawCroppedBitmap(gfx_textbox, 0, VID_HEIGHT-24 + i*8, 0, 8, 8, 8, 0);
-		V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-24 + i*8, 16, 8, 8, 8, 0);
+		V_DrawCropped(gfx_textbox, 0, VID_HEIGHT-24 + i*8, 0, 8, 8, 8, 0);
+		V_DrawCropped(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-24 + i*8, 16, 8, 8, 8, 0);
 	}
 	
 	for (y = 0; y < 2; y++)
 		for (x = 0; x < VID_WIDTH/8 - 2; x++)
-			V_DrawCroppedBitmap(gfx_textbox, 8 + x*8, VID_HEIGHT-24 + y*8, 8, 8, 8, 8, 0);
+			V_DrawCropped(gfx_textbox, 8 + x*8, VID_HEIGHT-24 + y*8, 8, 8, 8, 8, 0);
 	
 	V_DrawText(str, 8, VID_HEIGHT-24, 0);
 	//V_DrawText(va("%d/%d", cur_char, strlen(dialogue[curdiag])), 0, 8, 0);
 
 	if (cur_char >= strlen(dialogue[curdiag]))
 		if (dialogue[curdiag][cur_char-1] == '^') {
-			V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-(8*9), VID_HEIGHT-64, 0, 0, 8, 8, 0);
-			V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-64, 16, 0, 8, 8, 0);
-			V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-(8*9), VID_HEIGHT-40, 0, 16, 8, 8, 0);
-			V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-40, 16, 16, 8, 8, 0);
+			V_DrawCropped(gfx_textbox, VID_WIDTH-(8*9), VID_HEIGHT-64, 0, 0, 8, 8, 0);
+			V_DrawCropped(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-64, 16, 0, 8, 8, 0);
+			V_DrawCropped(gfx_textbox, VID_WIDTH-(8*9), VID_HEIGHT-40, 0, 16, 8, 8, 0);
+			V_DrawCropped(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-40, 16, 16, 8, 8, 0);
 			
 			for (i = 0; i < 7; i++) {
-				V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-(8*8) + i*8, VID_HEIGHT-64, 8, 0, 8, 8, 0);
-				V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-(8*8) + i*8, VID_HEIGHT-40, 8, 16, 8, 8, 0);
+				V_DrawCropped(gfx_textbox, VID_WIDTH-(8*8) + i*8, VID_HEIGHT-64, 8, 0, 8, 8, 0);
+				V_DrawCropped(gfx_textbox, VID_WIDTH-(8*8) + i*8, VID_HEIGHT-40, 8, 16, 8, 8, 0);
 			}
 			
 			for (i = 0; i < 2; i++) {
-				V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-(8*9), VID_HEIGHT-56 + i*8, 0, 8, 8, 8, 0);
-				V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-56 + i*8, 16, 8, 8, 8, 0);
+				V_DrawCropped(gfx_textbox, VID_WIDTH-(8*9), VID_HEIGHT-56 + i*8, 0, 8, 8, 8, 0);
+				V_DrawCropped(gfx_textbox, VID_WIDTH-8, VID_HEIGHT-56 + i*8, 16, 8, 8, 8, 0);
 			}
 			
 			for (y = 0; y < 2; y++)
 				for (x = 0; x < 7; x++)
-					V_DrawCroppedBitmap(gfx_textbox, VID_WIDTH-(8*8) + x*8, VID_HEIGHT-56 + y*8, 8, 8, 8, 8, 0);
+					V_DrawCropped(gfx_textbox, VID_WIDTH-(8*8) + x*8, VID_HEIGHT-56 + y*8, 8, 8, 8, 8, 0);
 
 			V_DrawText("Accept\nDeny", VID_WIDTH-(8*6), VID_HEIGHT-56, 0);
 			V_DrawText(">", VID_WIDTH-(8*8), VID_HEIGHT-56+cur_option*8, 0);

@@ -18,12 +18,7 @@ font_t FNT_LoadFont(const char *filename)
 	
 	fread(gfx_name, sizeof(char), 32, fp);
 	gfx_name[32] = '\0';
-	fread(&font.bitmap, sizeof(bool), 1, fp);
-
-	if (font.bitmap)
-		font.bmpgfx = BMPGFX_LoadBitmap(va("data/fonts/%s.bmp", gfx_name));
-	else
-		font.gfx = GFX_LoadGFX(va("data/fonts/%s.gfx", gfx_name));
+	font.gfx = GFX_LoadGFX(va("data/fonts/%s.bmp", gfx_name));
 
 	fread(&font.charsize, sizeof(uint16_t), 1, fp);
 	font.offset = malloc(256*sizeof(int16_t));
@@ -113,33 +108,6 @@ void FNT_FontEditUpdate(void)
 	}
 }
 
-static void FNT_DrawCroppedDouble(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h)
-{	
-	int zx, zy;
-
-	if ((gfx.size + gfx.width) <= 0)
-        return;
-	
-	for (zy = 0; zy < h; zy++)
-		for (zx = 0; zx < w; zx++)
-		{
-			uint32_t i = sx + sy*gfx.width + zx + zy*gfx.width;
-			int32_t vx = x + zx*2 - gfx.xoff*2;
-			int32_t vy = y + zy*2 - gfx.yoff*2;
-						
-			if (i >= gfx.size)
-				return;
-			
-			if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT || gfx.data[i] == 0)
-				continue;
-			
-			vid.buffer[vx+(vy*VID_WIDTH)] = palette[gfx.data[i]];
-			vid.buffer[vx+(vy*VID_WIDTH)+1] = palette[gfx.data[i]];
-			vid.buffer[vx+(vy*VID_WIDTH)+VID_WIDTH] = palette[gfx.data[i]];
-			vid.buffer[vx+(vy*VID_WIDTH)+VID_WIDTH+1] = palette[gfx.data[i]];
-		}
-}
-
 void FNT_FontEditDraw(void)
 {
 	uint8_t charw = temp_font.charsize >> 8, charh = temp_font.charsize & 0xFF;
@@ -174,11 +142,6 @@ void FNT_FontEditDraw(void)
 		V_DrawDot(VID_WIDTH - charw*4 - 1, 2*charh-1 + y, col);
 		V_DrawDot(VID_WIDTH - charw*4 + charw*2, 2*charh-1 + y, col);
 	}
-	
-	if (curchar >= 33) {
-		int cc = curchar - 33;
-		FNT_DrawCroppedDouble(font_default.gfx, VID_WIDTH - charw*4 + xoff*2, 2*charh + yoff*2, (cc % 10) * charw, (cc / 10) * charh, charw, charh);
-	}
 
 	V_DrawText(va("Offsets: %d, %d", xoff, yoff), 0, charw*charh+charh, 0);
 	V_DrawText(va("Char Size (wxh): %d, %d", w, h), 0, charw*charh+charh*2, 0);
@@ -193,12 +156,10 @@ void FNT_SaveTempFont(void)
 {
 	FILE *fp = fopen("data/fonts/default.fnt", "wb+");
 	char gfx_name[33];
-	bool bitmap = false;
 	int i;
 
 	snprintf(gfx_name, 32, "default");
 	fwrite(gfx_name, sizeof(gfx_name)-1, 1, fp);
-	fwrite(&temp_font.bitmap, sizeof(bool), 1, fp);
 	fwrite(&temp_font.charsize, sizeof(uint16_t), 1, fp);
 	
 	for (i = 0; i < 256; i++)

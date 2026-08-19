@@ -8,25 +8,16 @@
 
 typedef struct
 {
-	uint32_t size; // updated to uint32_t Nozomi 22-JUN-26 // apparently it never actually got done or something Nozomi 08-JUL-26
-	uint16_t width; // updated to uint16_t Nozomi 22-JUN-26
-	int16_t xoff; // updated to int16_t Nozomi 22-JUN-26
-	int16_t yoff; // updated to int16_t Nozomi 22-JUN-26
-	uint8_t *data;
-} gfx_t;
-
-typedef struct
-{
 	int32_t width;  // image width
 	int32_t height; // image height
 	uint16_t *data;	// pixel data
-} bitmap_gfx_t;
+} gfx_t;
 
 void GFX_InitGFX(void);
+
 gfx_t GFX_LoadGFX(const char *filename);
+gfx_t GFX_LoadLegacyGFX(const char *filename);
 
-bitmap_gfx_t BMPGFX_LoadBitmap(const char *filename);
-
-extern bitmap_gfx_t gfx_her, gfx_tiles, gfx_tree, gfx_tree2, gfx_tree3, gfx_textbox;
+extern gfx_t gfx_her, gfx_tiles, gfx_tree, gfx_tree2, gfx_tree3, gfx_textbox;
 
 #endif

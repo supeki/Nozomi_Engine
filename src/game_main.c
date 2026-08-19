@@ -129,15 +129,15 @@ void gameDisplay(void)
 		FNT_FontEditDraw();
 	
 	for (i = 0; i < 576; i++)
-		V_DrawCroppedBitmap(gfx_tiles, (i%16)*16, (i/16)*16 - camera.y, demo_tiles[i]*16, 0, 16, 16, 0);
+		V_DrawCropped(gfx_tiles, (i%16)*16, (i/16)*16 - camera.y, demo_tiles[i]*16, 0, 16, 16, 0);
 	
 	OBJ_DrawObjectLayer(0);
 	
 	treeoff_1 = abs((I_GetTicks()/30) % 8 - 4) + 4;
 	treeoff_2 = -abs((I_GetTicks()/15) % 4 - 2) + 2;
 	
-	V_DrawBitmap(gfx_tree2, 128 - gfx_tree.width/2 + treeoff_1, 96 - gfx_tree.height - camera.y + -treeoff_2, 0);
-	V_DrawBitmap(gfx_tree3, 128 - gfx_tree.width/2 + -treeoff_1, 96 - gfx_tree.height - camera.y + treeoff_2, 0);
+	V_Draw(gfx_tree2, 128 - gfx_tree.width/2 + treeoff_1, 96 - gfx_tree.height - camera.y + -treeoff_2, 0);
+	V_Draw(gfx_tree3, 128 - gfx_tree.width/2 + -treeoff_1, 96 - gfx_tree.height - camera.y + treeoff_2, 0);
 	
 	if (in_diag)
 		D_DrawDialogue();

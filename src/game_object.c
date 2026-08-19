@@ -100,15 +100,15 @@ void OBJ_DrawObjectLayer(uint8_t layer)
 		if (obj->type == OBJ_MARIL)
 		{
 			if ((obj->y + obj->hit[1] + obj->hit[3])/PU >= 96)
-				V_DrawBitmap(gfx_tree, 128 - gfx_tree.width/2, 96 - gfx_tree.height - camera.y, 0);
+				V_Draw(gfx_tree, 128 - gfx_tree.width/2, 96 - gfx_tree.height - camera.y, 0);
 			
 			if (obj->anim_timer > 0)
-				V_DrawCroppedBitmap(gfx_her, obj->x/PU, obj->y/PU - camera.y, walk_table[(obj->anim_timer/6) % 4]*24, obj->dir*32, 24, 32, 0);
+				V_DrawCropped(gfx_her, obj->x/PU, obj->y/PU - camera.y, walk_table[(obj->anim_timer/6) % 4]*24, obj->dir*32, 24, 32, 0);
 			else
-				V_DrawCroppedBitmap(gfx_her, obj->x/PU, obj->y/PU - camera.y, 0, obj->dir*32, 24, 32, 0);
+				V_DrawCropped(gfx_her, obj->x/PU, obj->y/PU - camera.y, 0, obj->dir*32, 24, 32, 0);
 			
 			if ((obj->y + obj->hit[1] + obj->hit[3])/PU < 96)
-				V_DrawBitmap(gfx_tree, 128 - gfx_tree.width/2, 96 - gfx_tree.height - camera.y, 0);
+				V_Draw(gfx_tree, 128 - gfx_tree.width/2, 96 - gfx_tree.height - camera.y, 0);
 		}
 		
 		obj = obj->next;
