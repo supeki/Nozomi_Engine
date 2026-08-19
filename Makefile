@@ -28,7 +28,6 @@ GLFW ?= 0
 SDL ?= 1
 NDS ?= 0
 PSP ?= 0
-GBC ?= 0
 
 ifeq ($(WIN_32),1)
 WINDOWS = 0
@@ -51,17 +50,6 @@ endif
 
 ifeq ($(PSP),1)
 WINDOWS = 0
-endif
-
-ifeq ($(GBC),1)
-WINDOWS = 0
-WIN_32 = 0
-LINUX = 0
-LINUX_32 = 0
-SDL = 0
-GLFW = 0
-NDS = 0
-PSP = 0
 endif
 
 ifeq ($(SDL),1)
@@ -216,25 +204,6 @@ ifeq ($(NDS),1)
 			 -specs=$(SPECS)
 endif
 
-ifeq ($(GBC),1)
-	ifndef GBDK_HOME
-		GBDK_HOME = ~/gbdk
-	endif
-
-	CC = $(GBDK_HOME)/bin/lcc -Wm-yo512 -msm83:gb -Wm-yC -Wm-yn"$(GAME_TITLE)"
-	EXEC_EXT = .gbc
-
-	INTERFACE = GBC
-	i_main = gbc_main
-	i_event = gbc_event
-	i_sound = gbc_sound
-	i_system = gbc_system
-	i_video = gbc_video
-
-	DEFINES	:= -DGBC
-	CFLAGS := $(CFLAGS) $(DEFINES)
-endif
-
 INTERFACE_SRC = $(SRC_DIR)/interface/$(INTERFACE)
 INTERFACE_OBJ = $(OBJ_DIR)/$(INTERFACE)
 INTERFACE_BIN = $(BIN_DIR)/$(INTERFACE)
@@ -261,7 +230,7 @@ OBJS := $(OBJS) \
 		$(INTERFACE_OBJ)/$(i_system).o \
 		$(INTERFACE_OBJ)/$(i_video).o \
 		$(OBJ_DIR)/bitmap.o
-		
+
 ifdef i_input
 OBJS := $(OBJS) $(INTERFACE_OBJ)/$(i_input).o
 endif

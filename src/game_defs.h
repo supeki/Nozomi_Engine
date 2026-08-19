@@ -35,11 +35,7 @@ typedef boolean bool;
 #endif
 #include <stdio.h>
 #include <stdlib.h>
-
-#if !defined(GBC)
 #include <math.h>
-#endif
-
 #include <string.h>
 
 #ifndef GAME_NAME
@@ -48,7 +44,7 @@ typedef boolean bool;
 
 #define FRAMERATE 30
 
-#if defined(GBC) || defined (WINCE)
+#if defined (WINCE)
 #define MAX_PLAYERS 1
 #else
 #define MAX_PLAYERS 4

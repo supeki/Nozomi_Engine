@@ -80,7 +80,7 @@ void gameLoop(void)
 		if (game_quit)
 			break;
 		
-		#if defined(__NDS__) || defined(WINCE)
+		#if defined(__NDS__)
 		// Force the game to run a tick on NDS otherwise it cries.
 		gameRunStuff(1);
 		#else
