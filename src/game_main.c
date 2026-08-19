@@ -44,9 +44,7 @@ void gameMain(void)
 	P_CreatePlayer(128*PU - 12*PU, 536*PU, 2);
 	OBJ_CreateObject(128*PU, 64*PU, OBJ_MAN);
 	I_PlayMusic(mus_man, true);
-	
-	//W_InitTiles();
-	//W_InitWorldEdit(128, 20);
+
 	//FNT_StartFontEdit();
 }
 
@@ -110,8 +108,6 @@ void gameRunStuff(uint32_t elapsed)
 
 		if (font_edit)
 			FNT_FontEditUpdate();
-		if (world_edit)
-			W_UpdateWorldEdit();
 		
 		if (in_diag) {
 			D_UpdateDialogue();
@@ -131,8 +127,6 @@ void gameDisplay(void)
 
 	if (font_edit)
 		FNT_FontEditDraw();
-	if (world_edit)
-		W_DrawWorldEdit();
 	
 	for (i = 0; i < 576; i++)
 		V_DrawCroppedBitmap(gfx_tiles, (i%16)*16, (i/16)*16 - camera.y, demo_tiles[i]*16, 0, 16, 16, 0);
