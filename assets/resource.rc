@@ -1,0 +1,25 @@
+id ICON "icon.ico"
+
+1 VERSIONINFO
+FILEVERSION     1,0,0,0
+PRODUCTVERSION  1,0,0,0
+BEGIN
+	BLOCK "StringFileInfo"
+	BEGIN
+		BLOCK "040904E4"
+		BEGIN
+			VALUE "CompanyName", "Unknown Author"
+			VALUE "FileDescription", "Nozomi Engine"
+			VALUE "FileVersion", "v1.0.0"
+			VALUE "InternalName", "Nozomi Engine"
+			VALUE "LegalCopyright", "(c) 2026 Unknown Author"
+			VALUE "OriginalFilename", "game.exe"
+			VALUE "ProductName", "Nozomi Engine"
+			VALUE "ProductVersion", "v1.0.0"
+		END
+	END
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE "Translation", 0x409, 1252
+	END
+END

@@ -15,8 +15,9 @@ EXEC_EXT ?= .exe
 
 # Name of the game Nozomi 08-12-2026
 GAME_TITLE	?= Nozomi Engine
-GAME_SUBTITLE	?= Demo
+GAME_SUBTITLE ?= Demo
 GAME_AUTHOR	?= Unknown Author
+GAME_VERSION ?= v1.0.0
 
 # Assume Windows SDL by default Nozomi 04-15-2026
 WINDOWS ?= 1
@@ -122,8 +123,22 @@ ifeq ($(LINUX),1)
 	EXEC_EXT = 
 
 	LIBS := $(LIBS) -lm -lc
-	CFLAGS := $(CFLAGS) $(pkg-config sdl2 SDL2_mixer --cflags) -w
+	CFLAGS := $(CFLAGS) $(pkg-config sdl2 SDL2_mixer --cflags) -w -DLINUX
 	LDFLAGS := $(LDFLAGS) $(pkg-config sdl2 SDL2_mixer --libs)
+
+define LINUX_DESKTOP
+[Desktop Entry]
+Type=Application
+Version=$(GAME_VERSION)
+Name=$(GAME_TITLE)
+Comment=$(GAME_SUBTITLE)
+Exec=$(CURDIR)/bin/Linux/$(EXEC_NAME)$(EXEC_EXT)
+Icon=$(CURDIR)/assets/icons/icon.gif
+Terminal=false
+Categories=Games;
+endef
+
+export LINUX_DESKTOP
 endif
 
 ifeq ($(LINUX_32),1)
@@ -250,6 +265,39 @@ OBJS := $(OBJS) \
 ifdef i_input
 OBJS := $(OBJS) $(INTERFACE_OBJ)/$(i_input).o
 endif
+
+ifeq ($(WINDOWS),1)
+define RC_DATA
+id ICON "icon.ico"
+
+1 VERSIONINFO
+FILEVERSION     1,0,0,0
+PRODUCTVERSION  1,0,0,0
+BEGIN
+	BLOCK "StringFileInfo"
+	BEGIN
+		BLOCK "040904E4"
+		BEGIN
+			VALUE "CompanyName", "$(GAME_AUTHOR)"
+			VALUE "FileDescription", "$(GAME_TITLE)"
+			VALUE "FileVersion", "$(GAME_VERSION)"
+			VALUE "InternalName", "$(GAME_TITLE)"
+			VALUE "LegalCopyright", "(c) $(shell date +%Y) $(GAME_AUTHOR)"
+			VALUE "OriginalFilename", "$(EXEC_NAME)$(EXEC_EXT)"
+			VALUE "ProductName", "$(GAME_TITLE)"
+			VALUE "ProductVersion", "$(GAME_VERSION)"
+		END
+	END
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE "Translation", 0x409, 1252
+	END
+END
+endef
+
+export RC_DATA
+OBJS := $(OBJS) $(INTERFACE_OBJ)/resource.o
+endif
 		
 ifeq ($(NDS),1)
 # Start Nintendo DS build requirements!
@@ -281,14 +329,18 @@ ifeq ($(PSP),1)
 include $(PSPSDK)/lib/build.mak
 else
 # Start generic build requirements!
+ifeq ($(LINUX),1)
+all: $(INTERFACE_BIN)/$(EXEC_NAME)$(EXEC_EXT) $(INTERFACE_BIN)/game.desktop
+else
 all: $(INTERFACE_BIN)/$(EXEC_NAME)$(EXEC_EXT)
+endif
 endif
 endif
 
 # Clean up the objects.
 clean:
 	rm -rf $(OBJ_DIR)/*
-	rm -rf $(INTERFACE_BIN)/$(EXEC_NAME).*
+	rm -rf $(INTERFACE_BIN)/*
 	
 # Make all required directories!
 $(OBJ_DIR):
@@ -368,6 +420,26 @@ $(INTERFACE_OBJ)/$(i_system).o: $(INTERFACE_SRC)/$(i_system).c $(INTERFACE_OBJ)
 	
 $(INTERFACE_OBJ)/$(i_video).o: $(INTERFACE_SRC)/$(i_video).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+
+ifeq ($(WINDOWS),1)
+ifeq ($(WIN_32),1)
+$(INTERFACE_OBJ)/resource.o:
+	rm -rf assets/resource.rc
+	@echo "$$RC_DATA" > assets/resource.rc
+	i686-w64-mingw32-windres assets/resource.rc -I "assets/icons" -o $(INTERFACE_OBJ)/resource.o
+else
+$(INTERFACE_OBJ)/resource.o:
+	rm -rf assets/resource.rc
+	@echo "$$RC_DATA" > assets/resource.rc
+	x86_64-w64-mingw32-windres assets/resource.rc -I "assets/icons" -o $(INTERFACE_OBJ)/resource.o
+endif
+endif
+
+ifeq ($(LINUX),1)
+$(INTERFACE_BIN)/game.desktop:
+	rm -rf $(INTERFACE_BIN)/game.desktop
+	@echo "$$LINUX_DESKTOP" > $(INTERFACE_BIN)/game.desktop
+endif
 	
 # Make the helper stuff :3
 

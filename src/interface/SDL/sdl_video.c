@@ -25,7 +25,7 @@ uint32_t win_width = VID_WIDTH, win_height = VID_HEIGHT;
 float scale;
 
 void I_StartupGraphics(void)
-{		
+{
 	pixels = malloc(VID_WIDTH * VID_HEIGHT * sizeof(uint16_t));
 	scale = 1.0f;
 

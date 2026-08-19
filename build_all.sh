@@ -12,10 +12,9 @@ cp -r assets/data bin/Windows/data
 cp -r assets/credits bin/Windows/credits
 
 # Make and move Windows binary and libaries
-make LINUX_WIN=1
+make -j2 LINUX_WIN=1
 mv bin/SDL/game.exe bin/Windows
-cp -r assets/Windows/SDL2.dll bin/Windows/SDL2.dll
-cp -r assets/Windows/SDL2_mixer.dll bin/Windows/SDL2_mixer.dll
+cp -r assets/Windows/*.dll bin/Windows/
 
 # Clean obj directory to prepare for Linux
 make clean
@@ -26,12 +25,13 @@ mkdir -p bin/Linux
 
 # Copy game data
 cp -r assets/data bin/Linux/data
+cp -r assets/icons/icon.bmp bin/Linux/icon.bmp
 
 # Copy required licenses/credits
 cp -r assets/credits bin/Linux/credits
 
 # Make and move Linux binary
-make LINUX=1
+make -j2 LINUX=1
 mv bin/SDL/game bin/Linux
 
 # Clean obj directory to prepare for GLFW
@@ -48,7 +48,7 @@ cp -r assets/data bin/GLFW/data
 cp -r assets/credits bin/GLFW/credits
 
 # Make GLFW binary
-make SDL=0 LINUX=1 GLFW=1
+make -j2 SDL=0 LINUX=1 GLFW=1
 
 # Clean obj directory to prepare for NDS
 make clean
@@ -63,7 +63,7 @@ rm -rf src/interface/NDS/soundbank.h
 # Copy game data
 cp -r assets/data assets/NDS/nitrofs/data
 rm -rf assets/NDS/icon.gif
-cp -r assets/icon.gif assets/NDS/icon.gif
+cp -r assets/icons/icon.gif assets/NDS/icon.gif
 
 # Remove and copy audio data
 rm -rf assets/NDS/audio
@@ -84,7 +84,7 @@ mkdir -p bin/NDS
 cp -r assets/credits bin/NDS/credits
 
 # Make NDS binary
-make NDS=1
+make -j2 NDS=1
 
 # Clean obj directory to prepare for PSP
 make clean
@@ -101,7 +101,7 @@ rm -rf bin/PSP/data/audio
 cp -r assets/PSP/audio bin/PSP/data/audio
 
 # Make and move PSP binary
-make PSP=1
+make -j2 PSP=1
 mv EBOOT.PBP bin/PSP
 
 # Generate licenses for PSP ver. so my ass doesn't get sued <3
@@ -112,3 +112,4 @@ mv third-party-licenses bin/PSP
 rm -rf PARAM.SFO
 rm -rf game.elf
 rm -rf bin/SDL
+rm -rf obj/*

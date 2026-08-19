@@ -5,6 +5,7 @@ obj/*
 *.elf
 *.ncb
 *.out
+*.suo
 
 # i use vscode
 .vscode/
