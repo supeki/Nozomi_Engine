@@ -12,40 +12,13 @@
 #endif
 
 #include "game_input.h"
+#include "game_video.h" // for vid width and height
 
 uint32_t gamecontrols[MAX_PLAYERS][NUMCONTROLS];
 int16_t  gameaxis[MAX_PLAYERS][NUMAXIS];
 uint32_t gamecontrolbinds[MAX_PLAYERS][NUMCONTROLS][2];
-
-bool G_ControlDown(uint8_t player, uint8_t control, bool pressed)
-{
-	if (control > NUMCONTROLS-1)
-		return false;
-	
-	if (gamecontrols[player][control] > 0xFFFFFFFE)
-		gamecontrols[player][control] = 0xFFFFFFFF;
-	
-	if (pressed)
-		return (gamecontrols[player][control] == 1);
-	else
-		return (gamecontrols[player][control] > 0);
-}
-
-int16_t G_PlayerAxis(uint8_t player, uint8_t axis)
-{
-	if (axis > NUMAXIS-1)
-		return 0;
-	
-	if (gameaxis[player][axis] > 0xFFFF)
-		gameaxis[player][axis] = 0xFFFF;
-	if (gameaxis[player][axis] < -0xFFFF)
-		gameaxis[player][axis] = -0xFFFF;
-	
-	if (abs(gameaxis[player][axis]) <= 0x1FF)
-		return 0;
-	
-	return gameaxis[player][axis];
-}
+uint32_t mousecontrols[MAX_PLAYERS][NUMMOUSECONTROLS];
+int16_t  mouseaxis[MAX_PLAYERS][NUMMOUSEAXIS];
 
 void G_DefaultControls(void)
 {
@@ -130,4 +103,60 @@ void G_DefaultControls(void)
 		gamecontrolbinds[j][CON_A][0] = VK_RETURN;
 	#endif
 	}
+}
+
+bool G_ControlDown(uint8_t player, uint8_t control, bool pressed)
+{
+	if (control > NUMCONTROLS-1)
+		return false;
+	
+	if (gamecontrols[player][control] > 0xFFFFFFFE)
+		gamecontrols[player][control] = 0xFFFFFFFF;
+	
+	if (pressed)
+		return (gamecontrols[player][control] == 1);
+	else
+		return (gamecontrols[player][control] > 0);
+}
+
+int16_t G_PlayerAxis(uint8_t player, uint8_t axis)
+{
+	if (axis > NUMAXIS-1)
+		return 0;
+	
+	if (gameaxis[player][axis] > 0xFFFE)
+		gameaxis[player][axis] = 0xFFFE;
+	if (gameaxis[player][axis] < -0xFFFF)
+		gameaxis[player][axis] = -0xFFFF;
+	
+	// deadzone
+	if (abs(gameaxis[player][axis]) <= 0x1FF)
+		return 0;
+	
+	return gameaxis[player][axis];
+} 
+
+int16_t G_MouseAxis(uint8_t player, uint8_t axis)
+{
+	if (axis > NUMMOUSEAXIS-1)
+		return 0;
+	
+	if (mouseaxis[player][axis] > 0xFFFE)
+		mouseaxis[player][axis] = 0xFFFE;
+	if (mouseaxis[player][axis] < -0xFFFF)
+		mouseaxis[player][axis] = -0xFFFF;
+
+	switch (axis) {
+		case MOUSE_POSX:
+			if (mouseaxis[player][axis] > VID_WIDTH-1) mouseaxis[player][axis] = VID_WIDTH-1;
+			if (mouseaxis[player][axis] < 0) mouseaxis[player][axis] = 0;
+			break;
+		case MOUSE_POSY:
+			if (mouseaxis[player][axis] > VID_HEIGHT-1) mouseaxis[player][axis] = VID_HEIGHT-1;
+			if (mouseaxis[player][axis] < 0) mouseaxis[player][axis] = 0;
+			break;
+
+	}
+	
+	return mouseaxis[player][axis];
 }

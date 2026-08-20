@@ -11,6 +11,8 @@
 extern SDL_Window *sdlWnd;
 extern SDL_Surface *sdlSurf;
 extern SDL_Surface *wndSurf;
+extern float scale; // for scaling mouse as well
+extern int mouse_offx, mouse_offy;
 
 void I_UpdateWindow(SDL_Event event);
 

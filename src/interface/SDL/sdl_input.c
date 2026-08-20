@@ -4,6 +4,7 @@
 
 #include <SDL2/SDL.h>
 
+#include "sdl_main.h"
 #include "sdl_input.h"
 
 #include "../../i_system.h"
@@ -11,6 +12,8 @@
 
 static int player_controllers[MAX_PLAYERS] = {-1, -1, -1, -1};
 static SDL_GameController *player_gamecontroller[MAX_PLAYERS];
+
+int mouse_offx, mouse_offy; // set in sdl_video.c
 
 // handled differently for every backend...
 void I_UpdateControls(SDL_Event event)
@@ -32,6 +35,16 @@ void I_UpdateControls(SDL_Event event)
 				for (c = CON_UP; c < NUMCONTROLS; c++)
 					if (gamecontrolbinds[j][c][0] == event.key.keysym.sym) // holy fucking shit
 						gamecontrols[j][c] = 0;
+			break;
+
+		// Mouse Support
+		case SDL_MOUSEMOTION:
+			{
+				mouseaxis[0][MOUSE_POSX] = (event.motion.x - mouse_offx) / scale;
+				mouseaxis[0][MOUSE_POSY] = (event.motion.y - mouse_offy) / scale;
+				mouseaxis[0][MOUSE_INPUTX] = event.motion.xrel / scale;
+				mouseaxis[0][MOUSE_INPUTY] = event.motion.yrel / scale;
+			}
 			break;
 			
 		// Controllers!

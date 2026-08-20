@@ -123,6 +123,7 @@
 				BufferSecurityCheck="false"
 				ObjectFile="$(IntDir)\"
 				ProgramDataBaseFileName="$(IntDir)\vc80.pdb"
+				EnableFloatingPointEmulation="true"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -140,6 +141,7 @@
 				ManifestFile="$(ProjectDir)\obj\$(TargetFileName).intermediate.manifest"
 				SubSystem="9"
 				BaseAddress="0x00010000"
+				TargetMachine="3"
 				FixedBaseAddress="2"
 			/>
 			<Tool

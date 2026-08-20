@@ -83,6 +83,9 @@ void I_PushGraphics(void)
 	int height = (int)(scale*(float)VID_HEIGHT);
 	SDL_Rect dest_rect[4] = {(win_width/2) - (width/2), (win_height/2) - (height/2), width, height};
 
+	mouse_offx = (win_width/2) - (width/2); 
+	mouse_offy = (win_height/2) - (height/2);
+
 	memcpy(pixels, vid.buffer, VID_WIDTH * VID_HEIGHT * sizeof(uint16_t));
 
 	SDL_RenderClear(wndRend);

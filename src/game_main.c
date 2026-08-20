@@ -65,12 +65,19 @@ void gameLoop(void)
 			continue;
 		}
 		
-		// dumbass hack for SDL
-		#if defined(SDL)
-		for (int j = 0; j < MAX_PLAYERS; j++)
-			for (int c = CON_UP; c < NUMCONTROLS; c++)
-				if (gamecontrols[j][c] > 0)
-					gamecontrols[j][c]++;
+		// dumbass hack for SDL and WINCE ports
+		#if defined(SDL) || defined(WINCE)
+		{
+			int j, c;
+			for (j = 0; j < MAX_PLAYERS; j++) {
+				for (c = CON_UP; c < NUMCONTROLS; c++)
+					if (gamecontrols[j][c] > 0)
+						gamecontrols[j][c]++;
+				for (c = MOUSE_LBUTTON; c < NUMMOUSECONTROLS; c++)
+					if (mousecontrols[j][c] > 0)
+						mousecontrols[j][c]++;
+			}
+		}
 		#endif
 		
 		I_PollEvents();
@@ -141,6 +148,8 @@ void gameDisplay(void)
 	
 	if (in_diag)
 		D_DrawDialogue();
+
+	V_DrawText(va("Mouse X, Mouse Y\n%02d, %02d", G_MouseAxis(PLAYER_ONE, MOUSE_POSX), G_MouseAxis(PLAYER_ONE, MOUSE_POSY)), 0, 0, 0);
 }
 
 uint8_t demo_tiles[576] = {
