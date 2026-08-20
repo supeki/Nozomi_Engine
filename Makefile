@@ -89,7 +89,7 @@ ifeq ($(GLFW),1)
 	
 	CFLAGS = $(OPTS) \
 		$(LIBS) \
-		$(DEFINES) -g3
+		$(DEFINES)
 endif
 
 ifeq ($(WINDOWS),1)
