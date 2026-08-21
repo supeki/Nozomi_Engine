@@ -6,6 +6,7 @@ obj/*
 *.ncb
 *.out
 *.suo
+wants.txt
 
 # i use vscode
 .vscode/

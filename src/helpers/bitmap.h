@@ -61,5 +61,6 @@ typedef struct
 } bitmap_t;
 
 bitmap_t Bitmap_Load(const char *filename);
+void Bitmap_Free(bitmap_t *bitmap);
 
 #endif

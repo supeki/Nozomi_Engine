@@ -88,7 +88,18 @@ gfx_t GFX_LoadGFX(const char *filename)
 			return gfx;
 	}
 
+	Bitmap_Free(&bitmap);
+
 	return gfx;
+}
+
+void GFX_FreeGFX(gfx_t *gfx)
+{
+	gfx->width = 0;
+	gfx->height = 0;
+
+	free(gfx->data);
+	gfx->data = NULL;
 }
 
 gfx_t GFX_LoadLegacyGFX(const char *filename)

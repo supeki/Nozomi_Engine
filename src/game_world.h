@@ -28,9 +28,13 @@ typedef enum
 
 extern uint8_t tile_width, tile_height; // 256x256 is pretty big for one tile as-is
 extern uint32_t *tile_attributes; // per-tile attributes (basically just flags)
+extern gfx_t gfx_tileset;
 
 extern uint16_t world_width, world_height; // shouldn't need larger than 65536x65536 tiles right
 extern uint32_t world_bgtype; // background type maybe if i wanna have a 2d game with cool backgrounds (like cave story)
-extern uint16_t *world_tiles; // tile layout in the world
+extern uint16_t *world_tiles, *world_bgtiles; // tile layout in the world
+extern gfx_t gfx_worldbg;
+
+void W_LoadWorldFile(const char *filename);
 
 #endif

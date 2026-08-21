@@ -59,8 +59,6 @@ typedef boolean bool;
 char *va(const char *format, ...);
 
 // types
-typedef int32_t subpixel_t;
-#define SUBPIXEL_SHIFT 16
 #define PU 65536
 
 extern uint8_t demo_tiles[576];

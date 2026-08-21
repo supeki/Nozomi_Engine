@@ -42,7 +42,7 @@ void OBJ_RunObjects(void)
 	}
 }
 
-object_t *OBJ_CreateObject(subpixel_t x, subpixel_t y, int type)
+object_t *OBJ_CreateObject(uint32_t x, uint32_t y, int type)
 {
 	object_t *obj;
 	obj = malloc(sizeof(object_t));
@@ -115,16 +115,16 @@ void OBJ_DrawObjectLayer(uint8_t layer)
 	}
 }
 
-static bool OBJ_InTile(object_t *obj, subpixel_t x, subpixel_t y)
+static bool OBJ_InTile(object_t *obj, uint32_t x, uint32_t y)
 {
-	subpixel_t hit_left = obj->x + obj->hit[0];
-	subpixel_t hit_top = obj->y + obj->hit[1];
-	subpixel_t hit_right = hit_left + obj->hit[2];
-	subpixel_t hit_bottom = hit_top + obj->hit[3];
-	subpixel_t hit2_left = x;
-	subpixel_t hit2_top = y;
-	subpixel_t hit2_right = x + 16*PU;
-	subpixel_t hit2_bottom = y + 16*PU;
+	uint32_t hit_left = obj->x + obj->hit[0];
+	uint32_t hit_top = obj->y + obj->hit[1];
+	uint32_t hit_right = hit_left + obj->hit[2];
+	uint32_t hit_bottom = hit_top + obj->hit[3];
+	uint32_t hit2_left = x;
+	uint32_t hit2_top = y;
+	uint32_t hit2_right = x + 16*PU;
+	uint32_t hit2_bottom = y + 16*PU;
 	
 	return (
 		hit_left <= hit2_right - 1 &&
@@ -136,14 +136,14 @@ static bool OBJ_InTile(object_t *obj, subpixel_t x, subpixel_t y)
 
 static bool OBJ_InObject(object_t *obj, object_t *obj2)
 {
-	subpixel_t hit_left = obj->x + obj->hit[0];
-	subpixel_t hit_top = obj->y + obj->hit[1];
-	subpixel_t hit_right = hit_left + obj->hit[2];
-	subpixel_t hit_bottom = hit_top + obj->hit[3];
-	subpixel_t hit2_left = obj2->x + obj2->hit[0];
-	subpixel_t hit2_top = obj2->y + obj2->hit[1];
-	subpixel_t hit2_right = hit2_left + obj2->hit[2];
-	subpixel_t hit2_bottom = hit2_top + obj2->hit[3];
+	uint32_t hit_left = obj->x + obj->hit[0];
+	uint32_t hit_top = obj->y + obj->hit[1];
+	uint32_t hit_right = hit_left + obj->hit[2];
+	uint32_t hit_bottom = hit_top + obj->hit[3];
+	uint32_t hit2_left = obj2->x + obj2->hit[0];
+	uint32_t hit2_top = obj2->y + obj2->hit[1];
+	uint32_t hit2_right = hit2_left + obj2->hit[2];
+	uint32_t hit2_bottom = hit2_top + obj2->hit[3];
 	
 	return (
 		hit_left <= hit2_right - 1 &&
@@ -153,10 +153,10 @@ static bool OBJ_InObject(object_t *obj, object_t *obj2)
 	);
 }
 
-bool OBJ_TryMovement(object_t *obj, subpixel_t x, subpixel_t y)
+bool OBJ_TryMovement(object_t *obj, int32_t x, int32_t y)
 {	
-	subpixel_t step_x = (x > 0 ? 1 : -1)*PU, step_y = (y > 0 ? 1 : -1)*PU;
-	uint32_t x2, y2;
+	int32_t step_x = (x > 0 ? 1 : -1)*PU, step_y = (y > 0 ? 1 : -1)*PU;
+	int32_t x2, y2;
 
 	if (x == 0 && y == 0)
 		return false;
@@ -164,7 +164,7 @@ bool OBJ_TryMovement(object_t *obj, subpixel_t x, subpixel_t y)
 	if (x != 0)
 		for (x2 = 0; x2 < abs(x/PU); x2++)
 		{
-			subpixel_t hit_x, hit_y, hit_x2, hit_y2;
+			uint32_t hit_x, hit_y, hit_x2, hit_y2;
 			object_t *obj2;
 			int i, i2, i3, i4, res;
 			obj->x += step_x;
@@ -259,7 +259,7 @@ bool OBJ_TryMovement(object_t *obj, subpixel_t x, subpixel_t y)
 	if (y != 0)
 		for (y2 = 0; y2 < abs(y/PU); y2++)
 		{
-			subpixel_t hit_x, hit_y, hit_x2, hit_y2;
+			uint32_t hit_x, hit_y, hit_x2, hit_y2;
 			object_t *obj2;
 			int i, i2, i3, i4, res;
 			obj->y += step_y;
