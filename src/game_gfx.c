@@ -88,7 +88,8 @@ gfx_t GFX_LoadGFX(const char *filename)
 			return gfx;
 	}
 
-	Bitmap_Free(&bitmap);
+	if (&bitmap != NULL)
+		Bitmap_Free(&bitmap);
 
 	return gfx;
 }

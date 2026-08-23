@@ -11,6 +11,8 @@ bitmap_t Bitmap_Load(const char *filename)
 	BMP_DIBHeader_t dib_header;
 	int i;
 
+	memset(&bitmap, 0, sizeof(bitmap_t));
+
 	if (!fp)
 		I_Error("Failed to find bitmap file: %s", filename);
 	
@@ -72,10 +74,13 @@ void Bitmap_Free(bitmap_t *bitmap)
 	bitmap->bpp = 0;
 	bitmap->compression = 0;
 
-	free(bitmap->pixel_data);
-	if (bitmap->bpp <= 8)
-		free(bitmap->palette);
+	if (bitmap->pixel_data != NULL) {
+		free(bitmap->pixel_data);
+		bitmap->pixel_data = NULL;
+	}
 
-	bitmap->pixel_data = NULL;
-	bitmap->palette = NULL;
+	if (bitmap->palette != NULL) {
+		free(bitmap->palette);
+		bitmap->palette = NULL;
+	}
 }
