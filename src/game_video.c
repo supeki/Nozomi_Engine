@@ -23,11 +23,12 @@ void V_Init(void)
 
 // Load the palette into vid.palette :3 Nozomi
 // UPDATE: Only used for LEGACY GFX now!!
-void V_LoadPalette(void)
+// UPDATE 2: unless you wanna use it for misc stuff
+void V_LoadPalette(const char *filename, uint16_t* pal)
 {
 	int i;
 	long size;
-	FILE *file = fopen("data/palette.mpl", "rb");
+	FILE *file = fopen(filename, "rb");
 	
 	if (file == NULL)
 		I_Error("Failed to read palette file!\n");
@@ -36,9 +37,9 @@ void V_LoadPalette(void)
 	size = ftell(file);
 	rewind(file);
 	
-	palette = malloc((size/3 + 1) * sizeof(uint16_t));
+	pal = malloc((size/3 + 1) * sizeof(uint16_t));
 	
-	palette[0] = 0; // pitch black!
+	pal[0] = 0; // pitch black!
 	
 	for (i = 0; i < size/3; i++)
 	{
@@ -48,10 +49,18 @@ void V_LoadPalette(void)
 		fread(&g, 1, 1, file);
 		fread(&b, 1, 1, file);
 		
-		palette[i+1] = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
+		pal[i+1] = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
 	}
 	
 	fclose(file);
+}
+
+void V_Free(void)
+{
+	if (palette != NULL)
+		free(palette);
+
+	free(vid.buffer);
 }
 
 void V_ClearScreen(void)

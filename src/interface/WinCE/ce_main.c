@@ -33,7 +33,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 			StretchDIBits(
 				hdc,
 				-8, 64,
-				256, 192,
+				VID_WIDTH, VID_HEIGHT,
 				0, 0,
 				VID_WIDTH, VID_HEIGHT,
 				dibPixels,

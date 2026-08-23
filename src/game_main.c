@@ -2,6 +2,7 @@
 // game_main.c
 
 #include "i_event.h"
+#include "i_net.h"
 #include "i_sound.h"
 #include "i_system.h"
 #include "i_video.h"
@@ -28,14 +29,17 @@ void gameMain(void)
 	V_Init();
 	
 	I_printf("Loading palette...\n");
-	V_LoadPalette();
+	V_LoadPalette("data/palette.mpl", palette);
 	
 	I_printf("Starting graphics backend...\n");
 	I_StartupGraphics();
 	
 	I_printf("Starting sound backend...\n");
 	I_StartupSound();
-	
+
+	I_printf("Starting networking backend...\n");
+	I_StartupNetwork();
+
 	I_printf("Setting default controls...\n");
 	G_DefaultControls();
 	
@@ -102,6 +106,13 @@ void gameLoop(void)
 		
 		V_ClearScreen();
 	}
+
+	OBJ_FreeObjects();
+	W_Free();
+	I_ShutdownNetwork();
+	I_ShutdownSound();
+	I_ShutdownGraphics();
+	V_Free();
 }
 
 void gameRunStuff(uint32_t elapsed)
@@ -148,8 +159,6 @@ void gameDisplay(void)
 	
 	if (in_diag)
 		D_DrawDialogue();
-
-	V_DrawText(va("Mouse X, Mouse Y\n%02d, %02d", G_MouseAxis(PLAYER_ONE, MOUSE_POSX), G_MouseAxis(PLAYER_ONE, MOUSE_POSY)), 0, 0, 0);
 }
 
 uint8_t demo_tiles[576] = {

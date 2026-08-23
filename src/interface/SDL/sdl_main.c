@@ -48,12 +48,11 @@ int main(int argc, char *argv[])
 	gameMain();
 	
 	I_printf("Starting main game loop...\n");
-		
 	gameLoop();
 	
 	I_printf("Quitting SDL...\n");
-	
 	SDL_Quit();
+
 	I_printf("Quitting %s...\n", GAME_NAME);
 	
 	exit(0);

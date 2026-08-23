@@ -31,7 +31,7 @@ cp -r assets/icons/icon.bmp bin/Linux/icon.bmp
 cp -r assets/credits bin/Linux/credits
 
 # Make and move Linux binary
-make -j2 LINUX=1
+make -j2 LINUX=1 NET=1
 mv bin/SDL/game bin/Linux
 
 # Clean obj directory to prepare for GLFW

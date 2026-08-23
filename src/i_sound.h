@@ -7,6 +7,7 @@
 #include "game_defs.h"
 
 void I_StartupSound(void);
+void I_ShutdownSound(void);
 
 void I_PlaySound(void);
 

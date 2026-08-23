@@ -16,7 +16,7 @@ typedef struct object_s
 	uint32_t x; // X position relative to the world
 	uint32_t y; // Y position relative to the world
 	uint8_t dir; // Facing direction 0 is down, 3 is right
-	uint32_t flags; // Any special flags for this type.
+	uint32_t flags; // Any special flags for this object.
 	uint32_t hit[4]; // Hitbox, index 0 is x offset, 1 is y offset, 2 is width, 3 is height
 	uint8_t layer;
 	
@@ -52,6 +52,7 @@ extern camera_t camera;
 
 void OBJ_InitObjects(void);
 void OBJ_RunObjects(void);
+void OBJ_FreeObjects(void);
 object_t *OBJ_CreateObject(uint32_t x, uint32_t y, int type);
 void OBJ_RemoveObject(object_t *obj);
 void OBJ_DrawObjectLayer(uint8_t layer);

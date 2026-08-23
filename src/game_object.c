@@ -42,6 +42,18 @@ void OBJ_RunObjects(void)
 	}
 }
 
+void OBJ_FreeObjects(void)
+{
+	object_t *obj = objects.next;
+	
+	while (obj != &objects)
+	{	
+		object_t *obj2 = obj->next;
+		OBJ_RemoveObject(obj);
+		obj = obj2;
+	}
+}
+
 object_t *OBJ_CreateObject(uint32_t x, uint32_t y, int type)
 {
 	object_t *obj;

@@ -73,7 +73,7 @@ void Bitmap_Free(bitmap_t *bitmap)
 	bitmap->compression = 0;
 
 	free(bitmap->pixel_data);
-	if (bitmap.bpp <= 8)
+	if (bitmap->bpp <= 8)
 		free(bitmap->palette);
 
 	bitmap->pixel_data = NULL;

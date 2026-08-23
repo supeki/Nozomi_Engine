@@ -59,6 +59,14 @@ void I_StartupGraphics(void)
 		I_Error("Failed to create texture!\n");
 }
 
+void I_ShutdownGraphics(void)
+{
+	SDL_DestroyTexture(sdlTex);
+	SDL_DestroyRenderer(wndRend);
+	SDL_DestroyWindow(sdlWnd);
+	free(pixels);
+}
+
 void I_UpdateWindow(SDL_Event event)
 {	
 	switch (event.window.event)

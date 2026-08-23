@@ -24,7 +24,7 @@ void P_RemovePlayer(void)
 {
 	num_players--;
 	memset(&players[num_players], 0, sizeof(player_t));
-	players[num_players].object = (void *)NULL;
+	OBJ_RemoveObject(players[num_players].object);
 }
 
 void P_PlayerLogic(player_t player)

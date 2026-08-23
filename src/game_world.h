@@ -36,5 +36,6 @@ extern uint16_t *world_tiles, *world_bgtiles; // tile layout in the world
 extern gfx_t gfx_worldbg;
 
 void W_LoadWorldFile(const char *filename);
+void W_Free(void);
 
 #endif

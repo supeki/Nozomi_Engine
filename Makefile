@@ -62,10 +62,15 @@ ifeq ($(SDL),1)
 	i_system = sdl_system
 	i_video = sdl_video
 
+	ifeq ($(NET), 1)
+		i_net = sdl_net
+		LIBS := $(LIBS) -lSDL2_net
+	endif
+
 	# Define some stuff!
 	DEFINES = -DSDL
 	OPTS := $(OPTS) -I.
-	LIBS = -lSDL2main -lSDL2 -lSDL2_mixer
+	LIBS := $(LIBS) -lSDL2main -lSDL2 -lSDL2_mixer
 	LDFLAGS =  
 	
 	CFLAGS = $(OPTS) \
@@ -84,7 +89,7 @@ ifeq ($(GLFW),1)
 
 	DEFINES = -DGLFW
 	OPTS := $(OPTS) -I.
-	LIBS = -lglfw -lGL -lGLU -lSDL2 -lSDL2_mixer -lm -lc # lol, need a different audio backend
+	LIBS := $(LIBS) -lglfw -lGL -lGLU -lSDL2 -lSDL2_mixer -lm -lc # lol, need a different audio backend
 	LDFLAGS =  
 	
 	CFLAGS = $(OPTS) \
@@ -235,6 +240,12 @@ ifdef i_input
 OBJS := $(OBJS) $(INTERFACE_OBJ)/$(i_input).o
 endif
 
+ifdef i_net
+OBJS := $(OBJS) $(INTERFACE_OBJ)/$(i_net).o
+else
+OBJS := $(OBJS) $(OBJ_DIR)/dummy_net.o
+endif
+
 ifeq ($(WINDOWS),1)
 define RC_DATA
 id ICON "icon.ico"
@@ -376,6 +387,14 @@ $(INTERFACE_OBJ)/$(i_input).o: $(INTERFACE_SRC)/$(i_input).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
 endif
 	
+ifdef i_net	
+$(INTERFACE_OBJ)/$(i_net).o: $(INTERFACE_SRC)/$(i_net).c $(INTERFACE_OBJ)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+else
+$(OBJ_DIR)/dummy_net.o: $(SRC_DIR)/interface/dummy_net.c $(SRC_DIR)/i_net.h $(SRC_DIR)/game_defs.h
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+endif
+
 ifeq ($(NDS),1)
 $(INTERFACE_OBJ)/$(i_sound).o: $(INTERFACE_SRC)/$(i_sound).c $(INTERFACE_SRC)/soundbank.h $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
@@ -409,7 +428,7 @@ $(INTERFACE_BIN)/game.desktop:
 	rm -rf $(INTERFACE_BIN)/game.desktop
 	@echo "$$LINUX_DESKTOP" > $(INTERFACE_BIN)/game.desktop
 endif
-	
+
 # Make the helper stuff :3
 
 $(OBJ_DIR)/bitmap.o: $(SRC_DIR)/helpers/bitmap.c $(SRC_DIR)/helpers/bitmap.h

@@ -5,6 +5,7 @@
 #define I_VIDEO_H
 
 void I_StartupGraphics(void);
+void I_ShutdownGraphics(void);
 void I_PushGraphics(void);
 
 #endif

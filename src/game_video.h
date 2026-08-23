@@ -22,7 +22,8 @@ extern vid_t vid;
 extern uint16_t* palette;
 
 void V_Init(void);
-void V_LoadPalette(void);
+void V_Free(void);
+void V_LoadPalette(const char *filename, uint16_t* pal);
 void V_ClearScreen(void);
 void V_DrawDot(int16_t x, int16_t y, uint16_t col);
 void V_Draw(gfx_t gfx, int16_t x, int16_t y, uint32_t flags);

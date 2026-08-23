@@ -1,6 +1,7 @@
 // Nozomi Engine
 // game_world.c
 
+#include "game_object.h"
 #include "game_world.h"
 
 uint8_t tile_width, tile_height; // 256x256 is pretty big for one tile as-is
@@ -12,7 +13,7 @@ uint16_t *world_tiles = NULL, *world_bgtiles = NULL; // tile layout in the world
 
 gfx_t gfx_tileset, gfx_worldbg;
 
-void W_LoadTileset(const char *filename)
+static void W_LoadTileset(const char *filename)
 {
     FILE *fp = fopen(filename, "rb");
     char graphic_name[33];
@@ -22,7 +23,7 @@ void W_LoadTileset(const char *filename)
     fread(&graphic_name, sizeof(char), 32, fp);
     graphic_name[32] = '\0';
 
-    if (gfx_tileset)
+    if (&gfx_tileset)
         GFX_FreeGFX(&gfx_tileset);
 
     gfx_tileset = GFX_LoadGFX(va("data/tilesets/%s.bmp", graphic_name));
@@ -34,10 +35,6 @@ void W_LoadTileset(const char *filename)
 
     // get number of tiles from graphic size and tile width/height
     num_tiles = (gfx_tileset.width / tile_width) * (gfx_tileset.height / tile_height);
-
-    // free if exist already
-    if (tile_attributes)
-        free(tile_attributes);
 
     // get tile attributes from file
     tile_attributes = malloc(num_tiles * sizeof(uint32_t));
@@ -53,6 +50,9 @@ void W_LoadWorldFile(const char *filename)
     char tileset_name[33];
     char background_name[33];
     uint32_t i, num_objs;
+
+    // free prior stuff
+    W_Free();
 
     // read world header
 
@@ -74,23 +74,13 @@ void W_LoadWorldFile(const char *filename)
         fread(&background_name, sizeof(char), 32, fp);
         background_name[32] = '\0';
 
-        if (gfx_worldbg)
+        if (&gfx_worldbg)
             GFX_FreeGFX(&gfx_worldbg);
 
         gfx_worldbg = GFX_LoadGFX(va("data/backgrounds/%s.bmp", background_name));
     }
 
     // read world tiles
-    if (world_tiles) {
-        free(world_tiles);
-        world_tiles = NULL;
-    }
-
-    if (world_bgtiles) {
-        free(world_bgtiles);
-        world_bgtiles = NULL;
-    }
-
     world_tiles = malloc(world_width * world_height * sizeof(uint16_t));
     for (i = 0; i < world_width * world_height; i++)
         fread(&world_tiles[i], sizeof(uint16_t), 1, fp);
@@ -107,7 +97,7 @@ void W_LoadWorldFile(const char *filename)
     fread(&num_objs, sizeof(uint32_t), 1, fp); // i'm lazyy so i'll store num of objs in file
 
     for (i = 0; i < num_objs; i++) {
-        obj_t *obj
+        object_t *obj;
         uint32_t type, x, xoff, y, yoff, flags;
         uint8_t dir;
 
@@ -125,4 +115,22 @@ void W_LoadWorldFile(const char *filename)
     }
 
     fclose(fp);
+}
+
+void W_Free(void)
+{
+    if (world_tiles != NULL) {
+        free(world_tiles);
+        world_tiles = NULL;
+    }
+
+    if (world_bgtiles != NULL) {
+        free(world_bgtiles);
+        world_bgtiles = NULL;
+    }
+
+    if (tile_attributes != NULL) {
+        free(tile_attributes);
+        tile_attributes = NULL;
+    }
 }

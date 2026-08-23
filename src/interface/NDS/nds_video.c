@@ -15,6 +15,11 @@ void I_StartupGraphics(void)
     vramSetBankA(VRAM_A_LCD);
 }
 
+void I_ShutdownGraphics(void)
+{	
+	vramDefault();
+}
+
 uint16_t rgb565_to_rgb15(uint16_t c)
 {
     uint16_t r = (c >> 11) & 0x1F;

@@ -98,8 +98,10 @@ void GFX_FreeGFX(gfx_t *gfx)
 	gfx->width = 0;
 	gfx->height = 0;
 
-	free(gfx->data);
-	gfx->data = NULL;
+	if (gfx->data != NULL) {
+		free(gfx->data);
+		gfx->data = NULL;
+	}
 }
 
 gfx_t GFX_LoadLegacyGFX(const char *filename)

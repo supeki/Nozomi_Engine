@@ -26,6 +26,14 @@ void I_StartupSound(void)
 	Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
 }
 
+void I_ShutdownSound(void)
+{
+	Mix_HaltMusic();
+    Mix_FreeMusic(current_song);
+	Mix_CloseAudio();
+    Mix_Quit();
+}
+
 void I_PlaySound(void) {}
 
 void I_PlayMusic(int id, bool loop)

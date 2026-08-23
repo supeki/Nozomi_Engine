@@ -15,10 +15,10 @@
 #include "game_video.h" // for vid width and height
 
 uint32_t gamecontrols[MAX_PLAYERS][NUMCONTROLS];
-int16_t  gameaxis[MAX_PLAYERS][NUMAXIS];
+int32_t  gameaxis[MAX_PLAYERS][NUMAXIS];
 uint32_t gamecontrolbinds[MAX_PLAYERS][NUMCONTROLS][2];
 uint32_t mousecontrols[MAX_PLAYERS][NUMMOUSECONTROLS];
-int16_t  mouseaxis[MAX_PLAYERS][NUMMOUSEAXIS];
+int32_t  mouseaxis[MAX_PLAYERS][NUMMOUSEAXIS];
 
 void G_DefaultControls(void)
 {
@@ -119,7 +119,7 @@ bool G_ControlDown(uint8_t player, uint8_t control, bool pressed)
 		return (gamecontrols[player][control] > 0);
 }
 
-int16_t G_PlayerAxis(uint8_t player, uint8_t axis)
+int32_t G_PlayerAxis(uint8_t player, uint8_t axis)
 {
 	if (axis > NUMAXIS-1)
 		return 0;
@@ -136,7 +136,7 @@ int16_t G_PlayerAxis(uint8_t player, uint8_t axis)
 	return gameaxis[player][axis];
 } 
 
-int16_t G_MouseAxis(uint8_t player, uint8_t axis)
+int32_t G_MouseAxis(uint8_t player, uint8_t axis)
 {
 	if (axis > NUMMOUSEAXIS-1)
 		return 0;

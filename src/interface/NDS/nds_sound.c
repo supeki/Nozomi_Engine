@@ -22,6 +22,11 @@ void I_StartupSound(void)
 	mmInitDefault("nitro:/soundbank.bin");
 }
 
+void I_ShutdownSound(void)
+{
+	mmStop();
+}
+
 void I_PlaySound(void)
 {
 }

@@ -17,7 +17,7 @@ extern player_t players[MAX_PLAYERS];
 
 // P for Player!
 
-void P_CreatePlayer(subpixel_t x, subpixel_t y, uint8_t dir);
+void P_CreatePlayer(uint32_t x, uint32_t y, uint8_t dir);
 void P_RemovePlayer(void);
 void P_PlayerLogic(player_t player);
 
