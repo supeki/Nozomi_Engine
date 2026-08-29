@@ -2,6 +2,9 @@ what the peoples would want from new game by new dev
 
 easy to pick up
 - intuitive mechanics
+- no weird instadeath/instalose stuff
+- no weird prompts
+- quality over quantity/speed
 
 controller support
 - remapping buttons
@@ -18,6 +21,9 @@ autosaving
 post-load debrief
 - remind player of their last actions
 - remind player of their current objective
+
+skippable cutscenes
+- perhaps as a menu option or a first-time prompt
 
 accessibility options
 - disable screen shaking

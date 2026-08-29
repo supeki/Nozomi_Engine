@@ -31,7 +31,7 @@ cp -r assets/icons/icon.bmp bin/Linux/icon.bmp
 cp -r assets/credits bin/Linux/credits
 
 # Make and move Linux binary
-make -j2 LINUX=1 NET=1
+make -j2 LINUX=1
 mv bin/SDL/game bin/Linux
 
 # Clean obj directory to prepare for GLFW
@@ -96,9 +96,8 @@ mkdir -p bin/PSP
 # Copy game data
 cp -r assets/data bin/PSP/data
 
-# Use separate audio dir for PSP
-rm -rf bin/PSP/data/audio
-cp -r assets/PSP/audio bin/PSP/data/audio
+# Copy PSP border graphic
+cp -r assets/PSP/border.bmp bin/PSP/data/border.bmp
 
 # Make and move PSP binary
 make -j2 PSP=1

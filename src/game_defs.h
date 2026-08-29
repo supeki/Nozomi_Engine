@@ -4,7 +4,7 @@
 #ifndef GAME_DEFS_H
 #define GAME_DEFS_H
 
-#if defined(WIN32) || defined(WINCE)
+#if defined (WINDOWS) || defined(WIN32) || defined(WINCE)
 #include <windows.h>
 #endif
 
@@ -59,6 +59,7 @@ typedef boolean bool;
 char *va(const char *format, ...);
 
 // types
+#define PI 3.14159265358
 #define PU 65536
 
 extern uint8_t demo_tiles[576];

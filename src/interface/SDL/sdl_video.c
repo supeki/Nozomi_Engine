@@ -18,7 +18,8 @@ SDL_Texture *sdlTex;
 
 uint16_t* pixels;
 #ifdef PSP
-int win_width = VID_WIDTH, win_height = VID_HEIGHT;
+int win_width = 480, win_height = 272;
+SDL_Texture *borderTex;
 #else
 uint32_t win_width = VID_WIDTH, win_height = VID_HEIGHT;
 #endif
@@ -57,6 +58,12 @@ void I_StartupGraphics(void)
 	
 	if (!sdlTex) 
 		I_Error("Failed to create texture!\n");
+
+	#ifdef PSP
+	SDL_Surface *borderSurf = SDL_LoadBMP("data/border.bmp");
+	borderTex = SDL_CreateTextureFromSurface(wndRend, borderSurf);
+	SDL_FreeSurface(borderSurf);
+	#endif
 }
 
 void I_ShutdownGraphics(void)
@@ -98,6 +105,12 @@ void I_PushGraphics(void)
 
 	SDL_RenderClear(wndRend);
 	SDL_UpdateTexture(sdlTex, NULL, pixels, VID_WIDTH * sizeof(uint16_t));
+
+	#ifdef PSP
+	SDL_Rect psp_border[4] = {0, 0, 480, 272};
+	SDL_RenderCopy(wndRend, borderTex, NULL, psp_border);
+	#endif
+
 	SDL_RenderCopy(wndRend, sdlTex, NULL, dest_rect);
 	SDL_RenderPresent(wndRend);
 }

@@ -2,10 +2,14 @@
 // game_world.c
 
 #include "game_object.h"
+#include "game_video.h"
 #include "game_world.h"
+
+#include "i_system.h"
 
 uint8_t tile_width, tile_height; // 256x256 is pretty big for one tile as-is
 uint32_t *tile_attributes; // per-tile attributes (basically just flags)
+uint32_t num_tiles; // for safe keeping
 
 uint16_t world_width, world_height; // shouldn't need larger than 65536x65536 tiles right
 uint32_t world_bgtype; // background type maybe if i wanna have a 2d game with cool backgrounds (like cave story)
@@ -17,7 +21,7 @@ static void W_LoadTileset(const char *filename)
 {
     FILE *fp = fopen(filename, "rb");
     char graphic_name[33];
-    uint32_t i, num_tiles;
+    uint32_t i;
 
     // load tileset graphics
     fread(&graphic_name, sizeof(char), 32, fp);
@@ -133,4 +137,89 @@ void W_Free(void)
         free(tile_attributes);
         tile_attributes = NULL;
     }
+}
+
+void W_CreateTilesetFromFile(const char *input, const char *output, uint8_t tile_size)
+{
+    FILE *fp = fopen(va("data/tilesets/%s.set", output), "wb+");
+    gfx_t gfx_temptileset;
+    uint32_t i, num_temptiles = 0, dummy = 0;
+    char gfx_name[33];
+
+    // gfx name for writing to file,,
+    sprintf(gfx_name, "%s", input);
+
+    // load graphics and write name to file
+    gfx_temptileset = GFX_LoadGFX(va("data/tilesets/%s.bmp", input));
+    fwrite(gfx_name, sizeof(char), 32, fp);
+
+    fwrite(&tile_size, sizeof(uint8_t), 1, fp); // write this twice since
+    fwrite(&tile_size, sizeof(uint8_t), 1, fp); // my tiles are squares
+
+    // get number of tiles from graphic size and tile width/height
+    num_temptiles = (gfx_temptileset.width / tile_size) * (gfx_temptileset.height / tile_size);
+
+    // write dummy attrs
+    for (i = 0; i < num_temptiles; i++)
+        fwrite(&dummy, sizeof(uint32_t), 1, fp);
+
+    fclose(fp);
+}
+
+bool tileset_edit = false; // tileset editing dawg
+char temp_tile_name[33]; // save temp tileset to this name
+uint8_t tiles_per_row = 0, tile_per_gfx_row = 0; // tiles to display per-row in editor
+
+// one or the other
+void W_StartTilesetEdit(const char *gfx_name, const char *tileset_name)
+{
+    if (gfx_name == NULL && tileset_name == NULL)
+    {
+        I_printf("Expected tileset name or gfx name to load.\n");
+        tileset_edit = false;
+        return;
+    }
+
+    if (gfx_name == NULL) { // didn't specify a graphics file to base from
+        W_LoadTileset(va("data/tilesets/%s.set", tileset_name)); // so you must want to edit a pre-made file
+        sprintf(temp_tile_name, tileset_name);
+    } else if (tileset_name == NULL) { // no tileset file
+        W_CreateTilesetFromFile(gfx_name, gfx_name, 8); // so you're ok with
+        W_LoadTileset(va("data/tilesets/%s.set", gfx_name)); // the graphics name being used instead
+        sprintf(temp_tile_name, gfx_name);
+    } else { // specified both
+        W_CreateTilesetFromFile(gfx_name, tileset_name, 8); // so make the tileset file
+        W_LoadTileset(va("data/tilesets/%s.set", tileset_name)); // with the graphics but your preferred name
+        sprintf(temp_tile_name, tileset_name);
+    }
+
+    // calculate tiles per row now
+    // also calculate tiles per row for the graphics since it could be less
+    tiles_per_row = VID_WIDTH / (tile_width + 2); // adding 2 for left/right padding
+    tile_per_gfx_row = gfx_tileset.width / (tile_width + 2);
+
+    tileset_edit = true; // we're tileset editing now dawg
+}
+
+void W_UpdateTilesetEdit(void)
+{
+    
+}
+
+void W_DrawTilesetEdit(void)
+{
+    int i;
+
+    // draw tiles first
+    for (i = 0; i < num_tiles; i++)
+        V_DrawCropped(
+            gfx_tileset, // gfx
+            1 + (i % tiles_per_row) * (tile_width + 1), // x 
+            1 + (i / tiles_per_row) * (tile_height + 1), // y
+            (i % tile_per_gfx_row) * tile_width, // crop x
+            (i / tile_per_gfx_row) * tile_height, // crop y
+            tile_width, // crop w
+            tile_height, // crop h
+            0 // flags
+        );
 }

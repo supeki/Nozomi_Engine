@@ -137,6 +137,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/SECTION:.rdata,R"
+				AdditionalDependencies="coredll.lib"
 				OutputFile="$(OutDir)\game.exe"
 				ManifestFile="$(ProjectDir)\obj\$(TargetFileName).intermediate.manifest"
 				SubSystem="9"
@@ -170,6 +171,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -423,6 +425,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\interface\dummy_net.c"
+				>
+				<FileConfiguration
+					Name="Release|Pocket PC 2003 (ARMV4)"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\src\game_dialogue.c"
 				>
 			</File>
@@ -465,6 +479,18 @@
 			<File
 				RelativePath=".\src\game_world.c"
 				>
+			</File>
+			<File
+				RelativePath=".\src\interface\windows_filesystem.c"
+				>
+				<FileConfiguration
+					Name="Release|Pocket PC 2003 (ARMV4)"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 	</Files>

@@ -78,6 +78,27 @@ void V_DrawDot(int16_t x, int16_t y, uint16_t col)
 	vid.buffer[x+(y*VID_WIDTH)] = col;
 }
 
+void V_DrawLine(int16_t x, int16_t y, int32_t angle, uint16_t length, uint16_t col)
+{	
+	uint16_t i;
+
+	if (col == 0)
+		return; // bow wow wow yippee yo yippee yay
+
+	for (i = 0; i < length; i++)
+	{
+		int16_t px = x, py = y;
+
+		px += i * cos((angle-90) * (PI/180.0));
+		py += i * sin((angle-90) * (PI/180.0));
+
+		if (px < 0 || py < 0 || px >= VID_WIDTH || py >= VID_HEIGHT)
+       		return;
+
+		vid.buffer[px+(py*VID_WIDTH)] = col;
+	}
+}
+
 void V_DrawCroppedNoCheck(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
 {	
 	int zx, zy;

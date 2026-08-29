@@ -61,9 +61,6 @@ bool OBJ_TryMovement(object_t *obj, int32_t x, int32_t y);
 typedef enum
 {
 	OBJ_NULL, // you can set an object's type to this to remove it :D ... or use OBJ_RemoveObject
-	OBJ_MARIL, // ts bitch playable or something
-	OBJ_MAN, // the man behind the tree
-	OBJ_CHECK, // invis object to check/interact with things
 	NUMOBJTYPES
 } objecttypes_e;
 

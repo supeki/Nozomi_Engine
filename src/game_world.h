@@ -38,4 +38,11 @@ extern gfx_t gfx_worldbg;
 void W_LoadWorldFile(const char *filename);
 void W_Free(void);
 
+void W_CreateTilesetFromFile(const char *input, const char *output, uint8_t tile_size);
+
+extern bool tileset_edit;
+void W_StartTilesetEdit(const char *gfx_name, const char *tileset_name);
+void W_UpdateTilesetEdit(void);
+void W_DrawTilesetEdit(void);
+
 #endif

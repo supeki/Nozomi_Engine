@@ -29,9 +29,10 @@ int main(int argc, char *argv[])
 	I_printf("Initializing NitroFS...\n");
 	if (!nitroFSInit(NULL))
 		I_Error("NitroFS failed to initialize!\nCannot proceed!\n");
+	I_printf("Initializing FAT filesystem...\n");
 	if (!fatInitDefault())
-		I_Error("FAT filesystem failed to initialize!\nCannot proceed!\n");
-	
+		I_printf("FAT filesystem failed to initialize!\nWon't be able to save files!\n");
+
 	gameMain();
 	
 	I_printf("Starting main game loop...\n");

@@ -82,14 +82,12 @@ ifeq ($(GLFW),1)
 	INTERFACE = GLFW
 	i_main = glfw_main
 	i_event = glfw_event
-	#i_input = glfw_input
-	i_sound = glfw_sound
 	i_system = glfw_system
 	i_video = glfw_video
 
 	DEFINES = -DGLFW
 	OPTS := $(OPTS) -I.
-	LIBS := $(LIBS) -lglfw -lGL -lGLU -lSDL2 -lSDL2_mixer -lm -lc # lol, need a different audio backend
+	LIBS := $(LIBS) -lglfw -lGL -lGLU -lSDL2 -lSDL2_mixer -lm -lc
 	LDFLAGS =  
 	
 	CFLAGS = $(OPTS) \
@@ -181,7 +179,7 @@ ifeq ($(NDS),1)
 	ELF_NAME = $(EXEC_NAME).elf
 	NITROFSDIR := assets/$(INTERFACE)/nitrofs
 	AUDIODIR := assets/$(INTERFACE)/audio
-	AUDIOFILES := $(AUDIODIR)/tech_demo_boss.xm
+	AUDIOFILES := $(AUDIODIR)/eshop_8.it
 	
 	DEFINES	:= -DARM9 -D__NDS__
 	SPECS := $(BLOCKSDS)/sys/crts/ds_arm9.specs
@@ -229,12 +227,24 @@ OBJS := $(OBJS) \
 		$(OBJ_DIR)/game_video.o \
 		$(OBJ_DIR)/game_world.o \
 		$(OBJ_DIR)/game_dialogue.o \
+		$(OBJ_DIR)/bitmap.o \
 		$(INTERFACE_OBJ)/$(i_main).o \
 		$(INTERFACE_OBJ)/$(i_event).o \
-		$(INTERFACE_OBJ)/$(i_sound).o \
 		$(INTERFACE_OBJ)/$(i_system).o \
 		$(INTERFACE_OBJ)/$(i_video).o \
-		$(OBJ_DIR)/bitmap.o
+
+ifeq ($(WINDOWS), 1)
+i_filesystem = ../windows_filesystem
+else # assume every other platform can use the linux one for rn
+i_filesystem = ../linux_filesystem
+endif
+
+ifdef i_sound
+OBJS := $(OBJS) $(INTERFACE_OBJ)/$(i_sound).o
+else
+OBJS := $(OBJS) $(OBJ_DIR)/dummy_sound.o
+endif
+
 
 ifdef i_input
 OBJS := $(OBJS) $(INTERFACE_OBJ)/$(i_input).o
@@ -244,6 +254,12 @@ ifdef i_net
 OBJS := $(OBJS) $(INTERFACE_OBJ)/$(i_net).o
 else
 OBJS := $(OBJS) $(OBJ_DIR)/dummy_net.o
+endif
+
+ifdef i_filesystem
+OBJS := $(OBJS) $(INTERFACE_OBJ)/$(i_filesystem).o
+else
+OBJS := $(OBJS) $(OBJ_DIR)/dummy_filesystem.o
 endif
 
 ifeq ($(WINDOWS),1)
@@ -381,26 +397,39 @@ $(INTERFACE_OBJ)/$(i_main).o: $(INTERFACE_SRC)/$(i_main).c $(INTERFACE_OBJ)
 	
 $(INTERFACE_OBJ)/$(i_event).o: $(INTERFACE_SRC)/$(i_event).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
-	
+
 ifdef i_input	
 $(INTERFACE_OBJ)/$(i_input).o: $(INTERFACE_SRC)/$(i_input).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
 endif
 	
 ifdef i_net	
-$(INTERFACE_OBJ)/$(i_net).o: $(INTERFACE_SRC)/$(i_net).c $(INTERFACE_OBJ)
+$(INTERFACE_OBJ)/$(i_net).o: $(INTERFACE_SRC)/$(i_net).c $(SRC_DIR)/i_net.h $(SRC_DIR)/game_defs.h $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
 else
 $(OBJ_DIR)/dummy_net.o: $(SRC_DIR)/interface/dummy_net.c $(SRC_DIR)/i_net.h $(SRC_DIR)/game_defs.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
 endif
 
-ifeq ($(NDS),1)
-$(INTERFACE_OBJ)/$(i_sound).o: $(INTERFACE_SRC)/$(i_sound).c $(INTERFACE_SRC)/soundbank.h $(INTERFACE_OBJ)
+ifdef i_filesystem
+$(INTERFACE_OBJ)/$(i_filesystem).o: $(INTERFACE_SRC)/$(i_filesystem).c $(SRC_DIR)/i_system.h $(SRC_DIR)/game_defs.h $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
 else
-$(INTERFACE_OBJ)/$(i_sound).o: $(INTERFACE_SRC)/$(i_sound).c $(INTERFACE_OBJ)
+$(OBJ_DIR)/dummy_filesystem.o: $(SRC_DIR)/interface/dummy_filesystem.c $(SRC_DIR)/i_system.h $(SRC_DIR)/game_defs.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+endif
+
+ifeq ($(NDS),1)
+$(INTERFACE_OBJ)/$(i_sound).o: $(INTERFACE_SRC)/$(i_sound).c $(SRC_DIR)/i_sound.h $(INTERFACE_SRC)/soundbank.h $(INTERFACE_OBJ)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+else
+ifdef i_sound
+$(INTERFACE_OBJ)/$(i_sound).o: $(INTERFACE_SRC)/$(i_sound).c $(SRC_DIR)/i_sound.h $(INTERFACE_OBJ)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+else
+$(OBJ_DIR)/dummy_sound.o: $(SRC_DIR)/interface/dummy_sound.c $(SRC_DIR)/i_sound.h
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+endif
 endif
 	
 $(INTERFACE_OBJ)/$(i_system).o: $(INTERFACE_SRC)/$(i_system).c $(INTERFACE_OBJ)

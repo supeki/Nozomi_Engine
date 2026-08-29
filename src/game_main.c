@@ -25,6 +25,27 @@ uint32_t game_tick;
 // Game startup / main function.
 void gameMain(void)
 {
+	I_printf("Testing filesystem scanning...\n");
+	{
+		dirfiles_t tmp;
+		const char *home = I_GetHomeDir();
+		int i;
+
+		I_printf("Home Dir: %s\n", home);
+		if (!strcmp(home, "."))
+			memset(&tmp, 0, sizeof(dirfiles_t));
+		else
+			tmp = I_GetDir(home);
+
+		I_printf("Scan results: %d files, %d dirs\n", tmp.num_files, tmp.num_dirs);
+		if (tmp.num_files > 0)
+			for (i = 0; i < tmp.num_files; i++)
+				I_printf("%d: %s\n", i+1, tmp.filenames[i]);
+		if (tmp.num_dirs > 0)
+			for (i = 0; i < tmp.num_dirs; i++)
+				I_printf("%d: %s/\n", i+1, tmp.directories[i]);
+	}
+
 	I_printf("Initializing video...\n");
 	V_Init();
 	
@@ -42,12 +63,15 @@ void gameMain(void)
 
 	I_printf("Setting default controls...\n");
 	G_DefaultControls();
-	
+
 	GFX_InitGFX();
 	OBJ_InitObjects();
-	P_CreatePlayer(128*PU - 12*PU, 536*PU, 2);
-	OBJ_CreateObject(128*PU, 64*PU, OBJ_MAN);
-	I_PlayMusic(mus_man, true);
+
+	//W_CreateTilesetFromFile("tech_demo", "tech_demo", 8);
+	W_StartTilesetEdit(NULL, "tech_demo");
+
+	I_PlayMusic(mus_demo, true);
+	D_StartDialogue(0);
 
 	//FNT_StartFontEdit();
 }
@@ -124,78 +148,27 @@ void gameRunStuff(uint32_t elapsed)
 	{	
 		int i;
 
-		if (font_edit)
-			FNT_FontEditUpdate();
-		
 		if (in_diag) {
 			D_UpdateDialogue();
 			return;
 		}
-			
-		for (i = 0; i < num_players; i++)
-			P_PlayerLogic(players[i]);
-		
-		OBJ_RunObjects();
+
+		if (font_edit)
+			FNT_FontEditUpdate();
+
+		if (tileset_edit)
+			W_UpdateTilesetEdit();
 	}
 }
 
 void gameDisplay(void)
 {
-	int i, treeoff_1, treeoff_2;
-
 	if (font_edit)
 		FNT_FontEditDraw();
-	
-	for (i = 0; i < 576; i++)
-		V_DrawCropped(gfx_tiles, (i%16)*16, (i/16)*16 - camera.y, demo_tiles[i]*16, 0, 16, 16, 0);
-	
-	OBJ_DrawObjectLayer(0);
-	
-	treeoff_1 = abs((I_GetTicks()/30) % 8 - 4) + 4;
-	treeoff_2 = -abs((I_GetTicks()/15) % 4 - 2) + 2;
-	
-	V_Draw(gfx_tree2, 128 - gfx_tree.width/2 + treeoff_1, 96 - gfx_tree.height - camera.y + -treeoff_2, 0);
-	V_Draw(gfx_tree3, 128 - gfx_tree.width/2 + -treeoff_1, 96 - gfx_tree.height - camera.y + treeoff_2, 0);
-	
+
+	if (tileset_edit)
+		W_DrawTilesetEdit();
+
 	if (in_diag)
 		D_DrawDialogue();
 }
-
-uint8_t demo_tiles[576] = {
-	00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,01,01,01,01,00,00,00,00,00,00,
-	00,00,00,00,00,01,01,01,01,01,01,00,00,00,00,00,
-	00,00,00,00,00,01,01,01,01,01,01,00,00,00,00,00,
-	00,00,00,00,00,01,01,01,01,01,01,00,00,00,00,00,
-	00,00,00,00,00,00,01,01,01,01,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-};

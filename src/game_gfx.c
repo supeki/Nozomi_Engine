@@ -7,16 +7,11 @@
 #include "i_system.h"
 #include "helpers/bitmap.h"
 
-gfx_t gfx_her, gfx_tiles, gfx_tree, gfx_tree2, gfx_tree3, gfx_textbox;
+gfx_t gfx_textbox;
 
 void GFX_InitGFX(void)
 {
-	gfx_her = GFX_LoadGFX("data/her.bmp");
-	gfx_tiles = GFX_LoadGFX("data/tiles.bmp");
-	gfx_tree = GFX_LoadGFX("data/tree1.bmp");
-	gfx_tree2 = GFX_LoadGFX("data/tree2.bmp");
-	gfx_tree3 = GFX_LoadGFX("data/tree3.bmp");
-	gfx_textbox = GFX_LoadGFX("data/box.bmp");
+	gfx_textbox = GFX_LoadGFX("data/textbox.bmp");
 }
 
 // Load a Bitmap and convert it to our GFX format
