@@ -11,10 +11,13 @@ typedef enum
 {
     TILE_NONE = 0,
     TILE_SOLID = 1, // solid tile, objects collide with it
-    TILE_WATER = 2, // water tile (draw with wavy effect and has water properties with objects)
-    TILE_BG = 4, // background tile (draw behind object)
-    TILE_FG = 8 // foreground tile (draw in front of object)
+    TILE_WATER = 2, // water tile (has water properties with objects)
+    TILE_FG = 4, // foreground tile (draw in front of object)
+    TILE_ANIMATED = 8
 } tileattr_e;
+
+// TILE_OPTIONS should be the number of items above minus TILE_NONE
+#define TILE_OPTIONS 4
 
 typedef enum
 {
@@ -25,6 +28,9 @@ typedef enum
     BG_WATER = 8, // use water wavy effect on background (applies to full background)
     BG_FG = 16 // place background in front of tiles (foreground)
 } bgattr_e;
+
+// cool tips n' tricks with mareuhlyn
+// use BG_FG + BG_WATER for a wavy overlay in underwater areas!
 
 extern uint8_t tile_width, tile_height; // 256x256 is pretty big for one tile as-is
 extern uint32_t *tile_attributes; // per-tile attributes (basically just flags)
@@ -38,7 +44,7 @@ extern gfx_t gfx_worldbg;
 void W_LoadWorldFile(const char *filename);
 void W_Free(void);
 
-void W_CreateTilesetFromFile(const char *input, const char *output, uint8_t tile_size);
+void W_CreateTilesetFromFile(const char *input, uint8_t tile_size);
 
 extern bool tileset_edit;
 void W_StartTilesetEdit(const char *gfx_name, const char *tileset_name);

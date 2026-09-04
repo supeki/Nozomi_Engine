@@ -25,27 +25,6 @@ uint32_t game_tick;
 // Game startup / main function.
 void gameMain(void)
 {
-	I_printf("Testing filesystem scanning...\n");
-	{
-		dirfiles_t tmp;
-		const char *home = I_GetHomeDir();
-		int i;
-
-		I_printf("Home Dir: %s\n", home);
-		if (!strcmp(home, "."))
-			memset(&tmp, 0, sizeof(dirfiles_t));
-		else
-			tmp = I_GetDir(home);
-
-		I_printf("Scan results: %d files, %d dirs\n", tmp.num_files, tmp.num_dirs);
-		if (tmp.num_files > 0)
-			for (i = 0; i < tmp.num_files; i++)
-				I_printf("%d: %s\n", i+1, tmp.filenames[i]);
-		if (tmp.num_dirs > 0)
-			for (i = 0; i < tmp.num_dirs; i++)
-				I_printf("%d: %s/\n", i+1, tmp.directories[i]);
-	}
-
 	I_printf("Initializing video...\n");
 	V_Init();
 	
@@ -68,10 +47,10 @@ void gameMain(void)
 	OBJ_InitObjects();
 
 	//W_CreateTilesetFromFile("tech_demo", "tech_demo", 8);
-	W_StartTilesetEdit(NULL, "tech_demo");
+	W_StartTilesetEdit(NULL, NULL);
 
 	I_PlayMusic(mus_demo, true);
-	D_StartDialogue(0);
+	//D_StartDialogue(0);
 
 	//FNT_StartFontEdit();
 }

@@ -1,12 +1,19 @@
+# compiled files
 bin/*/*
 obj/*
+
+# if ur using WSL2
 *.Identifier
+
+# psp port
 *.SFO
 *.elf
+
+# wince port
+# why is it detecting SUOs wtf
 *.ncb
-*.out
 *.suo
-wants.txt
+*.out
 
 # i use vscode
 .vscode/

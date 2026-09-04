@@ -99,6 +99,24 @@ void V_DrawLine(int16_t x, int16_t y, int32_t angle, uint16_t length, uint16_t c
 	}
 }
 
+void V_DrawBox(int16_t x, int16_t y, int32_t angle, uint16_t width, uint16_t height, uint16_t col)
+{
+	int16_t offx, offy, offx2, offy2;
+	double rad_width = (angle + 90) * (PI/180.0);
+	double rad_height = (angle + 180) * (PI/180.0);
+
+	V_DrawLine(x, y, angle+180, height, col);
+	V_DrawLine(x, y, angle+90, width, col);
+
+	offx = (int16_t)(-sin(rad_height) * height);
+    offy = (int16_t)(-cos(rad_height) * height); 
+    offx2 = (int16_t)(-sin(rad_width) * width);
+    offy2 = (int16_t)(-cos(rad_width) * width);
+
+	V_DrawLine(x - offx2 - 1, y + offy2, angle+180, height, col);
+	V_DrawLine(x - offx, y + offy - 1, angle+90, width, col);
+}
+
 void V_DrawCroppedNoCheck(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
 {	
 	int zx, zy;
@@ -189,7 +207,7 @@ void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, u
 		
 		if ((string[i] == '\n') || (x+w >= VID_WIDTH && c != 32)) {
 			x = bx;
-			y += charh;
+			y += charh+1;
 		}
 		
 		if (y + yoff + charh < 0) {
@@ -207,7 +225,7 @@ void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, u
 				yoff += abs((game_tick + i) % FRAMERATE - FRAMERATE/2)/2 - charh/2;
 			
 			if (flags & V_JUMPYTEXT)
-				yoff += abs((game_tick/2 + x*w) % h - h/2)/2 - charh/2;
+				yoff += abs((game_tick/2 + x*w) % h - h/2)/2 - charh/2 + 2;
 				
 			if (c > -1)
 				V_DrawCropped(font.gfx, x + xoff, y + yoff, (c % 16) * charw, (c / 16) * charh, charw, charh, flags);

@@ -5,6 +5,7 @@
 // Some useful, some maybe not. Nozomi
 
 #include "game_defs.h"
+#include "i_system.h"
 
 #define VA_BUF_SIZE 256
 
@@ -19,4 +20,16 @@ char *va(const char *fmt, ...) {
     va_end(ap);
 
     return buf[idx];
+}
+
+void DF_Free(dirfiles_t *dirfiles)
+{
+    if (dirfiles != NULL) {
+        free(dirfiles->directories);
+        free(dirfiles->filenames);
+        dirfiles->directories = NULL;
+        dirfiles->filenames = NULL;
+        dirfiles->num_files = 0;
+        dirfiles->num_dirs = 0;
+    }
 }

@@ -12,11 +12,14 @@ const char *I_GetHomeDir(void)
 {
     // waow nds and psp support too
     #if defined(__NDS__)
-    return "./";
+    return va("fat:/%s/", GAME_NAME);
     #elif defined(PSP)
     return va("ms0:/PSP/GAME/%s/", GAME_NAME);
     #else
-    const char *home = getenv("HOME");
+    const char *home = NULL;
+
+    // lets use "." for now
+    //home = getenv("HOME");
 
     if (home == NULL)
         home = ".";

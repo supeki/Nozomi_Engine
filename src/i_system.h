@@ -25,5 +25,6 @@ typedef struct
 
 const char *I_GetHomeDir(void);
 dirfiles_t I_GetDir(const char *path);
+void DF_Free(dirfiles_t *dirfiles);
 
 #endif

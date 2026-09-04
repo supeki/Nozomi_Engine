@@ -27,6 +27,7 @@ void V_LoadPalette(const char *filename, uint16_t* pal);
 void V_ClearScreen(void);
 void V_DrawDot(int16_t x, int16_t y, uint16_t col);
 void V_DrawLine(int16_t x, int16_t y, int32_t angle, uint16_t length, uint16_t col);
+void V_DrawBox(int16_t x, int16_t y, int32_t angle, uint16_t width, uint16_t height, uint16_t col);
 void V_Draw(gfx_t gfx, int16_t x, int16_t y, uint32_t flags);
 void V_DrawCropped(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags);
 void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, uint32_t flags); // draw text from a font
