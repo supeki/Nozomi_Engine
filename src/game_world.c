@@ -291,13 +291,10 @@ void W_UpdateWorldEdit(void)
             name = malloc((name_len-4) * sizeof(char)); 
             snprintf(name, name_len-4, "%s", filename);
 
-            I_printf(name);
-
-            if (!strcmp(dot, ".set")) {
+            if (!strcmp(dot, ".set"))
                 W_StartWorldEdit(name, NULL);
-            } else {
+            else if (!strcmp(dot, ".wld"))
                 W_StartWorldEdit(NULL, name);
-            }
 
             free(name);
         }
@@ -324,8 +321,15 @@ void W_DrawWorldEdit(void)
             for (i = 0; i < world_dirfiles.num_files + tileset_dirfiles.num_files; i++) {
                 if (i < world_dirfiles.num_files)
                     V_DrawText(va("%s", world_dirfiles.filenames[i]), (i/17) * 80 + 8, (i%17) * 10 + 20, 0);
-                else
-                    V_DrawText(va("%s", tileset_dirfiles.filenames[i - world_dirfiles.num_files]), (i/17) * 80 + 8, (i%17) * 10 + 20, 0);
+                else {
+                    char *dot;
+                    dot = strrchr(tileset_dirfiles.filenames[i - world_dirfiles.num_files], '.');
+
+                    if (!strcmp(dot, ".bmp"))
+                        V_DrawText(va("N/A - %s", tileset_dirfiles.filenames[i - world_dirfiles.num_files]), (i/17) * 80 + 8, (i%17) * 10 + 20, 0);
+                    else
+                        V_DrawText(va("%s", tileset_dirfiles.filenames[i - world_dirfiles.num_files]), (i/17) * 80 + 8, (i%17) * 10 + 20, 0);
+                }        
             }
 
             V_DrawText(">", (tile_sel_option/17) * 80 + 1, (tile_sel_option%17) * 10 + 20, 0);
@@ -430,8 +434,6 @@ void W_UpdateTilesetEdit(void)
             name_len = strlen(filename) + 1;
             name = malloc((name_len-4) * sizeof(char)); 
             snprintf(name, name_len-4, "%s", filename);
-
-            I_printf(name);
 
             if (!strcmp(dot, ".bmp")) {
                 W_StartTilesetEdit(name, NULL);
