@@ -22,12 +22,15 @@ typedef enum
 typedef enum
 {
     BG_NONE = 0,
-    BG_TILE = 1, // use tiles for background (doesn't apply water wavy effect on water tiles)
+    BG_TILE = 1, // use tiles for background
     BG_STATIC = 2, // fixed on-screen (doesn't move)
-    BG_FOLLOW = 4, // follow camera (inverse)
-    BG_WATER = 8, // use water wavy effect on background (applies to full background)
-    BG_FG = 16 // place background in front of tiles (foreground)
+    BG_WATER = 4, // use water wavy effect on background (applies to full background)
+    BG_FG = 8, // place background in front of tiles (foreground)
+    BG_SLOW = 16, // move slower than the tiles (parallax-ish)
+    BG_COLOR = 32, // use a solid color for the background
 } bgattr_e;
+
+#define BG_OPTIONS 6
 
 // cool tips n' tricks with mareuhlyn
 // use BG_FG + BG_WATER for a wavy overlay in underwater areas!
@@ -45,6 +48,12 @@ void W_LoadWorldFile(const char *filename);
 void W_Free(void);
 
 void W_CreateTilesetFromFile(const char *input, uint8_t tile_size);
+void W_CreateWorldFromTilesetFile(const char *input, uint16_t width, uint16_t height);
+
+extern bool world_edit;
+void W_StartWorldEdit(const char *gfx_name, const char *tileset_name);
+void W_UpdateWorldEdit(void);
+void W_DrawWorldEdit(void);
 
 extern bool tileset_edit;
 void W_StartTilesetEdit(const char *gfx_name, const char *tileset_name);

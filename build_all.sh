@@ -1,41 +1,104 @@
-# Clean obj directory to prepare for Windows
+# Clean obj directory to prepare for Windows (x64)
 make clean
 
 # Remove pre-existing binaries
-rm -rf bin/Windows
-mkdir -p bin/Windows
+rm -rf bin/Win64
+mkdir -p bin/Win64
 
 # Copy game data
-cp -r assets/data bin/Windows/data
+cp -r assets/data bin/Win64/data
 
 # Copy required licenses/credits
-cp -r assets/credits bin/Windows/credits
+cp -r assets/credits/SDL2_LICENSE.txt bin/Win64/SDL2_LICENSE.txt
 
 # Make and move Windows binary and libaries
 make -j2 LINUX_WIN=1
-mv bin/SDL/game.exe bin/Windows
-cp -r assets/Windows/*.dll bin/Windows/
+cp -r assets/Win64/*.dll bin/Win64/
 
-# Clean obj directory to prepare for Linux
-make clean
+# Clean obj directory to prepare for Windows (x86)
+make clean WIN_32=1
+
+# Remove pre-existing binaries
+rm -rf bin/Win32
+mkdir -p bin/Win32
+
+# Copy game data
+cp -r assets/data bin/Win32/data
+
+# Copy required licenses/credits
+cp -r assets/credits/SDL2_LICENSE.txt bin/Win32/SDL2_LICENSE.txt
+
+# Make and move Windows binary and libaries
+make -j2 LINUX_WIN=1 WIN_32=1
+cp -r assets/Win32/*.dll bin/Win32/
+
+# Clean obj directory to prepare for Linux (SDL)
+make clean LINUX=1
 
 # Remove pre-existing binaries
 rm -rf bin/Linux
 mkdir -p bin/Linux
 
+# Copy libraries
+mkdir -p bin/Linux/lib
+cp -L /lib/x86_64-linux-gnu/libSDL2-2.0.so.0 bin/Linux/lib/
+cp -L /lib/x86_64-linux-gnu/libSDL2_mixer-2.0.so.0 bin/Linux/lib/
+cp -L /lib/x86_64-linux-gnu/libxmp.so.4 bin/Linux/lib/
+cp -L /lib/x86_64-linux-gnu/libvorbisfile.so.3 bin/Linux/lib/
+cp -L /lib/x86_64-linux-gnu/libFLAC.so.14 bin/Linux/lib/
+cp -L /lib/x86_64-linux-gnu/libmpg123.so.0 bin/Linux/lib/
+cp -L /lib/x86_64-linux-gnu/libopusfile.so.0 bin/Linux/lib/
+cp -L /lib/x86_64-linux-gnu/libvorbis.so.0 bin/Linux/lib/
+cp -L /lib/x86_64-linux-gnu/libogg.so.0 bin/Linux/lib/
+cp -L /lib/x86_64-linux-gnu/libopus.so.0 bin/Linux/lib/
+cp -L /lib/x86_64-linux-gnu/libvorbisenc.so.2 bin/Linux/lib/
+cp -L /lib/x86_64-linux-gnu/libmp3lame.so.0 bin/Linux/lib/
+cp -L /lib/x86_64-linux-gnu/libSDL2_net-2.0.so.0 bin/Linux/lib/
+
 # Copy game data
 cp -r assets/data bin/Linux/data
-cp -r assets/icons/icon.bmp bin/Linux/icon.bmp
 
 # Copy required licenses/credits
-cp -r assets/credits bin/Linux/credits
+cp -r assets/credits/SDL2_LICENSE.txt bin/Linux/SDL2_LICENSE.txt
 
 # Make and move Linux binary
 make -j2 LINUX=1
 mv bin/SDL/game bin/Linux
 
-# Clean obj directory to prepare for GLFW
-make clean
+# Clean obj directory to prepare for Linux (SDL) (x86)
+make clean LINUX=1 LINUX_32=1
+
+# Remove pre-existing binaries
+rm -rf bin/Linux32
+mkdir -p bin/Linux32
+
+# Copy libraries
+mkdir -p bin/Linux32/lib
+cp -L /usr/lib/i386-linux-gnu/libSDL2-2.0.so.0 bin/Linux32/lib/
+cp -L /usr/lib/i386-linux-gnu/libSDL2_mixer-2.0.so.0 bin/Linux32/lib/
+cp -L /usr/lib/i386-linux-gnu/libSDL2_net-2.0.so.0 bin/Linux32/lib/
+cp -L /usr/lib/i386-linux-gnu/libxmp.so.4 bin/Linux32/lib/
+cp -L /usr/lib/i386-linux-gnu/libvorbisfile.so.3 bin/Linux32/lib/
+cp -L /usr/lib/i386-linux-gnu/libFLAC.so.14 bin/Linux32/lib/
+cp -L /usr/lib/i386-linux-gnu/libmpg123.so.0 bin/Linux32/lib/
+cp -L /usr/lib/i386-linux-gnu/libopusfile.so.0 bin/Linux32/lib/
+cp -L /usr/lib/i386-linux-gnu/libvorbis.so.0 bin/Linux32/lib/
+cp -L /usr/lib/i386-linux-gnu/libogg.so.0 bin/Linux32/lib/
+cp -L /usr/lib/i386-linux-gnu/libopus.so.0 bin/Linux32/lib/
+cp -L /usr/lib/i386-linux-gnu/libvorbisenc.so.2 bin/Linux32/lib/
+cp -L /usr/lib/i386-linux-gnu/libmp3lame.so.0 bin/Linux32/lib/
+
+# Copy game data
+cp -r assets/data bin/Linux32/data
+
+# Copy required licenses/credits
+cp -r assets/credits/SDL2_LICENSE.txt bin/Linux32/SDL2_LICENSE.txt
+
+# Make and move Linux binary
+make -j2 LINUX=1 LINUX_32=1
+
+# Clean obj directory to prepare for Linux (GLFW)
+make clean GLFW=1
 
 # Remove pre-existing binaries
 rm -rf bin/GLFW
@@ -45,13 +108,13 @@ mkdir -p bin/GLFW
 cp -r assets/data bin/GLFW/data
 
 # Copy required licenses/credits
-cp -r assets/credits bin/GLFW/credits
+# cp -r assets/credits bin/GLFW/credits
 
 # Make GLFW binary
 make -j2 SDL=0 LINUX=1 GLFW=1
 
 # Clean obj directory to prepare for NDS
-make clean
+make clean NDS=1
 
 # Make a new nitrofs directory
 rm -rf assets/NDS/nitrofs
@@ -81,13 +144,13 @@ rm -rf bin/NDS
 mkdir -p bin/NDS
 
 # Copy required licenses/credits
-cp -r assets/credits bin/NDS/credits
+cp -r assets/credits/NDS_LICENSES.txt bin/NDS/NDS_LICENSES.txt
 
 # Make NDS binary
 make -j2 NDS=1
 
 # Clean obj directory to prepare for PSP
-make clean
+make clean PSP=1
 
 # Remove pre-existing binaries
 rm -rf bin/PSP

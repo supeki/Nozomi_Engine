@@ -14,7 +14,7 @@ uint32_t num_tiles; // for safe keeping
 
 uint16_t world_width, world_height; // shouldn't need larger than 65536x65536 tiles right
 uint32_t world_bgtype; // background type maybe if i wanna have a 2d game with cool backgrounds (like cave story)
-uint16_t *world_tiles = NULL, *world_bgtiles = NULL; // tile layout in the world
+uint16_t *world_tiles = NULL, *world_bgtiles = NULL, world_bgcolor = 0; // tile layout in the world + bg color ig
 
 gfx_t gfx_tileset, gfx_worldbg;
 
@@ -173,20 +173,33 @@ void W_CreateTilesetFromFile(const char *input, uint8_t tile_size)
         tile_attributes[i] = 0;
 }
 
-bool tileset_edit = false; // tileset editing dawg
-static char temp_tile_name[33]; // save temp tileset to this name
-static uint8_t tiles_per_row = 0; // tiles to display per-row in editor
-static int32_t current_tile = 0; // int instead of uint for some silly things
+void W_CreateWorldFromTilesetFile(const char *input, uint16_t width, uint16_t height)
+{
+    uint32_t i;
 
-static int16_t tile_screenw = 15;
-static int16_t tile_screenh = 11;
-static bool tile_selected = false;
-static uint8_t tile_sel_option = 0;
+    W_LoadTileset(va("data/tilesets/%s.set", input));
+
+    world_width = width;
+    world_height = height;
+    world_bgtype = BG_NONE; // no background
+    
+    world_tiles = malloc(world_width * world_height * sizeof(uint16_t));
+    for (i = 0; i < world_width * world_height; i++)
+        world_tiles[i] = 0; // default of the top-left tile // might want it to be transparent...
+
+    if (world_bgtiles != NULL) {
+        free(world_bgtiles);
+        world_bgtiles = NULL;
+    }
+}
+
+// idk if this needs to be here honestly, but i wanna multipurpose it now
 static bool file_menu = false;
-static dirfiles_t tileset_dirfiles;
+static dirfiles_t world_dirfiles, tileset_dirfiles;
 static char *last_path;
+static uint8_t tile_sel_option = 0;
 
-static void W_UpdateTilesetFiles(dirfiles_t *dirfiles, const char *path)
+static void W_UpdateFiles(dirfiles_t *dirfiles, const char *path)
 {
     if (dirfiles != NULL)
         DF_Free(dirfiles);
@@ -202,6 +215,143 @@ static void W_UpdateTilesetFiles(dirfiles_t *dirfiles, const char *path)
     strcpy(last_path, path);
 }
 
+bool world_edit = false; // world editing 'yo
+static char temp_world_name[33]; // woa it's almost like the tile editor but now you place them
+
+void W_StartWorldEdit(const char *tileset_name, const char *world_name)
+{
+    if (world_name == NULL && tileset_name == NULL)
+    {
+        world_edit = true;
+        file_menu = true;
+        tile_sel_option = 0;
+        W_UpdateFiles(&tileset_dirfiles, va("%s/data/tilesets", I_GetHomeDir())); // we need these too
+        W_UpdateFiles(&world_dirfiles, va("%s/data/worlds", I_GetHomeDir()));
+        return;
+    }
+
+    if (tileset_name == NULL) {
+        W_LoadWorldFile(va("data/worlds/%s.wld", world_name));
+        sprintf(temp_world_name, world_name);
+    } else {
+        W_CreateWorldFromTilesetFile(tileset_name, 16, 16);
+        sprintf(temp_world_name, tileset_name);
+    }
+
+    tile_sel_option = 0;
+    file_menu = false;
+    world_edit = true;
+}
+
+void W_UpdateWorldEdit(void)
+{  
+    if (file_menu) { // in some way some how it's hackier than the tile one
+        if (G_ControlDown(PLAYER_ONE, CON_START, true)) {
+            file_menu = false;
+            return;
+        }
+
+        if ((world_dirfiles.num_files + tileset_dirfiles.num_files) < 1)
+            return; // no files so no loading anything
+
+        if (G_ControlDown(PLAYER_ONE, CON_UP, true))
+            tile_sel_option--;
+        if (G_ControlDown(PLAYER_ONE, CON_DOWN, true))
+            tile_sel_option++;
+        if (G_ControlDown(PLAYER_ONE, CON_LEFT, true))
+            tile_sel_option-=16;
+        if (G_ControlDown(PLAYER_ONE, CON_RIGHT, true))
+            tile_sel_option+=16;
+
+        // sanity checks
+        if (tile_sel_option < 0)
+            tile_sel_option = (world_dirfiles.num_files + tileset_dirfiles.num_files) - abs(tile_sel_option);
+
+        // still below zero?
+        if (tile_sel_option < 0)
+            tile_sel_option = 0; // sigh..
+        
+        // loop around if need be
+        tile_sel_option = tile_sel_option % (world_dirfiles.num_files + tileset_dirfiles.num_files);
+
+        if (G_ControlDown(PLAYER_ONE, CON_A, true)) {
+            char *dot;
+            char *name;
+            const char *filename;
+            int name_len;
+
+            if (tile_sel_option < world_dirfiles.num_files)
+                filename = world_dirfiles.filenames[tile_sel_option];
+            else
+                filename = tileset_dirfiles.filenames[tile_sel_option - world_dirfiles.num_files];
+
+            dot = strrchr(filename, '.');
+
+            name_len = strlen(filename) + 1;
+            name = malloc((name_len-4) * sizeof(char)); 
+            snprintf(name, name_len-4, "%s", filename);
+
+            I_printf(name);
+
+            if (!strcmp(dot, ".set")) {
+                W_StartWorldEdit(name, NULL);
+            } else {
+                W_StartWorldEdit(NULL, name);
+            }
+
+            free(name);
+        }
+
+        // return early
+        return;
+    }
+
+    if (G_ControlDown(PLAYER_ONE, CON_START, true)) {
+        W_StartWorldEdit(NULL, NULL); // open file menu
+        return;
+    }
+}
+
+// my super yucky drawing code
+void W_DrawWorldEdit(void)
+{
+    int i, cur_posx, cur_posy;
+
+    if (file_menu) {
+        V_DrawText("Nozomi Engine World Editor\nSelect a file to open:", 0, 0, 0);
+
+        if (world_dirfiles.num_files + tileset_dirfiles.num_files > 0) {
+            for (i = 0; i < world_dirfiles.num_files + tileset_dirfiles.num_files; i++) {
+                if (i < world_dirfiles.num_files)
+                    V_DrawText(va("%s", world_dirfiles.filenames[i]), (i/17) * 80 + 8, (i%17) * 10 + 20, 0);
+                else
+                    V_DrawText(va("%s", tileset_dirfiles.filenames[i - world_dirfiles.num_files]), (i/17) * 80 + 8, (i%17) * 10 + 20, 0);
+            }
+
+            V_DrawText(">", (tile_sel_option/17) * 80 + 1, (tile_sel_option%17) * 10 + 20, 0);
+        } else
+            V_DrawText("No files found.", 8, 20, 0);
+
+        V_DrawText("Close the File Menu with Start/Enter", 0, VID_HEIGHT-8, 0);
+        // return early
+        return;
+    }
+
+    if (num_tiles <= 0) { // technically can still do this lolsies
+        V_DrawText("No world loaded.\nRe-open the File Menu with Start/Enter.", 0, 0, 0);
+        return;
+    }
+}
+
+bool tileset_edit = false; // tileset editing dawg
+static char temp_tile_name[33]; // save temp tileset to this name
+static uint8_t tiles_per_row = 0; // tiles to display per-row in editor
+static int32_t current_tile = 0; // int instead of uint for some silly things
+
+static int16_t tile_screenw = 15;
+static int16_t tile_screenh = 11;
+static bool tile_selected = false;
+
 // one or the other
 void W_StartTilesetEdit(const char *gfx_name, const char *tileset_name)
 {
@@ -210,7 +360,7 @@ void W_StartTilesetEdit(const char *gfx_name, const char *tileset_name)
         tileset_edit = true;
         file_menu = true;
         tile_sel_option = 0;
-        W_UpdateTilesetFiles(&tileset_dirfiles, va("%s/data/tilesets", I_GetHomeDir()));
+        W_UpdateFiles(&tileset_dirfiles, va("%s/data/tilesets", I_GetHomeDir()));
         return;
     }
 
@@ -426,10 +576,10 @@ void W_DrawTilesetEdit(void)
         );
     }
 
-    V_DrawLine(tile_screenw * (tile_height + 1) + 3, 0, 180, tile_screenh * (tile_height + 1) + 4, 0xFFFFFF);
-    V_DrawLine(0, tile_screenh * (tile_height + 1 ) + 3, 90, tile_screenw * (tile_height + 1) + 4, 0xFFFFFF);
+    V_DrawLine(tile_screenw * (tile_height + 1) + 3, 0, 180, tile_screenh * (tile_height + 1) + 4, 0xFFFF);
+    V_DrawLine(0, tile_screenh * (tile_height + 1 ) + 3, 90, tile_screenw * (tile_height + 1) + 4, 0xFFFF);
 
-    V_DrawBox(cur_posx - (tile_offx * (tile_width+1)), cur_posy - (tile_offy * (tile_height+1)), 0, tile_width + 2, tile_height + 2, 0xFFFFFF);
+    V_DrawBox(cur_posx - (tile_offx * (tile_width+1)), cur_posy - (tile_offy * (tile_height+1)), 0, tile_width + 2, tile_height + 2, 0xFFFF);
     V_DrawText(
         va("Tile: %03d/%03d", current_tile+1, num_tiles),
         0,

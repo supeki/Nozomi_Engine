@@ -47,7 +47,7 @@ void gameMain(void)
 	OBJ_InitObjects();
 
 	//W_CreateTilesetFromFile("tech_demo", "tech_demo", 8);
-	W_StartTilesetEdit(NULL, NULL);
+	W_StartWorldEdit(NULL, NULL);
 
 	I_PlayMusic(mus_demo, true);
 	//D_StartDialogue(0);
@@ -137,6 +137,9 @@ void gameRunStuff(uint32_t elapsed)
 
 		if (tileset_edit)
 			W_UpdateTilesetEdit();
+
+		if (world_edit)
+			W_UpdateWorldEdit();
 	}
 }
 
@@ -147,6 +150,9 @@ void gameDisplay(void)
 
 	if (tileset_edit)
 		W_DrawTilesetEdit();
+
+	if (world_edit)
+		W_DrawWorldEdit();
 
 	if (in_diag)
 		D_DrawDialogue();

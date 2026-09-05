@@ -16,6 +16,9 @@ font_t FNT_LoadFont(const char *filename)
 	char gfx_name[33];
 	int i;
 	
+	if (fp == NULL)
+		I_Error("Failed to read font file: %s\n", filename);
+
 	fread(gfx_name, sizeof(char), 32, fp);
 	gfx_name[32] = '\0';
 	font.gfx = GFX_LoadGFX(va("data/fonts/%s.bmp", gfx_name));
