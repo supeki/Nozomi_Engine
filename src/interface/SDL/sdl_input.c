@@ -24,7 +24,12 @@ void I_UpdateControls(SDL_Event event)
 		case SDL_KEYDOWN:
 			if (event.key.repeat)
 				break;
-			
+
+			if (event.key.keysym.sym == '1')
+				I_ChangeWindowSize(256, 192);
+			if (event.key.keysym.sym == '2')
+				I_ChangeWindowSize(512, 384);
+
 			for (j = 0; j < MAX_PLAYERS; j++)
 				for (c = CON_UP; c < NUMCONTROLS; c++)
 					if (gamecontrolbinds[j][c][0] == event.key.keysym.sym) // holy fucking shit
@@ -44,6 +49,17 @@ void I_UpdateControls(SDL_Event event)
 				mouseaxis[0][MOUSE_POSY] = (event.motion.y - mouse_offy) / scale;
 				mouseaxis[0][MOUSE_INPUTX] = event.motion.xrel / scale;
 				mouseaxis[0][MOUSE_INPUTY] = event.motion.yrel / scale;
+			}
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEBUTTONUP:
+			{
+				int res = 1;
+				if (event.type == SDL_MOUSEBUTTONUP)
+					res = 0;
+
+				if (event.button.button == 1)
+					mousecontrols[0][MOUSE_LBUTTON] = res;
 			}
 			break;
 			

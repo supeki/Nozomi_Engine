@@ -92,6 +92,20 @@ void I_UpdateWindow(SDL_Event event)
 	}
 }
 
+void I_ChangeWindowSize(int width, int height)
+{	
+	SDL_SetWindowSize(sdlWnd, width, height);
+			
+	scale = (float)height / (float)VID_HEIGHT;
+	float xscale = (float)width / (float)VID_WIDTH;
+	
+	if (xscale < scale)
+		scale = xscale;
+	
+	SDL_RenderPresent(wndRend);
+}
+
+
 void I_PushGraphics(void)
 {
 	int width = (int)(scale*(float)VID_WIDTH);

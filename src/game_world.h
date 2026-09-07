@@ -21,13 +21,14 @@ typedef enum
 
 typedef enum
 {
-    BG_NONE = 0,
-    BG_TILE = 1, // use tiles for background
-    BG_STATIC = 2, // fixed on-screen (doesn't move)
-    BG_WATER = 4, // use water wavy effect on background (applies to full background)
-    BG_FG = 8, // place background in front of tiles (foreground)
-    BG_SLOW = 16, // move slower than the tiles (parallax-ish)
-    BG_COLOR = 32, // use a solid color for the background
+    BG_NONE = 0, // no background
+    BG_STATIC = 1, // fixed on-screen (doesn't move)
+    BG_WATER = 2, // use water wavy effect on background (applies to layer 1)
+    BG_FG = 4, // place layer 1 background in front of tiles (foreground layer!!!??)
+    BG_SLOW = 8, // move slower than the tiles (parallax-ish) (layer 2 moves slower than layer 1)
+    BG_COLOR = 16, // use a solid color for the background
+    BG_IMAGE = 32, // use an image for the background as well
+    BG_SCROLL = 64 // scroll the two tile layers to the left automatically (clouds maybe) (it will loop the bg don't worry)
 } bgattr_e;
 
 #define BG_OPTIONS 6

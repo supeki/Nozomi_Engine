@@ -117,6 +117,43 @@ void V_DrawBox(int16_t x, int16_t y, int32_t angle, uint16_t width, uint16_t hei
 	V_DrawLine(x - offx, y + offy - 1, angle+90, width, col);
 }
 
+void V_DrawCropped2x(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
+{	
+	int zx, zy;
+
+	if ((gfx.width * gfx.height) <= 0)
+        return;
+	
+	// completely out of bounds
+	if (x*2 >= VID_WIDTH || y*2 >= VID_HEIGHT || x*2+w*2 < 0 || y*2+h*2 < 0)
+		return;
+	
+	for (zy = 0; zy < h; zy++)
+		for (zx = 0; zx < w; zx++)
+		{
+			int i = sx + sy*gfx.width + zx + zy*gfx.width;
+			int vx = x*2 + zx*2;
+			int vy = y*2 + zy*2;
+			
+			if (flags & V_SMALL)
+			{
+				vx -= zx;
+				vy -= zy;
+			}
+			
+			if (i >= gfx.width * gfx.height)
+				return;
+			
+			if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT || gfx.data[i] == 0)
+				continue;
+			
+			vid.buffer[vx+(vy*VID_WIDTH)] = gfx.data[i];
+			vid.buffer[vx+1+(vy*VID_WIDTH)] = gfx.data[i];
+			vid.buffer[vx+((vy+1)*VID_WIDTH)] = gfx.data[i];
+			vid.buffer[vx+1+((vy+1)*VID_WIDTH)] = gfx.data[i];
+		}
+}
+
 void V_DrawCroppedNoCheck(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
 {	
 	int zx, zy;

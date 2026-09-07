@@ -12,7 +12,7 @@ const char *I_GetHomeDir(void)
 {
     // waow nds and psp support too
     #if defined(__NDS__)
-    return va("fat:/%s/", GAME_NAME);
+    return va("sd:/%s/", GAME_NAME); // moved to sd:/ but it might not be supported on flashcards, we'll see
     #elif defined(PSP)
     return va("ms0:/PSP/GAME/%s/", GAME_NAME);
     #else

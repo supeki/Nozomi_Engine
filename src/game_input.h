@@ -59,6 +59,7 @@ extern int32_t  mouseaxis[MAX_PLAYERS][NUMMOUSEAXIS];
 
 void G_DefaultControls(void);
 bool G_ControlDown(uint8_t player, uint8_t control, bool pressed);
+bool G_MouseControlDown(uint8_t player, uint8_t control, bool pressed);
 int32_t G_PlayerAxis(uint8_t player, uint8_t axis);
 int32_t G_MouseAxis(uint8_t player, uint8_t axis);
 

@@ -13,6 +13,9 @@ void I_StartupGraphics(void)
 	//vramDefault();
 	videoSetMode(MODE_VRAM_A);
     vramSetBankA(VRAM_A_LCD);
+
+	// My top screen is broke :3
+	lcdMainOnBottom();
 }
 
 void I_ShutdownGraphics(void)

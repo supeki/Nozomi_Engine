@@ -46,7 +46,6 @@ void gameMain(void)
 	GFX_InitGFX();
 	OBJ_InitObjects();
 
-	//W_CreateTilesetFromFile("tech_demo", "tech_demo", 8);
 	W_StartWorldEdit(NULL, NULL);
 
 	I_PlayMusic(mus_demo, true);

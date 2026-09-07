@@ -47,8 +47,8 @@ void G_DefaultControls(void)
 		gamecontrolbinds[j][CON_START][1] = KEY_START;
 		gamecontrolbinds[j][CON_SELECT][1] = KEY_SELECT;
 		gamecontrolbinds[j][CON_X][1] = KEY_L;
-		gamecontrolbinds[j][CON_Y][1] = KEY_R;
-		gamecontrolbinds[j][CON_Z][1] = KEY_X;
+		gamecontrolbinds[j][CON_Y][1] = KEY_X;
+		gamecontrolbinds[j][CON_Z][1] = KEY_R;
 		gamecontrolbinds[j][CON_CONFIRM][1] = KEY_A;
 		gamecontrolbinds[j][CON_BACK][1] = KEY_B;
 	#elif defined(GLFW)
@@ -136,6 +136,20 @@ int32_t G_PlayerAxis(uint8_t player, uint8_t axis)
 	
 	return gameaxis[player][axis];
 } 
+
+bool G_MouseControlDown(uint8_t player, uint8_t control, bool pressed)
+{
+	if (control > NUMMOUSECONTROLS-1)
+		return false;
+	
+	if (mousecontrols[player][control] > 0xFFFFFFFE)
+		mousecontrols[player][control] = 0xFFFFFFFF;
+	
+	if (pressed)
+		return (mousecontrols[player][control] == 1);
+	else
+		return (mousecontrols[player][control] > 0);
+}
 
 int32_t G_MouseAxis(uint8_t player, uint8_t axis)
 {
