@@ -31,7 +31,7 @@ typedef enum
     BG_SCROLL = 64 // scroll the two tile layers to the left automatically (clouds maybe) (it will loop the bg don't worry)
 } bgattr_e;
 
-#define BG_OPTIONS 6
+#define BG_OPTIONS 7
 
 // cool tips n' tricks with mareuhlyn
 // use BG_FG + BG_WATER for a wavy overlay in underwater areas!
@@ -50,6 +50,8 @@ void W_Free(void);
 
 void W_CreateTilesetFromFile(const char *input, uint8_t tile_size);
 void W_CreateWorldFromTilesetFile(const char *input, uint16_t width, uint16_t height);
+
+void W_DrawWorld(void);
 
 extern bool world_edit;
 void W_StartWorldEdit(const char *gfx_name, const char *tileset_name);

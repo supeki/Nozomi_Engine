@@ -16,6 +16,9 @@ uint16_t world_width, world_height; // shouldn't need larger than 65536x65536 ti
 uint32_t world_bgtype; // background type maybe if i wanna have a 2d game with cool backgrounds (like cave story)
 uint16_t *world_tiles = NULL, *world_tiles2 = NULL, *world_bgtiles = NULL, *world_bgtiles2 = NULL, world_bgcolor = 0; // tile layout in the world + bg color ig
 
+// used to be for editor only but was proven needed
+static uint32_t tiles_per_row = 0;
+
 // Q: ok maril so why is there tiles2?
 // A: i was lazy and i needed to be able to layer tiles on tiles i'm sorryyyy 
 
@@ -43,6 +46,7 @@ static void W_LoadTileset(const char *filename)
 
     // get number of tiles from graphic size and tile width/height
     num_tiles = (gfx_tileset.width / tile_width) * (gfx_tileset.height / tile_height);
+    tiles_per_row = gfx_tileset.width / tile_width;
 
     // get tile attributes from file
     tile_attributes = malloc(num_tiles * sizeof(uint32_t));
@@ -107,6 +111,9 @@ void W_LoadWorldFile(const char *filename)
         gfx_worldbg = GFX_LoadGFX(va("data/backgrounds/%s.bmp", background_name));
     }
 
+    if (world_bgtype & BG_COLOR)
+        fread(&world_bgcolor, sizeof(uint16_t), 1, fp);
+
     // read world tiles
     world_tiles = malloc(world_width * world_height * sizeof(uint16_t));
     for (i = 0; i < world_width * world_height; i++)
@@ -147,6 +154,144 @@ void W_LoadWorldFile(const char *filename)
     }
 
     fclose(fp);
+}
+
+static void W_DrawLayer(uint8_t layer) {
+    uint32_t i;
+
+    if (layer > 3) {
+        // draw image or color
+        if (world_bgtype & BG_IMAGE)
+            V_DrawTiled(gfx_worldbg, -camera.x/4, -camera.y/4, 0); // draw the bg image and tile it
+        else if ((world_bgtype & BG_COLOR) && (world_bgtype & BG_WATER) == 0)
+            V_FillScreen(world_bgcolor);
+
+        return;
+    }
+
+    for (i = 0; i < world_width*world_height; i++)
+    {
+        int32_t px, py;
+        uint32_t id = 0;
+
+        switch (layer) {
+            case 1:
+                id = world_tiles2[i]; // sub tiles
+                break;
+            case 2:
+                id = world_bgtiles[i]; // main bg tiles
+                break;
+            case 3:
+                id = world_bgtiles2[i]; // sub bg tiles
+                break;
+            default:
+                id = world_tiles[i]; // main tiles
+                break;
+        }
+
+        if (id == 0)
+            continue;
+
+        px = ((i % world_width) * tile_width) - camera.x;
+        py = ((i / world_width) * tile_height) - camera.y;
+
+        if (layer > 1) {
+            if (world_bgtype & BG_SLOW) {
+                if (layer == 2) {
+                    px = ((i % world_width) * tile_width) - camera.x/3*2;
+                    py = ((i / world_width) * tile_height) - camera.y/3*2;
+                } else {
+                    px = ((i % world_width) * tile_width) - camera.x/3;
+                    py = ((i / world_width) * tile_height) - camera.y/3;
+                }
+            }
+
+            if (world_bgtype & BG_STATIC) {
+                px = ((i % world_width) * tile_width);
+                py = ((i / world_width) * tile_height);
+            }
+        }
+
+        if (world_height * tile_height < VID_HEIGHT)
+            py += (VID_HEIGHT - (world_height * tile_height))/2;
+
+        if (tile_attributes[id] & TILE_ANIMATED)
+            V_DrawCroppedAnimated(
+                gfx_tileset, // gfx
+                px, // x 
+                py, // y
+                (id % tiles_per_row) * tile_width, // crop x
+                (id / tiles_per_row) * tile_height, // crop y
+                tile_width, // crop w
+                tile_height, // crop h
+                3, // frames
+                3, // frames per second
+                0 // flags
+            );
+        else
+            V_DrawCropped(
+                gfx_tileset, // gfx
+                px, // x 
+                py, // y
+                (id % tiles_per_row) * tile_width, // crop x
+                (id / tiles_per_row) * tile_height, // crop y
+                tile_width, // crop w
+                tile_height, // crop h
+                0 // flags
+            );
+    }
+}
+
+static uint16_t *second_buf = NULL;
+
+void W_DrawWaveEffect(uint16_t color) 
+{
+    uint32_t x, y;
+
+    if (second_buf == NULL)
+        second_buf = malloc(VID_WIDTH * VID_HEIGHT * sizeof(uint16_t));
+
+    memcpy(second_buf, vid.buffer, VID_WIDTH * VID_HEIGHT * sizeof(uint16_t));
+    
+    for (y = 0; y < VID_HEIGHT; y++)
+        for (x = 0; x < VID_WIDTH; x++) {
+            int32_t sx;
+            int32_t x_off = 4 * sin((I_GetTicks()+x+y) * (PI/90));
+
+            if (x_off < -3)
+                x_off = -3;
+            if (x_off > 3)
+                x_off = 3;
+
+            sx = x - x_off;
+
+            if (sx < 0)
+                sx = 0;
+            if (sx >= VID_WIDTH)
+                sx = VID_WIDTH - 1;
+
+            vid.buffer[x + y*VID_WIDTH] = V_MixColors(second_buf[sx + y*VID_WIDTH], color, 64);
+        } 
+}
+
+void W_DrawWorld(void) {
+    W_DrawLayer(4);
+    W_DrawLayer(3);
+
+    if (!(world_bgtype & BG_FG))
+        W_DrawLayer(2);
+
+    if ((world_bgtype & BG_FG) == 0 && (world_bgtype & BG_WATER))
+        W_DrawWaveEffect(world_bgcolor);
+
+    W_DrawLayer(1);
+    W_DrawLayer(0);
+
+    if (world_bgtype & BG_FG)
+        W_DrawLayer(2);
+
+    if ((world_bgtype & (BG_FG|BG_WATER)) == (BG_FG|BG_WATER))
+        W_DrawWaveEffect(world_bgcolor);
 }
 
 void W_Free(void)
@@ -199,12 +344,14 @@ void W_CreateWorldFromTilesetFile(const char *input, uint16_t width, uint16_t he
 
     world_width = width;
     world_height = height;
-    world_bgtype = BG_SLOW; // slow parallax
+    world_bgtype = BG_SLOW|BG_WATER|BG_COLOR;
+    world_bgcolor = 0x4d5f;
     
     world_tiles = malloc(world_width * world_height * sizeof(uint16_t));
     world_tiles2 = malloc(world_width * world_height * sizeof(uint16_t));
     world_bgtiles = malloc(world_width * world_height * sizeof(uint16_t));
     world_bgtiles2 = malloc(world_width * world_height * sizeof(uint16_t));
+    GFX_FreeGFX(&gfx_worldbg);
 
     for (i = 0; i < world_width * world_height; i++) {
         world_tiles[i] = 0; // default of the top-left tile // might want it to be transparent...
@@ -216,7 +363,7 @@ void W_CreateWorldFromTilesetFile(const char *input, uint16_t width, uint16_t he
 
 // idk if this needs to be here honestly, but i wanna multipurpose it now
 static bool file_menu = false;
-static dirfiles_t world_dirfiles, tileset_dirfiles;
+static dirfiles_t world_dirfiles, tileset_dirfiles, background_dirfiles;
 static char *last_path;
 static uint8_t tile_sel_option = 0;
 
@@ -240,12 +387,15 @@ bool world_edit = false; // world editing 'yo
 static char temp_world_name[33]; // woa it's almost like the tile editor but now you place them
 
 // ermm these were in the tileset editor but i'm lazy and reusing variables is cooler
-static uint8_t tiles_per_row = 0; // tiles to display per-row in editor
 static int32_t current_tile = 0; // int instead of uint for some silly things
 static int64_t world_cam_x, world_cam_y;
 static bool edit_tiles2 = false;
 static bool edit_bgtiles = false;
 static bool edit_renderone = false; // only one layer
+static bool world_preview = false; // preview mode
+static bool world_properties = false; // properties menu
+static int8_t world_properties_option = 0;
+static int32_t image_sel_option = 0;
 
 void W_StartWorldEdit(const char *tileset_name, const char *world_name)
 {
@@ -256,6 +406,7 @@ void W_StartWorldEdit(const char *tileset_name, const char *world_name)
         tile_sel_option = 0;
         W_UpdateFiles(&tileset_dirfiles, va("%s/data/tilesets", I_GetHomeDir())); // we need these too
         W_UpdateFiles(&world_dirfiles, va("%s/data/worlds", I_GetHomeDir()));
+        W_UpdateFiles(&background_dirfiles, va("%s/data/backgrounds", I_GetHomeDir())); // and these
         return;
     }
 
@@ -263,7 +414,7 @@ void W_StartWorldEdit(const char *tileset_name, const char *world_name)
         W_LoadWorldFile(va("data/worlds/%s.wld", world_name));
         sprintf(temp_world_name, world_name);
     } else {
-        W_CreateWorldFromTilesetFile(tileset_name, 32, 22);
+        W_CreateWorldFromTilesetFile(tileset_name, 32, 24);
         sprintf(temp_world_name, tileset_name);
     }
 
@@ -275,6 +426,10 @@ void W_StartWorldEdit(const char *tileset_name, const char *world_name)
     edit_tiles2 = false;
     edit_bgtiles = false;
     edit_renderone = false;
+    world_preview = false;
+    world_properties = false;
+    world_properties_option = 0;
+    image_sel_option = 0;
     file_menu = false;
     world_edit = true;
 }
@@ -346,6 +501,158 @@ void W_UpdateWorldEdit(void)
 
     if (num_tiles <= 0)
         return;
+
+    if (G_ControlDown(PLAYER_ONE, CON_SELECT, true)) {
+        if (world_properties)
+            world_properties = false;
+        else
+            world_properties = true;
+        return;    
+    }
+
+    if (world_properties) {
+        if (G_ControlDown(PLAYER_ONE, CON_LEFT, true)) {
+            world_properties_option--;
+            tile_sel_option = 0;
+        }
+
+        if (G_ControlDown(PLAYER_ONE, CON_RIGHT, true)) {
+            world_properties_option++;
+            tile_sel_option = 0;
+        }
+
+        // sanity checks
+        if (world_properties_option < 0)
+            world_properties_option = 3 - abs(world_properties_option);
+
+        // still below zero?
+        if (world_properties_option < 0)
+            world_properties_option = 0; // sigh..
+        
+        // loop around if need be
+        world_properties_option = world_properties_option % 3;
+
+        if (world_properties_option == 0) {
+            if (G_ControlDown(PLAYER_ONE, CON_UP, true))
+                tile_sel_option--;
+            if (G_ControlDown(PLAYER_ONE, CON_DOWN, true))
+                tile_sel_option++;
+
+            // sanity checks
+            if (tile_sel_option < 0)
+                tile_sel_option = BG_OPTIONS - abs(world_properties_option);
+
+            // still below zero?
+            if (tile_sel_option < 0)
+                tile_sel_option = 0; // sigh..
+            
+            // loop around if need be
+            tile_sel_option = tile_sel_option % BG_OPTIONS;
+
+            if (G_ControlDown(PLAYER_ONE, CON_A, true))
+                if (world_bgtype & (1<<tile_sel_option))
+                    world_bgtype &= ~(1<<tile_sel_option);
+                else
+                    world_bgtype |= (1<<tile_sel_option);
+        } 
+        
+        if (world_properties_option == 1 && background_dirfiles.num_files > 0) {
+            if (G_ControlDown(PLAYER_ONE, CON_UP, true))
+                image_sel_option--;
+            if (G_ControlDown(PLAYER_ONE, CON_DOWN, true))
+                image_sel_option++;
+
+            // sanity checks
+            if (image_sel_option < 0)
+                image_sel_option = background_dirfiles.num_files - abs(world_properties_option);
+
+            // still below zero?
+            if (image_sel_option < 0)
+                image_sel_option = 0; // sigh..
+            
+            // loop around if need be
+            image_sel_option = image_sel_option % background_dirfiles.num_files;
+
+            if (image_sel_option > background_dirfiles.num_files-1)
+                image_sel_option = background_dirfiles.num_files-1;
+            
+            if (G_ControlDown(PLAYER_ONE, CON_A, true)) {
+                GFX_FreeGFX(&gfx_worldbg);
+                gfx_worldbg = GFX_LoadGFX(va("data/backgrounds/%s", background_dirfiles.filenames[image_sel_option]));
+            }
+        }
+
+        if (world_properties_option == 2) {
+            int8_t r, g, b;
+            int8_t input = 0;
+
+            r = (world_bgcolor >> 11) & 0x1F;
+            g = (world_bgcolor >> 5) & 0x3F;
+            b = world_bgcolor & 0x1F;
+
+            if (G_ControlDown(PLAYER_ONE, CON_UP, true))
+                tile_sel_option--;
+            if (G_ControlDown(PLAYER_ONE, CON_DOWN, true))
+                tile_sel_option++;
+            if (G_ControlDown(PLAYER_ONE, CON_A, true))
+                input--;
+            if (G_ControlDown(PLAYER_ONE, CON_B, true))
+                input++;
+
+            // sanity checks
+            if (tile_sel_option < 0)
+                tile_sel_option = 3 - abs(world_properties_option);
+
+            // still below zero?
+            if (tile_sel_option < 0)
+                tile_sel_option = 0; // sigh..
+            
+            // loop around if need be
+            tile_sel_option = tile_sel_option % 3;
+
+            if (tile_sel_option == 2)
+                b += input;
+            else if (tile_sel_option == 1)
+                g += input;
+            else
+                r += input;
+
+            if (r > 31)
+                r = 31;
+            if (g > 63)
+                g = 63;
+            if (b > 31)
+                b = 31;
+            if (r < 0)
+                r = 0;
+            if (g < 0)
+                g = 0;
+            if (b < 0)
+                b = 0;
+
+            world_bgcolor = (r << 11) | (g << 5) | b;
+        }
+
+        if (background_dirfiles.num_files <= 0)
+            world_bgtype &= ~BG_IMAGE;
+
+        return;
+    }
+
+    if (world_preview) {
+        if (G_ControlDown(PLAYER_ONE, CON_UP, false))
+            camera.y--;
+        if (G_ControlDown(PLAYER_ONE, CON_DOWN, false))
+            camera.y++;
+        if (G_ControlDown(PLAYER_ONE, CON_LEFT, false))
+            camera.x--;
+        if (G_ControlDown(PLAYER_ONE, CON_RIGHT, false))
+            camera.x++;
+        if (G_ControlDown(PLAYER_ONE, CON_B, false))
+            world_preview = false;
+
+        return;
+    }
 
     if (G_ControlDown(PLAYER_ONE, CON_UP, true))
         current_tile-=tiles_per_row;
@@ -473,6 +780,106 @@ void W_DrawWorldEdit(void)
         return;
     }
 
+    if (world_properties) {
+        char *dot;
+
+        V_DrawText(va("Background Type:         %02d", world_bgtype), 2, 2, 0);
+
+        if (world_properties_option == 0)
+            V_DrawText(">", 2, 12 + tile_sel_option*10, 0);
+        else if (world_properties_option == 1)
+            V_DrawText("U/D:", VID_WIDTH - 152, 12, 0);
+        else if (world_properties_option == 2)
+            V_DrawText(">", VID_WIDTH - 128, 31 + tile_sel_option*10, 0);
+
+        V_DrawText("Background Image:", VID_WIDTH - 128, 2, 0);
+        if (background_dirfiles.num_files <= 0)
+            V_DrawText("No images found.", VID_WIDTH - 128, 12, 0);
+        else {
+            char *dot;
+            char *name;
+            const char *filename;
+            int name_len;
+
+            filename = background_dirfiles.filenames[image_sel_option];
+            dot = strrchr(filename, '.');
+
+            name_len = strlen(filename) + 1;
+            name = malloc((name_len-4) * sizeof(char)); 
+            snprintf(name, name_len-4, "%s", filename);
+
+            V_DrawText(va("%s.bmp", name), VID_WIDTH - 128, 12, 0);
+
+            free(name);
+        }
+
+        V_DrawText("Background Color:", VID_WIDTH - 128, 22, 0);
+        for (i = 0; i < 64; i++) {
+            V_DrawDot(VID_WIDTH - 128 + i + 16, 35, (i/2 << 11));
+            V_DrawDot(VID_WIDTH - 128 + i + 16, 45, (i/2 << 5));
+            V_DrawDot(VID_WIDTH - 128 + i + 16, 55, i/2);
+            V_DrawDot(VID_WIDTH - 128 + i + 16, 36, (i/2 << 11));
+            V_DrawDot(VID_WIDTH - 128 + i + 16, 46, (i/2 << 5));
+            V_DrawDot(VID_WIDTH - 128 + i + 16, 56, i/2);
+        }
+
+        {
+            uint8_t r, g, b;
+            r = (world_bgcolor >> 11) & 0x1F;
+            g = (world_bgcolor >> 5) & 0x3F;
+            b = world_bgcolor & 0x1F;
+
+            V_DrawText("|", VID_WIDTH - 128 + r*2 + 14, 32, 0);
+            V_DrawText("|", VID_WIDTH - 128 + g + 14, 42, 0);
+            V_DrawText("|", VID_WIDTH - 128 + b*2 + 14, 52, 0);
+        }
+
+        if (world_bgtype & BG_STATIC) 
+            V_DrawText("Static", 12, 12, V_JUMPYTEXT);
+        else
+            V_DrawText("Static", 12, 12, 0);
+
+        if (world_bgtype & BG_WATER)
+            V_DrawText("Water", 12, 22, V_JUMPYTEXT);
+        else
+            V_DrawText("Water", 12, 22, 0);
+
+        if (world_bgtype & BG_FG)
+            V_DrawText("Foreground", 12, 32, V_JUMPYTEXT);
+        else
+            V_DrawText("Foreground", 12, 32, 0);
+
+        if (world_bgtype & BG_SLOW)
+            V_DrawText("Slow Parallax", 12, 42, V_JUMPYTEXT);
+        else
+            V_DrawText("Slow Parallax", 12, 42, 0);
+
+        if (world_bgtype & BG_COLOR)
+            V_DrawText("Color", 12, 52, V_JUMPYTEXT);
+        else
+            V_DrawText("Color", 12, 52, 0);
+
+        if (world_bgtype & BG_IMAGE)
+            V_DrawText("Image", 12, 62, V_JUMPYTEXT);
+        else
+            V_DrawText("Image", 12, 62, 0);
+
+        if (world_bgtype & BG_SCROLL)
+            V_DrawText("Scroll", 12, 72, V_JUMPYTEXT);
+        else
+            V_DrawText("Scroll", 12, 72, 0);
+
+        return;
+    }
+
+    if (world_preview) {
+        W_DrawWorld();
+
+        V_DrawText("WORLD PREVIEW", 2, VID_HEIGHT - 20, 0);
+        V_DrawText("D-Pad: Move Cam. | B: Return to Editor", 2, VID_HEIGHT - 10, 0);
+        return;
+    }
+
     cur_posx = 2 + (current_tile % tiles_per_row) * (tile_width+1)*2;
     cur_posy = 2 + (current_tile / tiles_per_row) * (tile_height+1)*2;
 
@@ -492,12 +899,18 @@ void W_DrawWorldEdit(void)
     if (tile_offy >= num_tiles/tiles_per_row - 2)
         tile_offy = num_tiles/tiles_per_row - 2;
 
+    // draw world bg color before tiles
+    if ((world_bgtype & BG_COLOR) && (world_bgtype & BG_WATER) == 0)
+        V_FillScreen(world_bgcolor);
+
+    // draw world bg image after color and before tiles
+    if (world_bgtype & BG_IMAGE)
+        V_DrawTiled(gfx_worldbg, -world_cam_x, -world_cam_y, 0);
+
     // draw world tiles first
     for (i = 0; i < world_width*world_height; i++)
     {
         int32_t px, py;
-        uint32_t id = world_tiles[i];
-        uint32_t id2 = world_tiles2[i];
         uint32_t id3 = world_bgtiles[i];
         uint32_t id4 = world_bgtiles2[i];
 
@@ -529,6 +942,19 @@ void W_DrawWorldEdit(void)
                     tile_height, // crop h
                     0 // flags
                 );
+    }
+
+    if ((world_bgtype & BG_FG) == 0 && (world_bgtype & BG_WATER))
+        W_DrawWaveEffect(world_bgcolor);
+
+    for (i = 0; i < world_width*world_height; i++)
+    {
+        int32_t px, py;
+        uint32_t id = world_tiles[i];
+        uint32_t id2 = world_tiles2[i];
+
+        px = ((i % world_width) * tile_width) - world_cam_x/2;
+        py = ((i / world_width) * tile_height) - world_cam_y/2;
 
         if ((edit_renderone && edit_tiles2 && edit_bgtiles == false) || !edit_renderone)
             if (id2 != 0)
@@ -557,6 +983,9 @@ void W_DrawWorldEdit(void)
                 );
     }
 
+    if ((world_bgtype & (BG_FG|BG_WATER)) == (BG_FG|BG_WATER))
+        W_DrawWaveEffect(world_bgcolor);
+
     // directly writing to the buffer is bad but i need to
     {
         int x, y;
@@ -569,22 +998,26 @@ void W_DrawWorldEdit(void)
     }
 
     V_DrawText("D-Pad: Change Tile | Mouse: Place | YABC: Move Cam.", 2, VID_HEIGHT-8, 0);
-    
+    V_DrawText("Start: File Menu | Select: World Properties", 2, VID_HEIGHT-18, 0);
+
     if (edit_bgtiles)
         if (edit_tiles2)
-            V_DrawText("BG Layer 2", 2, VID_HEIGHT-18, 0);
+            V_DrawText("BG Layer 2", 2, VID_HEIGHT-28, 0);
         else
-            V_DrawText("BG Layer 1", 2, VID_HEIGHT-18, 0);
+            if (world_bgtype & BG_FG)
+                V_DrawText("FG Layer", 2, VID_HEIGHT-28, 0);
+            else
+                V_DrawText("BG Layer 1", 2, VID_HEIGHT-28, 0);
     else
         if (edit_tiles2)
-            V_DrawText("Layer 2", 2, VID_HEIGHT-18, 0);
+            V_DrawText("Layer 2", 2, VID_HEIGHT-28, 0);
         else
-            V_DrawText("Layer 1", 2, VID_HEIGHT-18, 0);
+            V_DrawText("Layer 1", 2, VID_HEIGHT-28, 0);
 
     if (edit_renderone)
-        V_DrawText("Render One", 2, VID_HEIGHT-28, 0);
+        V_DrawText("Render One", 120, VID_HEIGHT-28, 0);
     else
-        V_DrawText("Render All", 2, VID_HEIGHT-28, 0);
+        V_DrawText("Render All", 120, VID_HEIGHT-28, 0);
 
     // tile selector
     for (i = 0; i < num_tiles; i++)

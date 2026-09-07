@@ -55,6 +55,26 @@ void V_LoadPalette(const char *filename, uint16_t* pal)
 	fclose(file);
 }
 
+uint16_t V_MixColors(uint16_t c, uint16_t c2, uint8_t a) 
+{
+    uint8_t r, g, b, r2, g2, b2, r_out, g_out, b_out;
+
+    r = (c >> 11) & 0x1F;
+    g = (c >> 5) & 0x3F;
+    b = c & 0x1F;
+
+    r2 = (c2 >> 11) & 0x1F;
+    g2 = (c2 >> 5) & 0x3F;
+    b2 = c2 & 0x1F;
+
+    r_out = (r*(255-a) + r2*a) >> 8;
+    g_out = (g*(255-a) + g2*a) >> 8;
+    b_out = (b*(255-a) + b2*a) >> 8;
+
+    return (r_out << 11) | (g_out << 5) | b_out;
+}
+
+
 void V_Free(void)
 {
 	if (palette != NULL)
@@ -63,11 +83,11 @@ void V_Free(void)
 	free(vid.buffer);
 }
 
-void V_ClearScreen(void)
+void V_FillScreen(uint16_t col)
 {
 	uint16_t i;
 	for (i = 0; i < VID_WIDTH*VID_HEIGHT; i++)
-		vid.buffer[i] = 0;
+		vid.buffer[i] = col;
 }
 
 void V_DrawDot(int16_t x, int16_t y, uint16_t col)
@@ -115,6 +135,13 @@ void V_DrawBox(int16_t x, int16_t y, int32_t angle, uint16_t width, uint16_t hei
 
 	V_DrawLine(x - offx2 - 1, y + offy2, angle+180, height, col);
 	V_DrawLine(x - offx, y + offy - 1, angle+90, width, col);
+}
+
+void V_DrawCroppedAnimated(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t frames, uint32_t fps, uint32_t flags)
+{	
+	uint32_t ticks = FRAMERATE / fps;
+	sx += ((I_GetTicks()/ticks) % frames)*w;
+	V_DrawCropped(gfx, x, y, sx, sy, w, h, flags);
 }
 
 void V_DrawCropped2x(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
@@ -219,6 +246,15 @@ void V_DrawCropped(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint
 			
 			vid.buffer[vx+(vy*VID_WIDTH)] = gfx.data[i];
 		}
+}
+
+void V_DrawTiled(gfx_t gfx, int16_t x, int16_t y, uint32_t flags)
+{
+	int16_t sx, sy;
+
+	for (sy = y; sy < VID_HEIGHT; sy += gfx.height)
+		for (sx = x; sx < VID_WIDTH; sx += gfx.width)
+			V_Draw(gfx, sx, sy, flags);
 }
 
 void V_Draw(gfx_t gfx, int16_t x, int16_t y, uint32_t flags)

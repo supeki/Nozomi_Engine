@@ -106,7 +106,7 @@ void gameLoop(void)
 			I_PushGraphics();
 		}
 		
-		V_ClearScreen();
+		V_FillScreen(0);
 	}
 
 	OBJ_FreeObjects();
@@ -150,7 +150,7 @@ void gameDisplay(void)
 	if (tileset_edit)
 		W_DrawTilesetEdit();
 
-	if (world_edit)
+	if (world_edit) 
 		W_DrawWorldEdit();
 
 	if (in_diag)
