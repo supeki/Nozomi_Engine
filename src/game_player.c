@@ -14,7 +14,7 @@ void P_CreatePlayer(uint32_t x, uint32_t y, uint8_t dir)
 {
 	memset(&players[num_players], 0, sizeof(player_t));
 	players[num_players].object = OBJ_CreateObject(x, y, OBJ_NULL);
-	players[num_players].object->dir = dir;
+	players[num_players].object->dir_layer = dir;
 	players[num_players].object->player = &players[num_players];
 	
 	num_players++;

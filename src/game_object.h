@@ -10,25 +10,26 @@
 typedef struct object_s
 {
 	// base variables
-	uint32_t type; // Object type
-	struct object_s *prev; // Previous object
-	struct object_s *next; // Next object
-	uint32_t x; // X position relative to the world
-	uint32_t y; // Y position relative to the world
-	uint8_t dir; // Facing direction 0 is down, 3 is right
-	uint32_t flags; // Any special flags for this object.
-	uint32_t hit[4]; // Hitbox, index 0 is x offset, 1 is y offset, 2 is width, 3 is height
-	uint8_t layer;
-	
-	// momentum variables
-	int32_t momx;
-	int32_t momy;
-	
-	// animation variables
-	uint32_t anim_state; // animation state, standing, walking, etc
-	uint32_t anim_timer; // animation timer, value depends on the animation and situation
+	uint16_t type; // obj type
+	struct object_s *prev; // previous obj
+	struct object_s *next; // next obj
 
-	// player reference pointer
+	// utility variables
+	uint8_t health;
+	uint32_t flags; // any special flags for this obj
+	uint8_t hit[4]; // hitbox, index 0 is x offset, 1 is y offset, 2 is width, 3 is height
+
+	// positional variables
+	uint16_t x; // obj x
+	uint16_t y; // obj y
+	int8_t momx; // obj momx
+	int8_t momy; // obj momy
+	uint8_t dir_layer; // LLLLLLDD L - layer D - dir
+	
+	uint8_t anim_state; // obj anim state
+	uint16_t anim_timer; // current anim tick
+
+	// player reference pointer - player objs
 	struct player_s *player;
 } object_t;
 
