@@ -18,6 +18,8 @@ uint16_t *world_tiles = NULL, *world_tiles2 = NULL, *world_bgtiles = NULL, *worl
 
 // used to be for editor only but was proven needed
 static uint32_t tiles_per_row = 0;
+static char temp_tile_name[33]; // save temp tileset to this name
+static char temp_bg_name[33];
 
 // Q: ok maril so why is there tiles2?
 // A: i was lazy and i needed to be able to layer tiles on tiles i'm sorryyyy 
@@ -37,7 +39,7 @@ static void W_LoadTileset(const char *filename)
     if (&gfx_tileset)
         GFX_FreeGFX(&gfx_tileset);
 
-    gfx_tileset = GFX_LoadGFX(va("data/tilesets/%s.bmp", graphic_name));
+    gfx_tileset = GFX_LoadGFX(va("data/tiles/%s.bmp", graphic_name));
 
     // load tileset data
     // get tile width/height
@@ -58,7 +60,7 @@ static void W_LoadTileset(const char *filename)
 
 static void W_SaveTileset(const char *name)
 {
-    FILE *fp = fopen(va("data/tilesets/%s.set", name), "wb+");
+    FILE *fp = fopen(va("data/tiles/%s.set", name), "wb+");
     gfx_t gfx_temptileset;
     uint32_t i;
     char gfx_name[33];
@@ -84,6 +86,7 @@ void W_LoadWorldFile(const char *filename)
 
     // free prior stuff
     W_Free();
+    OBJ_FreeObjects();
 
     // read world header
 
@@ -91,7 +94,8 @@ void W_LoadWorldFile(const char *filename)
     fread(&tileset_name, sizeof(char), 32, fp);
     tileset_name[32] = '\0';
 
-    W_LoadTileset(va("data/tilesets/%s.set", tileset_name));
+    W_LoadTileset(va("data/tiles/%s.set", tileset_name));
+    sprintf(temp_tile_name, "%s", tileset_name);
 
     // get world width and height
     fread(&world_width, sizeof(uint16_t), 1, fp);
@@ -104,11 +108,12 @@ void W_LoadWorldFile(const char *filename)
     if (world_bgtype & BG_IMAGE) {
         fread(&background_name, sizeof(char), 32, fp);
         background_name[32] = '\0';
+        sprintf(temp_bg_name, "%s", background_name);
 
         if (&gfx_worldbg)
             GFX_FreeGFX(&gfx_worldbg);
 
-        gfx_worldbg = GFX_LoadGFX(va("data/backgrounds/%s.bmp", background_name));
+        gfx_worldbg = GFX_LoadGFX(va("data/back/%s.bmp", background_name));
     }
 
     if (world_bgtype & BG_COLOR)
@@ -116,55 +121,50 @@ void W_LoadWorldFile(const char *filename)
 
     // read world tiles
     world_tiles = malloc(world_width * world_height * sizeof(uint16_t));
-    for (i = 0; i < world_width * world_height; i++)
-        fread(&world_tiles[i], sizeof(uint16_t), 1, fp);
-
     world_tiles2 = malloc(world_width * world_height * sizeof(uint16_t));
-    for (i = 0; i < world_width * world_height; i++)
-        fread(&world_tiles2[i], sizeof(uint16_t), 1, fp);
-
-    // load background tiles if using tiles
     world_bgtiles = malloc(world_width * world_height * sizeof(uint16_t));
-    for (i = 0; i < world_width * world_height; i++)
-        fread(&world_bgtiles[i], sizeof(uint16_t), 1, fp);
-    
     world_bgtiles2 = malloc(world_width * world_height * sizeof(uint16_t));
-    for (i = 0; i < world_width * world_height; i++)
+    for (i = 0; i < world_width * world_height; i++) {
+        fread(&world_tiles[i], sizeof(uint16_t), 1, fp);
+        fread(&world_tiles2[i], sizeof(uint16_t), 1, fp);
+        fread(&world_bgtiles[i], sizeof(uint16_t), 1, fp);
         fread(&world_bgtiles2[i], sizeof(uint16_t), 1, fp);
+    }
 
     // load objects into world
     fread(&num_objs, sizeof(uint32_t), 1, fp); // i'm lazyy so i'll store num of objs in file
 
-    for (i = 0; i < num_objs; i++) {
-        object_t *obj;
-        uint32_t type, x, xoff, y, yoff, flags;
-        uint8_t dir;
+    if (num_objs > 0)
+        for (i = 0; i < num_objs; i++) {
+            object_t *obj;
+            uint16_t type, x, y;
+            uint8_t dir_layer;
+            uint32_t flags;
 
-        fread(&type, sizeof(uint32_t), 1, fp);
-        fread(&x, sizeof(uint32_t), 1, fp);
-        fread(&xoff, sizeof(uint32_t), 1, fp);
-        fread(&y, sizeof(uint32_t), 1, fp);
-        fread(&yoff, sizeof(uint32_t), 1, fp);
-        fread(&dir, sizeof(uint8_t), 1, fp);
-        fread(&flags, sizeof(uint32_t), 1, fp);
+            fread(&type, sizeof(uint16_t), 1, fp);
+            fread(&x, sizeof(uint16_t), 1, fp);
+            fread(&y, sizeof(uint16_t), 1, fp);
+            fread(&dir_layer, sizeof(uint8_t), 1, fp);
+            fread(&flags, sizeof(uint32_t), 1, fp);
 
-        obj = OBJ_CreateObject(x*PU + xoff, y*PU + yoff, type);
-        obj->dir = dir;
-        obj->flags = flags;
-    }
+            obj = OBJ_CreateObject(x, y, type);
+            obj->dir_layer = dir_layer;
+            obj->flags = flags;
+        }
 
     fclose(fp);
 }
 
-static void W_DrawLayer(uint8_t layer) {
+void W_DrawLayer(uint8_t layer) 
+{
     uint32_t i;
 
     if (layer > 3) {
-        // draw image or color
+        // draw image and color
+        if ((world_bgtype & BG_COLOR) && (world_bgtype & BG_WATER) == 0)
+            V_FillScreen(world_bgcolor);
         if (world_bgtype & BG_IMAGE)
             V_DrawTiled(gfx_worldbg, -camera.x/4, -camera.y/4, 0); // draw the bg image and tile it
-        else if ((world_bgtype & BG_COLOR) && (world_bgtype & BG_WATER) == 0)
-            V_FillScreen(world_bgcolor);
 
         return;
     }
@@ -256,8 +256,16 @@ void W_DrawWaveEffect(uint16_t color)
     for (y = 0; y < VID_HEIGHT; y++)
         for (x = 0; x < VID_WIDTH; x++) {
             int32_t sx;
-            int32_t x_off = 4 * sin((I_GetTicks()+x+y) * (PI/90));
+            int32_t phase = (I_GetTicks() + x + y) % 180;
+            int32_t x_off;
 
+            // calculating the "phase" of a triangle wave is faster than using sin apparently
+            if (phase < 90)
+                x_off = (phase * 6 / 90) - 3;
+            else
+                x_off = 3 - ((phase - 90) * 6 / 90);
+
+            // for safety
             if (x_off < -3)
                 x_off = -3;
             if (x_off > 3)
@@ -326,7 +334,7 @@ void W_CreateTilesetFromFile(const char *input, uint8_t tile_size)
 {
     uint32_t i;
 
-    gfx_tileset = GFX_LoadGFX(va("data/tilesets/%s.bmp", input));
+    gfx_tileset = GFX_LoadGFX(va("data/tiles/%s.bmp", input));
 
     tile_width = tile_height = tile_size;
     num_tiles = (gfx_tileset.width / tile_width) * (gfx_tileset.height / tile_height);
@@ -340,11 +348,13 @@ void W_CreateWorldFromTilesetFile(const char *input, uint16_t width, uint16_t he
 {
     uint32_t i;
 
-    W_LoadTileset(va("data/tilesets/%s.set", input));
+    W_LoadTileset(va("data/tiles/%s.set", input));
+    sprintf(temp_tile_name, "%s", input);
+    temp_tile_name[strlen(input)] = '\0';
 
     world_width = width;
     world_height = height;
-    world_bgtype = BG_SLOW|BG_WATER|BG_COLOR;
+    world_bgtype = BG_COLOR;
     world_bgcolor = 0x4d5f;
     
     world_tiles = malloc(world_width * world_height * sizeof(uint16_t));
@@ -352,6 +362,7 @@ void W_CreateWorldFromTilesetFile(const char *input, uint16_t width, uint16_t he
     world_bgtiles = malloc(world_width * world_height * sizeof(uint16_t));
     world_bgtiles2 = malloc(world_width * world_height * sizeof(uint16_t));
     GFX_FreeGFX(&gfx_worldbg);
+    gfx_worldbg = GFX_LoadGFX("data/back/dummy.bmp");
 
     for (i = 0; i < world_width * world_height; i++) {
         world_tiles[i] = 0; // default of the top-left tile // might want it to be transparent...
@@ -404,9 +415,9 @@ void W_StartWorldEdit(const char *tileset_name, const char *world_name)
         world_edit = true;
         file_menu = true;
         tile_sel_option = 0;
-        W_UpdateFiles(&tileset_dirfiles, va("%s/data/tilesets", I_GetHomeDir())); // we need these too
+        W_UpdateFiles(&tileset_dirfiles, va("%s/data/tiles", I_GetHomeDir())); // we need these too
         W_UpdateFiles(&world_dirfiles, va("%s/data/worlds", I_GetHomeDir()));
-        W_UpdateFiles(&background_dirfiles, va("%s/data/backgrounds", I_GetHomeDir())); // and these
+        W_UpdateFiles(&background_dirfiles, va("%s/data/back", I_GetHomeDir())); // and these
         return;
     }
 
@@ -523,14 +534,14 @@ void W_UpdateWorldEdit(void)
 
         // sanity checks
         if (world_properties_option < 0)
-            world_properties_option = 3 - abs(world_properties_option);
+            world_properties_option = 6 - abs(world_properties_option);
 
         // still below zero?
         if (world_properties_option < 0)
             world_properties_option = 0; // sigh..
         
         // loop around if need be
-        world_properties_option = world_properties_option % 3;
+        world_properties_option = world_properties_option % 6;
 
         if (world_properties_option == 0) {
             if (G_ControlDown(PLAYER_ONE, CON_UP, true))
@@ -577,8 +588,19 @@ void W_UpdateWorldEdit(void)
                 image_sel_option = background_dirfiles.num_files-1;
             
             if (G_ControlDown(PLAYER_ONE, CON_A, true)) {
+                char *name;
+                const char *filename;
+                int name_len;
+
                 GFX_FreeGFX(&gfx_worldbg);
-                gfx_worldbg = GFX_LoadGFX(va("data/backgrounds/%s", background_dirfiles.filenames[image_sel_option]));
+                gfx_worldbg = GFX_LoadGFX(va("data/back/%s", background_dirfiles.filenames[image_sel_option]));
+
+                filename = background_dirfiles.filenames[image_sel_option];
+                name_len = strlen(filename) + 1;
+                name = malloc((name_len-4) * sizeof(char)); 
+                snprintf(name, name_len-4, "%s", filename);
+                sprintf(temp_bg_name, "%s", name);
+                free(name);
             }
         }
 
@@ -601,14 +623,14 @@ void W_UpdateWorldEdit(void)
 
             // sanity checks
             if (tile_sel_option < 0)
-                tile_sel_option = 3 - abs(world_properties_option);
+                tile_sel_option = 4 - abs(world_properties_option);
 
             // still below zero?
             if (tile_sel_option < 0)
                 tile_sel_option = 0; // sigh..
             
             // loop around if need be
-            tile_sel_option = tile_sel_option % 3;
+            tile_sel_option = tile_sel_option % 4;
 
             if (tile_sel_option == 2)
                 b += input;
@@ -633,6 +655,45 @@ void W_UpdateWorldEdit(void)
             world_bgcolor = (r << 11) | (g << 5) | b;
         }
 
+        if (world_properties_option == 3 && G_ControlDown(PLAYER_ONE, CON_A, true)) {
+            camera.x = 0;
+            camera.y = 0;
+            world_preview = true;
+            world_properties = false;
+            return;
+        }
+
+        if (world_properties_option == 4) {
+            if (G_ControlDown(PLAYER_ONE, CON_A, true))
+                tile_sel_option--;
+            if (G_ControlDown(PLAYER_ONE, CON_B, true))
+                tile_sel_option++;
+
+            // sanity checks
+            if (tile_sel_option < 0)
+                tile_sel_option = 32 - abs(world_properties_option);
+
+            // still below zero?
+            if (tile_sel_option < 0)
+                tile_sel_option = 0; // sigh..
+            
+            // loop around if need be
+            tile_sel_option = tile_sel_option % 32;
+        
+            if (G_ControlDown(PLAYER_ONE, CON_UP, true))
+                temp_world_name[tile_sel_option]--;
+            if (G_ControlDown(PLAYER_ONE, CON_DOWN, true))
+                temp_world_name[tile_sel_option]++;
+
+            if (temp_world_name[tile_sel_option] < 32)
+                temp_world_name[tile_sel_option] = 32;
+            if (temp_world_name[tile_sel_option] > 126)
+                temp_world_name[tile_sel_option] = 126;
+        }
+
+        if (world_properties_option == 5 && G_ControlDown(PLAYER_ONE, CON_A, true))
+            W_SaveWorldFile(temp_world_name);
+
         if (background_dirfiles.num_files <= 0)
             world_bgtype &= ~BG_IMAGE;
 
@@ -648,8 +709,10 @@ void W_UpdateWorldEdit(void)
             camera.x--;
         if (G_ControlDown(PLAYER_ONE, CON_RIGHT, false))
             camera.x++;
-        if (G_ControlDown(PLAYER_ONE, CON_B, false))
+        if (G_ControlDown(PLAYER_ONE, CON_B, false)) {
+            world_properties = true;
             world_preview = false;
+        }
 
         return;
     }
@@ -791,19 +854,22 @@ void W_DrawWorldEdit(void)
             V_DrawText("U/D:", VID_WIDTH - 152, 12, 0);
         else if (world_properties_option == 2)
             V_DrawText(">", VID_WIDTH - 128, 31 + tile_sel_option*10, 0);
+        else if (world_properties_option == 3)
+            V_DrawText(">", 2, 96, 0);
+        else if (world_properties_option == 4)
+            V_DrawText(">", VID_WIDTH - 16*9 - 8, 96, 0);
+        else if (world_properties_option == 5)
+            V_DrawText(">", VID_WIDTH - 16*9 - 8, VID_HEIGHT - 32, 0);
 
         V_DrawText("Background Image:", VID_WIDTH - 128, 2, 0);
         if (background_dirfiles.num_files <= 0)
             V_DrawText("No images found.", VID_WIDTH - 128, 12, 0);
         else {
-            char *dot;
             char *name;
             const char *filename;
             int name_len;
 
             filename = background_dirfiles.filenames[image_sel_option];
-            dot = strrchr(filename, '.');
-
             name_len = strlen(filename) + 1;
             name = malloc((name_len-4) * sizeof(char)); 
             snprintf(name, name_len-4, "%s", filename);
@@ -833,6 +899,24 @@ void W_DrawWorldEdit(void)
             V_DrawText("|", VID_WIDTH - 128 + g + 14, 42, 0);
             V_DrawText("|", VID_WIDTH - 128 + b*2 + 14, 52, 0);
         }
+
+        V_DrawText("Preview World", 12, 96, 0);
+
+        V_DrawLine(VID_WIDTH - 16*9, 117, 90, 8*16, 0xFFFF);
+        V_DrawLine(VID_WIDTH - 16*9, 129, 90, 8*16, 0xFFFF);
+        V_DrawText("Filename:", VID_WIDTH - 16*9, 96, 0);
+        for (i = 0; i < 32; i++) {
+            char t[2];
+            snprintf(t, 2, "%s", &temp_world_name[i]);
+            t[1] = '\0';
+
+            V_DrawText(t, VID_WIDTH - 16*9 + (i%16)*8, 106 + (i/16)*12, 0);
+        }
+
+        V_DrawText("Save World", VID_WIDTH - 16*9, VID_HEIGHT - 32, 0);
+
+        if ((I_GetTicks() / (FRAMERATE/2)) % 2 == 1)
+            V_DrawText("_", VID_WIDTH - 16*9 + (tile_sel_option%16)*8, 110 + (tile_sel_option/16)*12, 0);
 
         if (world_bgtype & BG_STATIC) 
             V_DrawText("Static", 12, 12, V_JUMPYTEXT);
@@ -930,6 +1014,7 @@ void W_DrawWorldEdit(void)
                     0 // flags
                 );
 
+        if ((world_bgtype & BG_FG) == 0)
         if ((edit_renderone && edit_tiles2 == false && edit_bgtiles) || !edit_renderone)
             if (id3 != 0)
                 V_DrawCropped2x(
@@ -952,6 +1037,7 @@ void W_DrawWorldEdit(void)
         int32_t px, py;
         uint32_t id = world_tiles[i];
         uint32_t id2 = world_tiles2[i];
+        uint32_t id3 = world_bgtiles[i];
 
         px = ((i % world_width) * tile_width) - world_cam_x/2;
         py = ((i / world_width) * tile_height) - world_cam_y/2;
@@ -977,6 +1063,19 @@ void W_DrawWorldEdit(void)
                     21 + py, // y
                     (id % tiles_per_row) * tile_width, // crop x
                     (id / tiles_per_row) * tile_height, // crop y
+                    tile_width, // crop w
+                    tile_height, // crop h
+                    0 // flags
+                );
+        if (world_bgtype & BG_FG)
+        if ((edit_renderone && edit_tiles2 == false && edit_bgtiles) || !edit_renderone)
+            if (id3 != 0)
+                V_DrawCropped2x(
+                    gfx_tileset, // gfx
+                    px, // x 
+                    21 + py, // y
+                    (id3 % tiles_per_row) * tile_width, // crop x
+                    (id3 / tiles_per_row) * tile_height, // crop y
                     tile_width, // crop w
                     tile_height, // crop h
                     0 // flags
@@ -1073,8 +1172,84 @@ void W_DrawWorldEdit(void)
         V_DrawText("Animated", 2, 30, 0);
 }
 
+void W_SaveWorldFile(const char *filename)
+{
+    FILE *fp;
+    char file_name[33];
+    char tileset_name[33];
+    char background_name[33];
+    uint32_t i, num_objs;
+    object_t *obj = objects.next;
+
+    sprintf(file_name, "%s", filename);
+    for (i = 0; i < 32; i++)
+        if (file_name[i] == ' ') {
+            file_name[i] = '\0';
+            break;
+        }
+
+    fp = fopen(va("data/worlds/%s.wld", file_name), "wb+");
+
+    // write world header
+
+    // save tileset name
+    sprintf(tileset_name, "%s", temp_tile_name);
+    fwrite(tileset_name, sizeof(char), 32, fp);
+
+    // write world width and height
+    fwrite(&world_width, sizeof(uint16_t), 1, fp);
+    fwrite(&world_height, sizeof(uint16_t), 1, fp);
+
+    // write world data
+    fwrite(&world_bgtype, sizeof(uint32_t), 1, fp);
+
+    if (world_bgtype & BG_IMAGE) {
+        sprintf(background_name, "%s", temp_bg_name);
+        fwrite(background_name, sizeof(char), 32, fp);
+    }
+
+    if (world_bgtype & BG_COLOR)
+        fwrite(&world_bgcolor, sizeof(uint16_t), 1, fp);
+
+    // write world tiles
+    for (i = 0; i < world_width * world_height; i++) {
+        fwrite(&world_tiles[i], sizeof(uint16_t), 1, fp);
+        fwrite(&world_tiles2[i], sizeof(uint16_t), 1, fp);
+        fwrite(&world_bgtiles[i], sizeof(uint16_t), 1, fp);
+        fwrite(&world_bgtiles2[i], sizeof(uint16_t), 1, fp);
+    }
+
+    num_objs = 0;
+	while (obj != &objects)
+	{
+		if (obj->type == OBJ_NULL) {
+			object_t *obj2 = obj->next;
+			OBJ_RemoveObject(obj);
+			obj = obj2;
+			continue;
+		}
+
+        num_objs++;
+		obj = obj->next;
+	}
+
+    fwrite(&num_objs, sizeof(uint32_t), 1, fp); // i'm lazyy so i'll store num of objs in file
+
+    if (num_objs > 0)
+        while (obj != &objects)
+        {
+            fwrite(&obj->type, sizeof(uint16_t), 1, fp);
+            fwrite(&obj->x, sizeof(uint16_t), 1, fp);
+            fwrite(&obj->y, sizeof(uint16_t), 1, fp);
+            fwrite(&obj->dir_layer, sizeof(uint8_t), 1, fp);
+            fwrite(&obj->flags, sizeof(uint32_t), 1, fp);
+            obj = obj->next;
+        }
+
+    fclose(fp);
+}
+
 bool tileset_edit = false; // tileset editing dawg
-static char temp_tile_name[33]; // save temp tileset to this name
 
 static int16_t tile_screenw = 15;
 static int16_t tile_screenh = 11;
@@ -1088,19 +1263,19 @@ void W_StartTilesetEdit(const char *gfx_name, const char *tileset_name)
         tileset_edit = true;
         file_menu = true;
         tile_sel_option = 0;
-        W_UpdateFiles(&tileset_dirfiles, va("%s/data/tilesets", I_GetHomeDir()));
+        W_UpdateFiles(&tileset_dirfiles, va("%s/data/tiles", I_GetHomeDir()));
         return;
     }
 
     if (gfx_name == NULL) { // didn't specify a graphics file to base from
-        W_LoadTileset(va("data/tilesets/%s.set", tileset_name)); // so you must want to edit a pre-made file
-        sprintf(temp_tile_name, tileset_name);
+        W_LoadTileset(va("data/tiles/%s.set", tileset_name)); // so you must want to edit a pre-made file
+        sprintf(temp_tile_name, "%s", tileset_name);
     } else if (tileset_name == NULL) { // no tileset file
         W_CreateTilesetFromFile(gfx_name, 8); // so you're ok with the
-        sprintf(temp_tile_name, gfx_name); // graphics name being used instead
+        sprintf(temp_tile_name, "%s", gfx_name); // graphics name being used instead
     } else { // specified both
         W_CreateTilesetFromFile(gfx_name, 8); // so make the tileset file with the
-        sprintf(temp_tile_name, tileset_name); // graphics but your preferred name
+        sprintf(temp_tile_name, "%s", tileset_name); // graphics but your preferred name
     }
 
     // calculate tiles per row now

@@ -86,17 +86,15 @@ void gameLoop(void)
 		}
 		#endif
 		
-		I_PollEvents();
+		while (elapsed_tick > 0) {
+			I_PollEvents();
 
-		if (game_quit)
-			break;
-		
-		#if defined(__NDS__)
-		// Force the game to run a tick on NDS otherwise it cries.
-		gameRunStuff(1);
-		#else
-		gameRunStuff(elapsed_tick);
-		#endif
+			if (game_quit)
+				break;
+
+			gameRunStuff();
+			elapsed_tick--;
+		}
 		
 		if (game_tick > render_tick)
 		{
@@ -104,9 +102,8 @@ void gameLoop(void)
 			
 			gameDisplay(); // Run all draw loops before pushing to the screen.
 			I_PushGraphics();
+			V_FillScreen(0);
 		}
-		
-		V_FillScreen(0);
 	}
 
 	OBJ_FreeObjects();
@@ -117,29 +114,21 @@ void gameLoop(void)
 	V_Free();
 }
 
-void gameRunStuff(uint32_t elapsed)
+void gameRunStuff(void)
 {
-	if (elapsed > 4)
-		elapsed = 1;
-	
-	while (elapsed--)
-	{	
-		int i;
-
-		if (in_diag) {
-			D_UpdateDialogue();
-			return;
-		}
-
-		if (font_edit)
-			FNT_FontEditUpdate();
-
-		if (tileset_edit)
-			W_UpdateTilesetEdit();
-
-		if (world_edit)
-			W_UpdateWorldEdit();
+	if (in_diag) {
+		D_UpdateDialogue();
+		return;
 	}
+
+	if (font_edit)
+		FNT_FontEditUpdate();
+
+	if (tileset_edit)
+		W_UpdateTilesetEdit();
+
+	if (world_edit)
+		W_UpdateWorldEdit();
 }
 
 void gameDisplay(void)

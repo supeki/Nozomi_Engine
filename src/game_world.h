@@ -46,11 +46,14 @@ extern uint16_t *world_tiles, *world_bgtiles; // tile layout in the world
 extern gfx_t gfx_worldbg;
 
 void W_LoadWorldFile(const char *filename);
+void W_SaveWorldFile(const char *filename);
 void W_Free(void);
 
 void W_CreateTilesetFromFile(const char *input, uint8_t tile_size);
 void W_CreateWorldFromTilesetFile(const char *input, uint16_t width, uint16_t height);
 
+void W_DrawLayer(uint8_t layer);
+void W_DrawWaveEffect(uint16_t color);
 void W_DrawWorld(void);
 
 extern bool world_edit;

@@ -9,6 +9,8 @@
 #include <SDL2/SDL.h>
 #elif defined(WINCE)
 #include <windows.h>
+#elif defined(DOS)
+#include <allegro.h>
 #endif
 
 #include "game_input.h"
@@ -102,6 +104,21 @@ void G_DefaultControls(void)
 		gamecontrolbinds[j][CON_RIGHT][0] = VK_RIGHT;
 		gamecontrolbinds[j][CON_A][0] = VK_RETURN;
 		gamecontrolbinds[j][CON_CONFIRM][0] = VK_RETURN;
+	#elif defined(DOS)
+		gamecontrolbinds[j][CON_UP][0] = KEY_UP;
+		gamecontrolbinds[j][CON_DOWN][0] = KEY_DOWN;
+		gamecontrolbinds[j][CON_LEFT][0] = KEY_LEFT;
+		gamecontrolbinds[j][CON_RIGHT][0] = KEY_RIGHT;
+		gamecontrolbinds[j][CON_A][0] = KEY_Z;
+		gamecontrolbinds[j][CON_B][0] = KEY_X;
+		gamecontrolbinds[j][CON_C][0] = KEY_C;
+		gamecontrolbinds[j][CON_START][0] = KEY_ENTER;
+		gamecontrolbinds[j][CON_SELECT][0] = KEY_RSHIFT;
+		gamecontrolbinds[j][CON_X][0] = KEY_A;
+		gamecontrolbinds[j][CON_Y][0] = KEY_S;
+		gamecontrolbinds[j][CON_Z][0] = KEY_D;
+		gamecontrolbinds[j][CON_CONFIRM][0] = KEY_Z;
+		gamecontrolbinds[j][CON_BACK][0] = KEY_X;
 	#endif
 	}
 }

@@ -12,6 +12,10 @@
 #include <unistd.h>
 #endif
 
+#if defined(DOS)
+#include <allegro.h>
+#endif
+
 #include <stdarg.h>
 #if !defined(WINCE)
 #include <stdbool.h>
@@ -59,7 +63,10 @@ typedef boolean bool;
 char *va(const char *format, ...);
 
 // types
+#ifndef PI
 #define PI 3.14159265358
+#endif
+
 #define PU 65536
 
 extern uint8_t demo_tiles[576];

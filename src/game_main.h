@@ -11,7 +11,7 @@ extern uint32_t game_tick;
 
 void gameMain(void);
 void gameLoop(void);
-void gameRunStuff(uint32_t elapsed);
+void gameRunStuff(void);
 void gameDisplay(void);
 
 #endif

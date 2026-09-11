@@ -11,7 +11,7 @@ cp -r assets/data bin/Win64/data
 # Copy required licenses/credits
 cp -r assets/credits/SDL2_LICENSE.txt bin/Win64/SDL2_LICENSE.txt
 
-# Make and move Windows binary and libaries
+# Make and move Windows binary and libraries
 make -j2 LINUX_WIN=1
 cp -r assets/Win64/*.dll bin/Win64/
 
@@ -28,9 +28,30 @@ cp -r assets/data bin/Win32/data
 # Copy required licenses/credits
 cp -r assets/credits/SDL2_LICENSE.txt bin/Win32/SDL2_LICENSE.txt
 
-# Make and move Windows binary and libaries
+# Make and move Windows binary and libraries
 make -j2 LINUX_WIN=1 WIN_32=1
 cp -r assets/Win32/*.dll bin/Win32/
+
+# Clean obj directory to prepare for DOS
+make clean DOS=1
+
+# Remove pre-existing binaries
+rm -rf bin/DOS
+mkdir -p bin/DOS
+
+# Copy game data
+cp -r assets/data bin/DOS/data
+rm -rf bin/DOS/data/soundfont.sf2
+rm -rf bin/DOS/data/gamecontrollerdb.txt
+rm -rf bin/DOS/data/audio
+
+# Copy required licenses/credits
+# add later
+
+# Make and move DOS binary and stuff
+make -j2 DOS=1
+cp -r assets/DOS/* bin/DOS/
+mv bin/DOS/audio bin/DOS/data/audio
 
 # Clean obj directory to prepare for Linux (SDL)
 make clean LINUX=1

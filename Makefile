@@ -22,6 +22,7 @@ GAME_VERSION ?= v1.0.0
 # Assume Windows SDL by default Nozomi 04-15-2026
 WINDOWS ?= 1
 WIN_32 ?= 0
+DOS ?= 0
 LINUX ?= 0
 LINUX_32 ?= 0
 GLFW ?= 0
@@ -31,6 +32,13 @@ PSP ?= 0
 
 ifeq ($(WIN_32),1)
 WINDOWS = 0
+endif
+
+ifeq ($(DOS), 1)
+WINDOWS = 0
+LINUX = 0
+SDL = 0
+GLFW = 0
 endif
 
 ifeq ($(LINUX),1)
@@ -115,6 +123,22 @@ ifeq ($(WIN_32),1)
 	LDFLAGS := $(LDFLAGS) -L/usr/local/i686-w64-mingw32/lib
 	CFLAGS := $(CFLAGS) -DWINDOWS -m32
 	i_filesystem = ../windows_filesystem
+endif
+
+ifeq ($(DOS),1)
+	CC = i386-pc-msdosdjgpp-gcc
+	INTERFACE = DOS
+	i_main = dos_main
+	i_event = dos_event
+	i_system = dos_system
+	i_video = dos_video
+	i_sound = dos_sound
+
+	DEFINES := -DDOS -DALLEGRO_NO_COMPATIBILITY -DALLEGRO_NO_INLINE
+	OPTS := $(OPTS) -I. -I/home/marilyn/djgpp/include -I/home/marilyn/djgpp/i386-pc-msdosdjgpp/sys-include
+	LIBS := $(LIBS) -lm -lalleg
+	LDFLAGS := $(LDFLAGS) -L/home/marilyn/djgpp/lib -L/home/marilyn/djgpp/i386-pc-msdosdjgpp/lib
+	CFLAGS := $(CFLAGS) $(OPTS) $(DEFINES) -O2 -std=gnu17 -fgnu89-inline
 endif
 
 ifeq ($(LINUX),1)
@@ -230,6 +254,11 @@ endif
 else
 INTERFACE_BIN = $(BIN_DIR)/Win64
 ADDITIONAL_OBJS := $(ADDITIONAL_OBJS) $(INTERFACE_OBJ)/resource.o
+endif
+
+ifeq ($(DOS),1)
+i_filesystem = dos_filesystem
+INTERFACE_BIN = $(BIN_DIR)/DOS
 endif
 
 ifeq ($(LINUX_32), 1)
@@ -368,84 +397,84 @@ $(INTERFACE_BIN)/$(EXEC_NAME)$(EXEC_EXT): $(OBJ_DIR) $(INTERFACE_OBJ) $(OBJS) $(
 	
 # Game-related objs!
 $(OBJ_DIR)/game_main.o: $(SRC_DIR)/game_main.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_main.h $(SRC_DIR)/game_object.h $(SRC_DIR)/game_video.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_gfx.o: $(SRC_DIR)/game_gfx.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_gfx.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_font.o: $(SRC_DIR)/game_font.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_font.h $(SRC_DIR)/game_gfx.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_input.o: $(SRC_DIR)/game_input.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_input.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_misc.o: $(SRC_DIR)/game_misc.c $(SRC_DIR)/game_defs.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_object.o: $(SRC_DIR)/game_object.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_object.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_player.o: $(SRC_DIR)/game_player.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_object.h $(SRC_DIR)/game_player.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_sound.o: $(SRC_DIR)/game_sound.c $(SRC_DIR)/game_sound.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_video.o: $(SRC_DIR)/game_video.c $(SRC_DIR)/game_video.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_world.o: $(SRC_DIR)/game_world.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_gfx.h $(SRC_DIR)/game_world.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(OBJ_DIR)/game_dialogue.o: $(SRC_DIR)/game_dialogue.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_gfx.h $(SRC_DIR)/game_dialogue.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 # Make the interface objs!
 $(INTERFACE_OBJ)/$(i_main).o: $(INTERFACE_SRC)/$(i_main).c $(INTERFACE_OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(INTERFACE_OBJ)/$(i_event).o: $(INTERFACE_SRC)/$(i_event).c $(INTERFACE_OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 
 ifdef i_input	
 $(INTERFACE_OBJ)/$(i_input).o: $(INTERFACE_SRC)/$(i_input).c $(INTERFACE_OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 endif
 	
 ifdef i_net	
 $(INTERFACE_OBJ)/$(i_net).o: $(INTERFACE_SRC)/$(i_net).c $(SRC_DIR)/i_net.h $(SRC_DIR)/game_defs.h $(INTERFACE_OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 else
 $(OBJ_DIR)/dummy_net.o: $(SRC_DIR)/interface/dummy_net.c $(SRC_DIR)/i_net.h $(SRC_DIR)/game_defs.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 endif
 
 ifdef i_filesystem
 $(INTERFACE_OBJ)/$(i_filesystem).o: $(INTERFACE_SRC)/$(i_filesystem).c $(SRC_DIR)/i_system.h $(SRC_DIR)/game_defs.h $(INTERFACE_OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 else
 $(OBJ_DIR)/dummy_filesystem.o: $(SRC_DIR)/interface/dummy_filesystem.c $(SRC_DIR)/i_system.h $(SRC_DIR)/game_defs.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 endif
 
 ifeq ($(NDS),1)
 $(INTERFACE_OBJ)/$(i_sound).o: $(INTERFACE_SRC)/$(i_sound).c $(SRC_DIR)/i_sound.h $(INTERFACE_SRC)/soundbank.h $(INTERFACE_OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 else
 ifdef i_sound
 $(INTERFACE_OBJ)/$(i_sound).o: $(INTERFACE_SRC)/$(i_sound).c $(SRC_DIR)/i_sound.h $(INTERFACE_OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 else
 $(OBJ_DIR)/dummy_sound.o: $(SRC_DIR)/interface/dummy_sound.c $(SRC_DIR)/i_sound.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 endif
 endif
 	
 $(INTERFACE_OBJ)/$(i_system).o: $(INTERFACE_SRC)/$(i_system).c $(INTERFACE_OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 	
 $(INTERFACE_OBJ)/$(i_video).o: $(INTERFACE_SRC)/$(i_video).c $(INTERFACE_OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 
 $(INTERFACE_OBJ)/resource.o:
 	rm -rf assets/resource.rc
@@ -455,7 +484,7 @@ $(INTERFACE_OBJ)/resource.o:
 # Make the helper stuff :3
 
 $(OBJ_DIR)/bitmap.o: $(SRC_DIR)/helpers/bitmap.c $(SRC_DIR)/helpers/bitmap.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@

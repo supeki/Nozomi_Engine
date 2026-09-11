@@ -42,8 +42,8 @@ typedef struct camera_s
 	uint8_t mode;
 	
 	// X and Y coordinates
-	uint32_t x;
-	uint32_t y;
+	int32_t x;
+	int32_t y;
 	
 	// Optional target object for certain modes
 	object_t *target;
@@ -54,10 +54,10 @@ extern camera_t camera;
 void OBJ_InitObjects(void);
 void OBJ_RunObjects(void);
 void OBJ_FreeObjects(void);
-object_t *OBJ_CreateObject(uint32_t x, uint32_t y, int type);
+object_t *OBJ_CreateObject(uint16_t x, uint16_t y, int type);
 void OBJ_RemoveObject(object_t *obj);
 void OBJ_DrawObjectLayer(uint8_t layer);
-bool OBJ_TryMovement(object_t *obj, int32_t x, int32_t y);
+bool OBJ_TryMovement(object_t *obj, int8_t x, int8_t y);
 
 typedef enum
 {
