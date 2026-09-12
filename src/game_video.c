@@ -18,7 +18,7 @@ void V_Init(void)
 	vid.buffer = malloc(VID_WIDTH * VID_HEIGHT * sizeof(uint16_t));
 	memset(vid.buffer, 0, VID_WIDTH * VID_HEIGHT * sizeof(uint16_t));
 
-	font_default = FNT_LoadFont("data/fonts/default.fnt");
+	font_default = FNT_LoadFont(va("%s/data/fonts/default.fnt", I_GetHomeDir()));
 }
 
 // Load the palette into vid.palette :3 Nozomi
@@ -174,10 +174,17 @@ void V_DrawCropped2x(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, ui
 			if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT || gfx.data[i] == 0)
 				continue;
 			
-			vid.buffer[vx+(vy*VID_WIDTH)] = gfx.data[i];
-			vid.buffer[vx+1+(vy*VID_WIDTH)] = gfx.data[i];
-			vid.buffer[vx+((vy+1)*VID_WIDTH)] = gfx.data[i];
-			vid.buffer[vx+1+((vy+1)*VID_WIDTH)] = gfx.data[i];
+			if (flags & V_HALFTRANS) {
+				vid.buffer[vx+(vy*VID_WIDTH)] = V_MixColors(vid.buffer[vx+(vy*VID_WIDTH)], gfx.data[i], 127);
+				vid.buffer[vx+1+(vy*VID_WIDTH)] = V_MixColors(vid.buffer[vx+1+(vy*VID_WIDTH)], gfx.data[i], 127);
+				vid.buffer[vx+((vy+1)*VID_WIDTH)] = V_MixColors(vid.buffer[vx+((vy+1)*VID_WIDTH)], gfx.data[i], 127);
+				vid.buffer[vx+1+((vy+1)*VID_WIDTH)] = V_MixColors(vid.buffer[vx+1+((vy+1)*VID_WIDTH)], gfx.data[i], 127);
+			} else {
+				vid.buffer[vx+(vy*VID_WIDTH)] = gfx.data[i];
+				vid.buffer[vx+1+(vy*VID_WIDTH)] = gfx.data[i];
+				vid.buffer[vx+((vy+1)*VID_WIDTH)] = gfx.data[i];
+				vid.buffer[vx+1+((vy+1)*VID_WIDTH)] = gfx.data[i];
+			}
 		}
 }
 
@@ -204,7 +211,10 @@ void V_DrawCroppedNoCheck(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t s
 			if (gfx.data[i] == 0)
 				continue;
 			
-			vid.buffer[vx+(vy*VID_WIDTH)] = gfx.data[i];
+			if (flags & V_HALFTRANS)
+				vid.buffer[vx+(vy*VID_WIDTH)] = V_MixColors(vid.buffer[vx+(vy*VID_WIDTH)], gfx.data[i], 127);
+			else
+				vid.buffer[vx+(vy*VID_WIDTH)] = gfx.data[i];
 		}
 }
 
@@ -244,7 +254,10 @@ void V_DrawCropped(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint
 			if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT || gfx.data[i] == 0)
 				continue;
 			
-			vid.buffer[vx+(vy*VID_WIDTH)] = gfx.data[i];
+			if (flags & V_HALFTRANS)
+				vid.buffer[vx+(vy*VID_WIDTH)] = V_MixColors(vid.buffer[vx+(vy*VID_WIDTH)], gfx.data[i], 127);
+			else
+				vid.buffer[vx+(vy*VID_WIDTH)] = gfx.data[i];
 		}
 }
 

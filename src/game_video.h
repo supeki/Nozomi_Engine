@@ -43,6 +43,7 @@ typedef enum
 	V_WAVYTEXTTWO = 2,
 	V_JUMPYTEXT = 4,
 	V_SMALL = 8,
+	V_HALFTRANS = 16,
 	NUMVIDEOFLAGS
 } video_flags_e;
 

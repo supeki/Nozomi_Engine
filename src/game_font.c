@@ -21,7 +21,7 @@ font_t FNT_LoadFont(const char *filename)
 
 	fread(gfx_name, sizeof(char), 32, fp);
 	gfx_name[32] = '\0';
-	font.gfx = GFX_LoadGFX(va("data/fonts/%s.bmp", gfx_name));
+	font.gfx = GFX_LoadGFX(va("%s/data/fonts/%s.bmp", I_GetHomeDir(), gfx_name));
 
 	fread(&font.charsize, sizeof(uint16_t), 1, fp);
 	font.offset = malloc(256*sizeof(int16_t));
@@ -41,7 +41,7 @@ uint8_t curchar = 0;
 
 void FNT_StartFontEdit(void)
 {
-	temp_font = FNT_LoadFont("data/fonts/default.fnt");
+	temp_font = FNT_LoadFont(va("%s/data/fonts/default.fnt", I_GetHomeDir()));
 	font_edit = true;
 }
 
@@ -157,11 +157,11 @@ void FNT_FontEditDraw(void)
 
 void FNT_SaveTempFont(void)
 {
-	FILE *fp = fopen("data/fonts/default.fnt", "wb+");
+	FILE *fp = fopen(va("%s/data/fonts/temp.fnt", I_GetHomeDir()), "wb+");
 	char gfx_name[33];
 	int i;
 
-	snprintf(gfx_name, 32, "default");
+	snprintf(gfx_name, 32, "temp");
 	fwrite(gfx_name, sizeof(gfx_name)-1, 1, fp);
 	fwrite(&temp_font.charsize, sizeof(uint16_t), 1, fp);
 	

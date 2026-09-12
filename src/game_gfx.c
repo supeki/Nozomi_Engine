@@ -11,7 +11,7 @@ gfx_t gfx_textbox;
 
 void GFX_InitGFX(void)
 {
-	gfx_textbox = GFX_LoadGFX("data/textbox.bmp");
+	gfx_textbox = GFX_LoadGFX(va("%s/data/textbox.bmp", I_GetHomeDir()));
 }
 
 // Load a Bitmap and convert it to our GFX format

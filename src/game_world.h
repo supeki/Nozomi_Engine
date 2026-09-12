@@ -13,11 +13,16 @@ typedef enum
     TILE_SOLID = 1, // solid tile, objects collide with it
     TILE_WATER = 2, // water tile (has water properties with objects)
     TILE_FG = 4, // foreground tile (draw in front of object)
-    TILE_ANIMATED = 8
+    TILE_ANIMATED = 8,
+    TILE_JUMPUP = 16, // Jump tiles
+    TILE_JUMPDOWN = 32, // let you 
+    TILE_JUMPLEFT = 64, // jump off
+    TILE_JUMPRIGHT = 128, // of them
+    TILE_PIT = 256 // dangerous
 } tileattr_e;
 
 // TILE_OPTIONS should be the number of items above minus TILE_NONE
-#define TILE_OPTIONS 4
+#define TILE_OPTIONS 9
 
 typedef enum
 {
@@ -28,10 +33,11 @@ typedef enum
     BG_SLOW = 8, // move slower than the tiles (parallax-ish) (layer 2 moves slower than layer 1)
     BG_COLOR = 16, // use a solid color for the background
     BG_IMAGE = 32, // use an image for the background as well
-    BG_SCROLL = 64 // scroll the two tile layers to the left automatically (clouds maybe) (it will loop the bg don't worry)
+    BG_SCROLL = 64, // scroll the two tile layers to the left automatically (clouds maybe) (it will loop the bg don't worry)
+    BG_TRANSLUCENT = 128
 } bgattr_e;
 
-#define BG_OPTIONS 7
+#define BG_OPTIONS 8
 
 // cool tips n' tricks with mareuhlyn
 // use BG_FG + BG_WATER for a wavy overlay in underwater areas!
