@@ -18,11 +18,12 @@ typedef enum
     TILE_JUMPDOWN = 32, // let you 
     TILE_JUMPLEFT = 64, // jump off
     TILE_JUMPRIGHT = 128, // of them
-    TILE_PIT = 256 // dangerous
+    TILE_PIT = 256, // dangerous
+    TILE_DECOR = 512 // for vapor
 } tileattr_e;
 
 // TILE_OPTIONS should be the number of items above minus TILE_NONE
-#define TILE_OPTIONS 9
+#define TILE_OPTIONS 10
 
 typedef enum
 {

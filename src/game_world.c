@@ -10,6 +10,7 @@
 
 uint8_t tile_width, tile_height; // 256x256 is pretty big for one tile as-is
 uint32_t *tile_attributes; // per-tile attributes (basically just flags)
+uint8_t *tile_decorid; // new thing for random decor placements
 uint32_t num_tiles; // for safe keeping
 
 uint16_t world_width, world_height; // shouldn't need larger than 65536x65536 tiles right
@@ -52,8 +53,11 @@ static void W_LoadTileset(const char *filename)
 
     // get tile attributes from file
     tile_attributes = malloc(num_tiles * sizeof(uint32_t));
-    for (i = 0; i < num_tiles; i++)
+    tile_decorid = malloc(num_tiles * sizeof(uint8_t));
+    for (i = 0; i < num_tiles; i++) {
         fread(&tile_attributes[i], sizeof(uint32_t), 1, fp);
+        fread(&tile_decorid[i], sizeof(uint8_t), 1, fp);
+    }
 
     fclose(fp);
 }
@@ -71,8 +75,10 @@ static void W_SaveTileset(const char *name)
     fwrite(&tile_height, sizeof(uint8_t), 1, fp);
 
     // write attrs
-    for (i = 0; i < num_tiles; i++)
+    for (i = 0; i < num_tiles; i++) {
         fwrite(&tile_attributes[i], sizeof(uint32_t), 1, fp);
+        fwrite(&tile_decorid[i], sizeof(uint8_t), 1, fp);
+    }
 
     fclose(fp);
 }
@@ -234,6 +240,8 @@ void W_DrawLayer(uint8_t layer)
                 flags |= V_HALFTRANS;
         }
 
+        if (world_width * tile_width < VID_WIDTH)
+            px += (VID_WIDTH - (world_width * tile_width))/2;
         if (world_height * tile_height < VID_HEIGHT)
             py += (VID_HEIGHT - (world_height * tile_height))/2;
 
@@ -350,6 +358,11 @@ void W_Free(void)
         free(tile_attributes);
         tile_attributes = NULL;
     }
+
+    if (tile_decorid != NULL) {
+        free(tile_decorid);
+        tile_decorid = NULL;
+    }
 }
 
 void W_CreateTilesetFromFile(const char *input, uint8_t tile_size)
@@ -362,8 +375,11 @@ void W_CreateTilesetFromFile(const char *input, uint8_t tile_size)
     num_tiles = (gfx_tileset.width / tile_width) * (gfx_tileset.height / tile_height);
     
     tile_attributes = malloc(num_tiles * sizeof(uint32_t));
-    for (i = 0; i < num_tiles; i++)
+    tile_decorid = malloc(num_tiles * sizeof(uint8_t));
+    for (i = 0; i < num_tiles; i++) {
         tile_attributes[i] = 0;
+        tile_decorid[i] = 0;
+    }
 }
 
 void W_CreateWorldFromTilesetFile(const char *input, uint16_t width, uint16_t height)
@@ -429,6 +445,8 @@ static bool world_preview = false; // preview mode
 static bool world_properties = false; // properties menu
 static int8_t world_properties_option = 0;
 static int32_t image_sel_option = 0;
+static int32_t menu_world_width = 32, menu_world_height = 25;
+static int64_t last_pos = -1;
 
 #if !defined(DOS)
 #define WORLD_NAME_SIZE 32
@@ -453,7 +471,7 @@ void W_StartWorldEdit(const char *tileset_name, const char *world_name)
         W_LoadWorldFile(va("%s/data/worlds/%s.wld", I_GetHomeDir(), world_name));
         sprintf(temp_world_name, world_name);
     } else {
-        W_CreateWorldFromTilesetFile(tileset_name, 32, 25);
+        W_CreateWorldFromTilesetFile(tileset_name, menu_world_width, menu_world_height);
         sprintf(temp_world_name, tileset_name);
     }
 
@@ -503,6 +521,24 @@ void W_UpdateWorldEdit(void)
         
         // loop around if need be
         tile_sel_option = tile_sel_option % (world_dirfiles.num_files + tileset_dirfiles.num_files);
+
+        if (G_ControlDown(PLAYER_ONE, CON_B, true))
+            menu_world_width--;
+        if (G_ControlDown(PLAYER_ONE, CON_C, true))
+            menu_world_width++;
+        if (G_ControlDown(PLAYER_ONE, CON_Y, true))
+            menu_world_height--;
+        if (G_ControlDown(PLAYER_ONE, CON_Z, true))
+            menu_world_height++;
+
+        if (menu_world_width < 1)
+            menu_world_width = 1;
+        if (menu_world_height < 1)
+            menu_world_height = 1;
+        if (menu_world_width > 1024) // my own self-imposed limits,, should be 32 "screens"
+            menu_world_width = 1024;
+        if (menu_world_height > 1024) // my own self-imposed limits,, should be 32 "screens"
+            menu_world_height = 1024;
 
         if (G_ControlDown(PLAYER_ONE, CON_A, true)) {
             char *dot;
@@ -737,6 +773,16 @@ void W_UpdateWorldEdit(void)
             camera.x--;
         if (G_ControlDown(PLAYER_ONE, CON_RIGHT, false))
             camera.x++;
+
+        if (camera.x > world_width*tile_width - VID_WIDTH)
+            camera.x = world_width*tile_width - VID_WIDTH;
+        if (camera.y > world_height*tile_height - VID_HEIGHT)
+            camera.y = world_height*tile_height - VID_HEIGHT;
+        if (camera.x < 0)
+            camera.x = 0;
+        if (camera.y < 0)
+            camera.y = 0;
+
         if (G_ControlDown(PLAYER_ONE, CON_B, false)) {
             world_properties = true;
             world_preview = false;
@@ -776,14 +822,14 @@ void W_UpdateWorldEdit(void)
         world_cam_y-=2;
 
     // camera bounds
+    if (world_cam_x > world_width*tile_width*2 - VID_WIDTH)
+        world_cam_x = world_width*tile_width*2 - VID_WIDTH;
+    if (world_cam_y > world_height*tile_height*2 - VID_HEIGHT + 42)
+        world_cam_y = world_height*tile_height*2 - VID_HEIGHT + 42;
     if (world_cam_x < 0)
         world_cam_x = 0;
     if (world_cam_y < 0)
         world_cam_y = 0;
-    if (world_cam_x > world_width*tile_width*2 - VID_WIDTH)
-        world_cam_x = world_width*tile_width*2 - VID_WIDTH;
-    if (world_cam_y > world_height*tile_height*2 - VID_HEIGHT + 21)
-        world_cam_y = world_height*tile_height*2 - VID_HEIGHT + 21;
 
     if (G_ControlDown(PLAYER_ONE, CON_X, true))
         if (edit_tiles2) {
@@ -803,7 +849,20 @@ void W_UpdateWorldEdit(void)
             edit_renderone++;
 
     if (G_MouseControlDown(PLAYER_ONE, MOUSE_LBUTTON, false)) {
+        int i;
         int16_t mouse_tilex, mouse_tiley;
+        uint32_t place_tile = current_tile;
+
+        // what a terrible implementation but idrc
+        if (mousecontrols[PLAYER_ONE][MOUSE_LBUTTON] > 1)
+        if (tile_decorid[current_tile] > 0)
+            for (i = 0; i < num_tiles; i++)
+                if (tile_decorid[i] == tile_decorid[current_tile])
+                    if (rand() % 10 == 0) {
+                        place_tile = i;
+                        break;
+                    }
+
 
         mouse_tilex = (G_MouseAxis(PLAYER_ONE, MOUSE_POSX)+world_cam_x) / (tile_width*2);
         mouse_tiley = (G_MouseAxis(PLAYER_ONE, MOUSE_POSY)+world_cam_y - 41) / (tile_height*2);
@@ -817,16 +876,42 @@ void W_UpdateWorldEdit(void)
         if (mouse_tiley > world_height-1)
             mouse_tiley = world_height-1;
 
+        if (last_pos == mouse_tilex + mouse_tiley*world_width)
+            if (!G_MouseControlDown(PLAYER_ONE, MOUSE_LBUTTON, true))
+                return;
+        
+        {
+            uint32_t temp;
+
+            if (edit_bgtiles)
+                if (edit_tiles2)
+                    temp = world_bgtiles2[mouse_tilex + mouse_tiley*world_width];
+                else
+                    temp = world_bgtiles[mouse_tilex + mouse_tiley*world_width];
+            else
+                if (edit_tiles2)
+                    temp = world_tiles2[mouse_tilex + mouse_tiley*world_width];
+                else
+                    temp = world_tiles[mouse_tilex + mouse_tiley*world_width];
+        
+            if (mousecontrols[PLAYER_ONE][MOUSE_LBUTTON] < 2*FRAMERATE && mousecontrols[PLAYER_ONE][MOUSE_LBUTTON] > 1)
+                if (tile_decorid[place_tile] > 0)
+                    if (tile_decorid[place_tile] == tile_decorid[temp])
+                        return;
+        }
+            
+        last_pos = mouse_tilex + mouse_tiley*world_width;
+
         if (edit_bgtiles)
             if (edit_tiles2)
-                world_bgtiles2[mouse_tilex + mouse_tiley*world_width] = current_tile;
+                world_bgtiles2[mouse_tilex + mouse_tiley*world_width] = place_tile;
             else
-                world_bgtiles[mouse_tilex + mouse_tiley*world_width] = current_tile;
+                world_bgtiles[mouse_tilex + mouse_tiley*world_width] = place_tile;
         else
             if (edit_tiles2)
-                world_tiles2[mouse_tilex + mouse_tiley*world_width] = current_tile;
+                world_tiles2[mouse_tilex + mouse_tiley*world_width] = place_tile;
             else
-                world_tiles[mouse_tilex + mouse_tiley*world_width] = current_tile;
+                world_tiles[mouse_tilex + mouse_tiley*world_width] = place_tile;
     }
 }
 
@@ -861,6 +946,7 @@ void W_DrawWorldEdit(void)
         } else
             V_DrawText("No files found.", 8, 20, 0);
 
+        V_DrawText(va("World Width: %d, Height: %d", menu_world_width, menu_world_height), 0, VID_HEIGHT-16, 0);
         V_DrawText("Close the File Menu with Start/Enter", 0, VID_HEIGHT-8, 0);
         // return early
         return;
@@ -1123,6 +1209,9 @@ void W_DrawWorldEdit(void)
                     flags // flags
                 );
             }
+
+        if ((px+tile_width)*2 < (tile_width*world_width)*2 && (py+tile_height)*2 < (tile_height*world_height)*2)
+            V_DrawDot((px+tile_width)*2, 42+(py+tile_height)*2, 0xFFFF);
     }
 
     if ((world_bgtype & (BG_FG|BG_WATER)) == (BG_FG|BG_WATER))
@@ -1456,6 +1545,11 @@ void W_UpdateTilesetEdit(void)
                 tile_attributes[current_tile] &= ~(1<<tile_sel_option);
             else
                 tile_attributes[current_tile] |= (1<<tile_sel_option);
+
+        if (G_ControlDown(PLAYER_ONE, CON_Y, true))
+            tile_decorid[current_tile]--;
+        if (G_ControlDown(PLAYER_ONE, CON_Z, true))
+            tile_decorid[current_tile]++;
     } else {
         if (G_ControlDown(PLAYER_ONE, CON_A, true))
             tile_selected = true;
@@ -1568,6 +1662,7 @@ void W_DrawTilesetEdit(void)
     V_DrawText("Jump Left", VID_WIDTH-108, 102, 0);
     V_DrawText("Jump Right", VID_WIDTH-108, 114, 0);
     V_DrawText("Pit", VID_WIDTH-108, 126, 0);
+    V_DrawText(va("Decor. ID %02d", tile_decorid[current_tile]), VID_WIDTH-108, 138, 0);
 
     if (tile_attributes[current_tile] & TILE_SOLID) 
         V_DrawText("Yes", VID_WIDTH-24, 30, V_JUMPYTEXT);

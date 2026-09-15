@@ -46,6 +46,7 @@ void gameMain(void)
 	GFX_InitGFX();
 	OBJ_InitObjects();
 
+	//W_StartTilesetEdit(NULL, NULL);
 	W_StartWorldEdit(NULL, NULL);
 
 	I_PlayMusic(mus_demo, true);
