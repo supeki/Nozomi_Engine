@@ -196,3 +196,18 @@ rm -rf PARAM.SFO
 rm -rf game.elf
 rm -rf bin/SDL
 rm -rf obj/*
+
+# Clean everything to prepare for XBOX
+make -f Makefile.xbox clean
+make -f Makefile.xbox clean-iso
+
+# Remove pre-existing binaries
+rm -rf bin/XBOX
+mkdir -p bin/XBOX
+
+# Make XBOX binary and move it
+make -f Makefile.xbox
+mv Nozomi\ Engine.iso bin/XBOX
+
+# Clean up misc. files
+make -f Makefile.xbox clean

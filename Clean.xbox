@@ -11,4 +11,6 @@ clean:
 	rm -rf src/interface/XBOX/*.obj
 	rm -rf *.exe
 	rm -rf bin/*.xbe
+
+clean-iso:
 	rm -rf Nozomi\ Engine.iso
