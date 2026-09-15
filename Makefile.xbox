@@ -1,0 +1,38 @@
+# i can't even test this and it leaves a big mess everywhere oml
+# run make -f Makefile.xbox to make the xbox "port"
+# you can add clean to the end to rid of the big mess
+
+GAME_TITLE ?= Nozomi\ Engine
+
+ifdef GAME_TITLE
+CFLAGS := $(CFLAGS) -DGAME_NAME="\"$(GAME_TITLE)\"" -DXBOX
+endif
+
+SRC_DIR = $(CURDIR)/src
+
+XBE_TITLE = $(GAME_TITLE)
+GEN_XISO = $(XBE_TITLE).iso
+SRCS = $(SRC_DIR)/game_main.c \
+		$(SRC_DIR)/game_gfx.c \
+		$(SRC_DIR)/game_font.c \
+		$(SRC_DIR)/game_input.c \
+		$(SRC_DIR)/game_misc.c \
+		$(SRC_DIR)/game_object.c \
+		$(SRC_DIR)/game_player.c \
+		$(SRC_DIR)/game_sound.c \
+		$(SRC_DIR)/game_video.c \
+		$(SRC_DIR)/game_world.c \
+		$(SRC_DIR)/game_dialogue.c \
+		$(SRC_DIR)/helpers/bitmap.c \
+		$(SRC_DIR)/interface/XBOX/xbox_main.c \
+		$(SRC_DIR)/interface/XBOX/xbox_event.c \
+		$(SRC_DIR)/interface/XBOX/xbox_system.c \
+		$(SRC_DIR)/interface/XBOX/xbox_video.c \
+        $(SRC_DIR)/interface/XBOX/xbox_sound.c \
+        $(SRC_DIR)/interface/dummy_net.c \
+        $(SRC_DIR)/interface/windows_filesystem.c
+NXDK_DIR ?= /home/marilyn/nxdk
+NXDK_SDL = y
+
+include $(NXDK_DIR)/Makefile
+include Clean.xbox

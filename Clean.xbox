@@ -1,0 +1,14 @@
+clean:
+	rm -rf *.d
+	rm -rf *.obj
+	rm -rf src/*.d 
+	rm -rf src/*.obj
+	rm -rf src/helpers/*.d 
+	rm -rf src/helpers/*.obj
+	rm -rf src/interface/*.d
+	rm -rf src/interface/*.obj
+	rm -rf src/interface/XBOX/*.d
+	rm -rf src/interface/XBOX/*.obj
+	rm -rf *.exe
+	rm -rf bin/*.xbe
+	rm -rf Nozomi\ Engine.iso

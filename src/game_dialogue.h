@@ -18,5 +18,4 @@ extern uint32_t cur_char;
 extern uint32_t cur_char_timer;
 extern uint32_t time_per_char;
 
-
 #endif

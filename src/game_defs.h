@@ -4,12 +4,16 @@
 #ifndef GAME_DEFS_H
 #define GAME_DEFS_H
 
-#if defined(WIN32) || defined(WINCE)
+#if defined (WINDOWS) || defined(WIN32) || defined(WINCE)
 #include <windows.h>
 #endif
 
 #if defined(PSP)
 #include <unistd.h>
+#endif
+
+#if defined(DOS)
+#include <allegro.h>
 #endif
 
 #include <stdarg.h>
@@ -44,7 +48,7 @@ typedef boolean bool;
 
 #define FRAMERATE 30
 
-#if defined (WINCE)
+#if defined(WINCE) || defined(DOS)
 #define MAX_PLAYERS 1
 #else
 #define MAX_PLAYERS 4
@@ -59,8 +63,10 @@ typedef boolean bool;
 char *va(const char *format, ...);
 
 // types
-typedef int32_t subpixel_t;
-#define SUBPIXEL_SHIFT 16
+#ifndef PI
+#define PI 3.14159265358
+#endif
+
 #define PU 65536
 
 extern uint8_t demo_tiles[576];

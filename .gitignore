@@ -1,11 +1,29 @@
+# compiled files
 bin/*/*
 obj/*
+
+# if ur using WSL2
 *.Identifier
+
+# psp port
 *.SFO
 *.elf
+
+# wince port
+# why is it detecting SUOs wtf
 *.ncb
-*.out
 *.suo
+*.out
 
 # i use vscode
 .vscode/
+
+# nxdk is silly
+src/*.d
+src/*.obj
+src/*/*.d
+src/*/*.obj
+src/*/*/*.d
+src/*/*/*.obj
+bin/*.xbe
+*.iso

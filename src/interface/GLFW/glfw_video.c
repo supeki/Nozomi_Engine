@@ -38,6 +38,9 @@ void I_StartupGraphics(void)
 	glfwSetWindowSizeCallback(window, window_size_callback);
 }
 
+void I_ShutdownGraphics(void)
+{}
+
 void window_size_callback(GLFWwindow* window, int width, int height)
 {
 	float scale = (float)height / (float)VID_HEIGHT;

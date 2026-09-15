@@ -18,7 +18,8 @@ SDL_Texture *sdlTex;
 
 uint16_t* pixels;
 #ifdef PSP
-int win_width = VID_WIDTH, win_height = VID_HEIGHT;
+int win_width = 480, win_height = 272;
+SDL_Texture *borderTex;
 #else
 uint32_t win_width = VID_WIDTH, win_height = VID_HEIGHT;
 #endif
@@ -57,6 +58,20 @@ void I_StartupGraphics(void)
 	
 	if (!sdlTex) 
 		I_Error("Failed to create texture!\n");
+
+	#ifdef PSP
+	SDL_Surface *borderSurf = SDL_LoadBMP("data/border.bmp");
+	borderTex = SDL_CreateTextureFromSurface(wndRend, borderSurf);
+	SDL_FreeSurface(borderSurf);
+	#endif
+}
+
+void I_ShutdownGraphics(void)
+{
+	SDL_DestroyTexture(sdlTex);
+	SDL_DestroyRenderer(wndRend);
+	SDL_DestroyWindow(sdlWnd);
+	free(pixels);
 }
 
 void I_UpdateWindow(SDL_Event event)
@@ -77,16 +92,39 @@ void I_UpdateWindow(SDL_Event event)
 	}
 }
 
+void I_ChangeWindowSize(int width, int height)
+{	
+	SDL_SetWindowSize(sdlWnd, width, height);
+			
+	scale = (float)height / (float)VID_HEIGHT;
+	float xscale = (float)width / (float)VID_WIDTH;
+	
+	if (xscale < scale)
+		scale = xscale;
+	
+	SDL_RenderPresent(wndRend);
+}
+
+
 void I_PushGraphics(void)
 {
 	int width = (int)(scale*(float)VID_WIDTH);
 	int height = (int)(scale*(float)VID_HEIGHT);
 	SDL_Rect dest_rect[4] = {(win_width/2) - (width/2), (win_height/2) - (height/2), width, height};
 
+	mouse_offx = (win_width/2) - (width/2); 
+	mouse_offy = (win_height/2) - (height/2);
+
 	memcpy(pixels, vid.buffer, VID_WIDTH * VID_HEIGHT * sizeof(uint16_t));
 
 	SDL_RenderClear(wndRend);
 	SDL_UpdateTexture(sdlTex, NULL, pixels, VID_WIDTH * sizeof(uint16_t));
+
+	#ifdef PSP
+	SDL_Rect psp_border[4] = {0, 0, 480, 272};
+	SDL_RenderCopy(wndRend, borderTex, NULL, psp_border);
+	#endif
+
 	SDL_RenderCopy(wndRend, sdlTex, NULL, dest_rect);
 	SDL_RenderPresent(wndRend);
 }

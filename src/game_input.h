@@ -36,12 +36,31 @@ typedef enum
 	NUMAXIS
 } controlaxis_e;
 
-extern uint32_t gamecontrols[MAX_PLAYERS][NUMCONTROLS];
-extern int16_t  gameaxis[MAX_PLAYERS][NUMAXIS];
-extern uint32_t gamecontrolbinds[MAX_PLAYERS][NUMCONTROLS][2];
+typedef enum
+{
+	MOUSE_LBUTTON,
+	NUMMOUSECONTROLS
+} mousecontrols_e;
 
-bool G_ControlDown(uint8_t player, uint8_t control, bool pressed);
-int16_t G_PlayerAxis(uint8_t player, uint8_t axis);
+typedef enum
+{
+	MOUSE_POSX,  // Mouse X
+	MOUSE_POSY,  // Mouse Y
+	MOUSE_INPUTX,  // Mouse Move X
+	MOUSE_INPUTY,  // Mouse Move Y
+	NUMMOUSEAXIS
+} mouseaxis_e;
+
+extern uint32_t gamecontrols[MAX_PLAYERS][NUMCONTROLS];
+extern int32_t  gameaxis[MAX_PLAYERS][NUMAXIS];
+extern uint32_t gamecontrolbinds[MAX_PLAYERS][NUMCONTROLS][2];
+extern uint32_t mousecontrols[MAX_PLAYERS][NUMMOUSECONTROLS];
+extern int32_t  mouseaxis[MAX_PLAYERS][NUMMOUSEAXIS];
+
 void G_DefaultControls(void);
+bool G_ControlDown(uint8_t player, uint8_t control, bool pressed);
+bool G_MouseControlDown(uint8_t player, uint8_t control, bool pressed);
+int32_t G_PlayerAxis(uint8_t player, uint8_t axis);
+int32_t G_MouseAxis(uint8_t player, uint8_t axis);
 
 #endif

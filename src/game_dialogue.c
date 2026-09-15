@@ -19,17 +19,14 @@
 // \d requires an option
 // \e requires a button to end
 static char *dialogue[] = {
-	"So... there's a Man here.",
-	"He smiles and offers you an Egg.^",
-	"You take the Egg.\n[The Egg is in your Key Items.]#",
-	"The Man shakes his head.\n[Somehow, you possess the Egg anyways.]#",
-	"Well, there was a Man here.",
-	"But now they're gone.#",
-	"Just a tree.#"
+	"This is test dialogue.\nYou can tell because I said so.",
+	"Did you know that Nozomi Engine\nsupports TWO graphics formats?^",
+	"Awesome!#",
+	"Ehehe, that's ok too.#"
 };
 
 static char options[][2][256] = {
-	{"Accept", "Deny"}
+	{"Yes", "No"}
 };
 
 bool in_diag = false;
@@ -73,11 +70,7 @@ void D_UpdateDialogue(void)
 		} else if (cur_char_timer < time_per_char*8 && !G_ControlDown(PLAYER_ONE, CON_A, true))
 			cur_char_timer++;
 		else
-			switch (dialogue[curdiag][cur_char]) {
-				default:
-					in_diag = false;
-					break;
-			}
+			in_diag = false;
 	} else {
 		if (G_ControlDown(PLAYER_ONE, CON_B, false))
 			cur_char_timer+=time_per_char;
@@ -148,7 +141,9 @@ void D_DrawDialogue(void)
 				for (x = 0; x < 7; x++)
 					V_DrawCropped(gfx_textbox, VID_WIDTH-(8*8) + x*8, VID_HEIGHT-56 + y*8, 8, 8, 8, 8, 0);
 
-			V_DrawText("Accept\nDeny", VID_WIDTH-(8*6), VID_HEIGHT-56, 0);
+			for (i = 0; i < 2; i++)
+				V_DrawText(options[0][i], VID_WIDTH-(8*7), VID_HEIGHT-56+(i*8), 0);
+			
 			V_DrawText(">", VID_WIDTH-(8*8), VID_HEIGHT-56+cur_option*8, 0);
 		}
 }

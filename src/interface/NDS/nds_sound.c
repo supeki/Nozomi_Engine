@@ -14,12 +14,17 @@
 
 int jadefrac_to_maxmod[NUMMUSIC] = {
 	-1,
-	MOD_TECH_DEMO_BOSS
+	MOD_ESHOP_8
 };
 
 void I_StartupSound(void)
 {
 	mmInitDefault("nitro:/soundbank.bin");
+}
+
+void I_ShutdownSound(void)
+{
+	mmStop();
 }
 
 void I_PlaySound(void)

@@ -17,7 +17,7 @@ Mix_Music *current_song;
 
 const char *jadefrac_to_sdl[NUMMUSIC] = {
 	"\0",
-	"tech_demo_boss.xm"
+	"eshop_8.it"
 };
 
 void I_StartupSound(void)
@@ -35,6 +35,14 @@ void I_StartupSound(void)
 	#endif
 	
 	Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
+}
+
+void I_ShutdownSound(void)
+{
+	Mix_HaltMusic();
+    Mix_FreeMusic(current_song);
+	Mix_CloseAudio();
+    Mix_Quit();
 }
 
 void I_PlaySound(void)

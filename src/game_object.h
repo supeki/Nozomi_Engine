@@ -7,29 +7,68 @@
 #include "game_defs.h"
 #include "game_video.h"
 
+typedef struct 
+{
+	uint8_t x_off;
+	uint8_t y_off;
+	uint8_t width;
+	uint8_t height;
+} object_animframe_t;
+
+typedef struct
+{
+	char name[32];
+	uint8_t fps;
+	uint8_t num_frames;
+	uint8_t dir_type;
+
+	object_animframe_t *frames;
+} object_animtype_t;
+
+typedef struct
+{
+	uint8_t health;
+	uint32_t flags;
+	uint8_t hit[4];
+
+	uint32_t spawn_logic;
+	uint32_t active_logic;
+	uint32_t death_logic;
+
+	object_animtype_t *anims;
+} object_info_t;
+
 typedef struct object_s
 {
 	// base variables
-	uint32_t type; // Object type
-	struct object_s *prev; // Previous object
-	struct object_s *next; // Next object
-	subpixel_t x; // X position relative to the world
-	subpixel_t y; // Y position relative to the world
-	uint8_t dir; // Facing direction 0 is down, 3 is right
-	subpixel_t hit[4]; // Hitbox, index 0 is x offset, 1 is y offset, 2 is width, 3 is height
-	uint8_t layer;
-	
-	// momentum variables
-	subpixel_t momx;
-	subpixel_t momy;
-	
-	// animation variables
-	uint32_t anim_state; // animation state, standing, walking, etc
-	uint32_t anim_timer; // animation timer, value depends on the animation and situation
+	uint16_t type; // obj type
+	struct object_s *prev; // previous obj
+	struct object_s *next; // next obj
 
-	// player reference pointer
+	// utility variables
+	uint8_t health;
+	uint32_t flags; // any special flags for this obj
+	uint8_t hit[4]; // hitbox, index 0 is x offset, 1 is y offset, 2 is width, 3 is height
+
+	// positional variables
+	uint16_t x; // obj x
+	uint16_t y; // obj y
+	int8_t momx; // obj momx
+	int8_t momy; // obj momy
+	uint8_t dir_layer; // LLLLLLDD L - layer D - dir
+	
+	uint8_t anim_state; // obj anim state
+	uint16_t anim_timer; // current anim tick
+
+	// player reference pointer - player objs
 	struct player_s *player;
 } object_t;
+
+typedef enum
+{
+	OBJ_NULL,
+	OBJ_PLAYER
+} object_types_e;
 
 extern object_t objects;
 
@@ -40,8 +79,8 @@ typedef struct camera_s
 	uint8_t mode;
 	
 	// X and Y coordinates
-	subpixel_t x;
-	subpixel_t y;
+	int32_t x;
+	int32_t y;
 	
 	// Optional target object for certain modes
 	object_t *target;
@@ -51,18 +90,10 @@ extern camera_t camera;
 
 void OBJ_InitObjects(void);
 void OBJ_RunObjects(void);
-object_t *OBJ_CreateObject(subpixel_t x, subpixel_t y, int type);
+void OBJ_FreeObjects(void);
+object_t *OBJ_CreateObject(uint16_t x, uint16_t y, int type);
 void OBJ_RemoveObject(object_t *obj);
 void OBJ_DrawObjectLayer(uint8_t layer);
-bool OBJ_TryMovement(object_t *obj, subpixel_t x, subpixel_t y);
-
-typedef enum
-{
-	OBJ_NULL, // you can set an object's type to this to remove it :D ... or use OBJ_RemoveObject
-	OBJ_MARIL, // ts bitch playable or something
-	OBJ_MAN, // the man behind the tree
-	OBJ_CHECK, // invis object to check/interact with things
-	NUMOBJTYPES
-} objecttypes_e;
+bool OBJ_TryMovement(object_t *obj, int8_t x, int8_t y);
 
 #endif

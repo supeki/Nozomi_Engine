@@ -1,0 +1,40 @@
+what the peoples would want from new game by new dev
+
+easy to pick up
+- intuitive mechanics
+- no weird instadeath/instalose stuff
+- no weird prompts
+- quality over quantity/speed
+
+controller support
+- remapping buttons
+- ui graphics
+
+on-point ui
+- keep it original
+- keep it understandable
+
+autosaving
+- save automatically after hitting key checkpoints
+- save automatically after entering important areas
+
+post-load debrief
+- remind player of their last actions
+- remind player of their current objective
+
+skippable cutscenes
+- perhaps as a menu option or a first-time prompt
+
+accessibility options
+- disable screen shaking
+
+organya accuracies
+- correct low snare frequency
+
+what i want to adds myself
+
+3d
+- based off a point-line system
+- distance from camera determines rendering priorities
+- use sprites for all objects
+- cool world for marilink yay

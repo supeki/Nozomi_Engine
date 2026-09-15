@@ -5,15 +5,13 @@
 
 bitmap_t Bitmap_Load(const char *filename)
 {
-	bitmap_t bitmap;
-
-	#if defined(GBC)
-
-	#else
 	FILE *fp = fopen(filename, "rb");
+	bitmap_t bitmap;
 	BMP_Header_t header;
 	BMP_DIBHeader_t dib_header;
 	int i;
+
+	memset(&bitmap, 0, sizeof(bitmap_t));
 
 	if (!fp)
 		I_Error("Failed to find bitmap file: %s", filename);
@@ -65,7 +63,24 @@ bitmap_t Bitmap_Load(const char *filename)
 	fseek(fp, header.data_offset, SEEK_SET);
 	fread(bitmap.pixel_data, sizeof(uint8_t), dib_header.image_size, fp);
 	fclose(fp);
-	#endif
 	
 	return bitmap;
+}
+
+void Bitmap_Free(bitmap_t *bitmap)
+{
+	bitmap->width = 0;
+	bitmap->height = 0;
+	bitmap->bpp = 0;
+	bitmap->compression = 0;
+
+	if (bitmap->pixel_data != NULL) {
+		free(bitmap->pixel_data);
+		bitmap->pixel_data = NULL;
+	}
+
+	if (bitmap->palette != NULL) {
+		free(bitmap->palette);
+		bitmap->palette = NULL;
+	}
 }

@@ -19,6 +19,10 @@ void I_StartupGraphics(void)
 	hdcWindow = GetDC(g_hWnd);
 }
 
+void I_ShutdownGraphics(void)
+{			
+}
+
 void I_PushGraphics(void)
 {
 	int i;

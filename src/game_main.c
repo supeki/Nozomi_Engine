@@ -2,6 +2,7 @@
 // game_main.c
 
 #include "i_event.h"
+#include "i_net.h"
 #include "i_sound.h"
 #include "i_system.h"
 #include "i_video.h"
@@ -28,22 +29,27 @@ void gameMain(void)
 	V_Init();
 	
 	I_printf("Loading palette...\n");
-	V_LoadPalette();
+	V_LoadPalette(va("%s/data/palette.mpl", I_GetHomeDir()), palette);
 	
 	I_printf("Starting graphics backend...\n");
 	I_StartupGraphics();
 	
 	I_printf("Starting sound backend...\n");
 	I_StartupSound();
-	
+
+	I_printf("Starting networking backend...\n");
+	I_StartupNetwork();
+
 	I_printf("Setting default controls...\n");
 	G_DefaultControls();
-	
+
 	GFX_InitGFX();
 	OBJ_InitObjects();
-	P_CreatePlayer(128*PU - 12*PU, 536*PU, 2);
-	OBJ_CreateObject(128*PU, 64*PU, OBJ_MAN);
-	I_PlayMusic(mus_man, true);
+
+	W_StartWorldEdit(NULL, NULL);
+
+	I_PlayMusic(mus_demo, true);
+	//D_StartDialogue(0);
 
 	//FNT_StartFontEdit();
 }
@@ -65,25 +71,30 @@ void gameLoop(void)
 			continue;
 		}
 		
-		// dumbass hack for SDL
-		#if defined(SDL)
-		for (int j = 0; j < MAX_PLAYERS; j++)
-			for (int c = CON_UP; c < NUMCONTROLS; c++)
-				if (gamecontrols[j][c] > 0)
-					gamecontrols[j][c]++;
+		// dumbass hack for SDL and WINCE ports
+		#if defined(SDL) || defined(WINCE)
+		{
+			int j, c;
+			for (j = 0; j < MAX_PLAYERS; j++) {
+				for (c = CON_UP; c < NUMCONTROLS; c++)
+					if (gamecontrols[j][c] > 0)
+						gamecontrols[j][c]++;
+				for (c = MOUSE_LBUTTON; c < NUMMOUSECONTROLS; c++)
+					if (mousecontrols[j][c] > 0)
+						mousecontrols[j][c]++;
+			}
+		}
 		#endif
 		
-		I_PollEvents();
+		while (elapsed_tick > 0) {
+			I_PollEvents();
 
-		if (game_quit)
-			break;
-		
-		#if defined(__NDS__)
-		// Force the game to run a tick on NDS otherwise it cries.
-		gameRunStuff(1);
-		#else
-		gameRunStuff(elapsed_tick);
-		#endif
+			if (game_quit)
+				break;
+
+			gameRunStuff();
+			elapsed_tick--;
+		}
 		
 		if (game_tick > render_tick)
 		{
@@ -91,93 +102,46 @@ void gameLoop(void)
 			
 			gameDisplay(); // Run all draw loops before pushing to the screen.
 			I_PushGraphics();
+			V_FillScreen(0);
 		}
-		
-		V_ClearScreen();
 	}
+
+	OBJ_FreeObjects();
+	W_Free();
+	I_ShutdownNetwork();
+	I_ShutdownSound();
+	I_ShutdownGraphics();
+	V_Free();
 }
 
-void gameRunStuff(uint32_t elapsed)
+void gameRunStuff(void)
 {
-	if (elapsed > 4)
-		elapsed = 1;
-	
-	while (elapsed--)
-	{	
-		int i;
-
-		if (font_edit)
-			FNT_FontEditUpdate();
-		
-		if (in_diag) {
-			D_UpdateDialogue();
-			return;
-		}
-			
-		for (i = 0; i < num_players; i++)
-			P_PlayerLogic(players[i]);
-		
-		OBJ_RunObjects();
+	if (in_diag) {
+		D_UpdateDialogue();
+		return;
 	}
+
+	if (font_edit)
+		FNT_FontEditUpdate();
+
+	if (tileset_edit)
+		W_UpdateTilesetEdit();
+
+	if (world_edit)
+		W_UpdateWorldEdit();
 }
 
 void gameDisplay(void)
 {
-	int i, treeoff_1, treeoff_2;
-
 	if (font_edit)
 		FNT_FontEditDraw();
-	
-	for (i = 0; i < 576; i++)
-		V_DrawCropped(gfx_tiles, (i%16)*16, (i/16)*16 - camera.y, demo_tiles[i]*16, 0, 16, 16, 0);
-	
-	OBJ_DrawObjectLayer(0);
-	
-	treeoff_1 = abs((I_GetTicks()/30) % 8 - 4) + 4;
-	treeoff_2 = -abs((I_GetTicks()/15) % 4 - 2) + 2;
-	
-	V_Draw(gfx_tree2, 128 - gfx_tree.width/2 + treeoff_1, 96 - gfx_tree.height - camera.y + -treeoff_2, 0);
-	V_Draw(gfx_tree3, 128 - gfx_tree.width/2 + -treeoff_1, 96 - gfx_tree.height - camera.y + treeoff_2, 0);
-	
+
+	if (tileset_edit)
+		W_DrawTilesetEdit();
+
+	if (world_edit) 
+		W_DrawWorldEdit();
+
 	if (in_diag)
 		D_DrawDialogue();
 }
-
-uint8_t demo_tiles[576] = {
-	00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,01,01,01,01,00,00,00,00,00,00,
-	00,00,00,00,00,01,01,01,01,01,01,00,00,00,00,00,
-	00,00,00,00,00,01,01,01,01,01,01,00,00,00,00,00,
-	00,00,00,00,00,01,01,01,01,01,01,00,00,00,00,00,
-	00,00,00,00,00,00,01,01,01,01,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-	00,00,00,00,00,00,00,01,01,00,00,00,00,00,00,00,
-};
