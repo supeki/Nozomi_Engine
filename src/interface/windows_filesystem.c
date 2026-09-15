@@ -58,7 +58,7 @@ const char *I_GetHomeDir(void)
         *slash = '\0';
 
     return path;
-	#elif defined(XBOX)
+    #elif defined(XBOX)
     return ".";
     #else
     static char path[MAX_PATH];
