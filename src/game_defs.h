@@ -16,11 +16,17 @@
 #include <allegro.h>
 #endif
 
-#include <stdarg.h>
 #if !defined(WINCE)
 #include <stdbool.h>
 #include <stdint.h>
-#else
+#endif
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+
+#if defined(WINCE)
 typedef signed __int8 int8_t;
 typedef unsigned __int8 uint8_t;
 typedef signed __int16 int16_t;
@@ -37,10 +43,6 @@ typedef boolean bool;
 #define rewind(f) (fseek((f), 0, SEEK_SET))
 #define va_copy(dest, src) ((dest) = (src))
 #endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
 
 #ifndef GAME_NAME
 #define GAME_NAME "Nozomi Engine dev"
@@ -68,7 +70,5 @@ char *va(const char *format, ...);
 #endif
 
 #define PU 65536
-
-extern uint8_t demo_tiles[576];
 
 #endif
