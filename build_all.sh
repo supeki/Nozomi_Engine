@@ -41,7 +41,6 @@ mkdir -p bin/DOS
 
 # Copy game data
 cp -r assets/data bin/DOS/data
-rm -rf bin/DOS/data/soundfont.sf2
 rm -rf bin/DOS/data/gamecontrollerdb.txt
 rm -rf bin/DOS/data/audio
 
@@ -153,8 +152,6 @@ cp -r assets/icons/icon.gif assets/NDS/icon.gif
 rm -rf assets/NDS/audio
 cp -r assets/data/audio assets/NDS/audio
 
-# NDS doesn't need a soundfont!
-rm -rf assets/NDS/nitrofs/data/soundfont.sf2
 # NDS also doesn't need the audio folder!
 rm -rf assets/NDS/nitrofs/data/audio
 # uhhh it also doesn't need gamecontrollerdb.txt lmfaooo
@@ -196,6 +193,9 @@ rm -rf PARAM.SFO
 rm -rf game.elf
 rm -rf bin/SDL
 rm -rf obj/*
+
+# activate xbox LIVEEEEEEEEEE
+# ~/nxdk/bin/activate
 
 # Clean everything to prepare for XBOX
 make -f Makefile.xbox clean

@@ -5,7 +5,7 @@
 GAME_TITLE ?= Nozomi\ Engine
 
 ifdef GAME_TITLE
-CFLAGS := $(CFLAGS) -DGAME_NAME="\"$(GAME_TITLE)\"" -DXBOX
+CFLAGS := $(CFLAGS) -DGAME_NAME="\"$(GAME_TITLE)\"" -DXBOX -Os -std=gnu17 -fno-exceptions -s
 endif
 
 SRC_DIR = $(CURDIR)/src

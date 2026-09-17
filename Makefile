@@ -112,7 +112,7 @@ ifeq ($(WINDOWS),1)
 	OPTS := $(OPTS) -I/usr/local/x86_64-w64-mingw32/include
 	LIBS := $(LIBS) -mwindows -lmingw32
 	LDFLAGS := $(LDFLAGS) -L/usr/local/x86_64-w64-mingw32/lib
-	CFLAGS := $(CFLAGS) -DWINDOWS
+	CFLAGS := $(CFLAGS) -DWINDOWS -Os -std=gnu17 -fno-exceptions -s
 	i_filesystem = ../windows_filesystem
 endif
 
@@ -121,7 +121,7 @@ ifeq ($(WIN_32),1)
 	OPTS := $(OPTS) -I/usr/local/i686-w64-mingw32/include
 	LIBS := $(LIBS) -mwindows -lmingw32
 	LDFLAGS := $(LDFLAGS) -L/usr/local/i686-w64-mingw32/lib
-	CFLAGS := $(CFLAGS) -DWINDOWS -m32
+	CFLAGS := $(CFLAGS) -DWINDOWS -m32 -Os -std=gnu17 -fno-exceptions -s
 	i_filesystem = ../windows_filesystem
 endif
 
@@ -138,24 +138,24 @@ ifeq ($(DOS),1)
 	OPTS := $(OPTS) -I. -I/home/marilyn/djgpp/include -I/home/marilyn/djgpp/i386-pc-msdosdjgpp/sys-include
 	LIBS := $(LIBS) -lm -lalleg
 	LDFLAGS := $(LDFLAGS) -L/home/marilyn/djgpp/lib -L/home/marilyn/djgpp/i386-pc-msdosdjgpp/lib
-	CFLAGS := $(CFLAGS) $(OPTS) $(DEFINES) -O2 -std=gnu17 -fgnu89-inline
+	CFLAGS := $(CFLAGS) $(OPTS) $(DEFINES) -Os -std=gnu17 -fgnu89-inline -fno-exceptions -s
 endif
 
 ifeq ($(LINUX),1)
 	EXEC_EXT = 
 
 	LIBS := $(LIBS) -lm -lc
-	CFLAGS := $(CFLAGS) $(pkg-config sdl2 SDL2_mixer --cflags) -w -DLINUX
+	CFLAGS := $(CFLAGS) $(pkg-config sdl2 SDL2_mixer --cflags) -Os -std=gnu17 -w -DLINUX -fno-exceptions -s
 	LDFLAGS := $(LDFLAGS) -Wl,-rpath,'/lib' $(pkg-config sdl2 SDL2_mixer --libs)
 endif
 
 ifeq ($(LINUX_32),1)
-	CFLAGS := $(CFLAGS) -m32
+	CFLAGS := $(CFLAGS) -m32 -Os -std=gnu17 -fno-exceptions -s
 endif
 
 ifeq ($(PSP),1)	
 	PSPSDK=$(shell psp-config --pspsdk-path)
-	CFLAGS := $(CFLAGS) $(shell $(PSPDIR)/bin/sdl2-config --cflags) $(shell ~/pspdev/bin/psp-pkg-config SDL2_mixer --cflags)
+	CFLAGS := $(CFLAGS) $(shell $(PSPDIR)/bin/sdl2-config --cflags) $(shell ~/pspdev/bin/psp-pkg-config SDL2_mixer --cflags) -Os -std=gnu17 -fno-exceptions -s
 	LIBS = $(shell $(PSPDIR)/bin/sdl2-config --libs) $(shell ~/pspdev/bin/psp-pkg-config SDL2_mixer --libs) -lGL -lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl -lpspumd -lpsprtc -lpsppower -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpspvram
 	
 	TARGET = $(EXEC_NAME)
@@ -214,7 +214,8 @@ ifeq ($(NDS),1)
 			 -Wno-format \
 			 -Wpointer-arith \
 			 -fno-exceptions \
-			 -specs=$(SPECS)
+			 -specs=$(SPECS) \
+			 -s
 endif
 
 INTERFACE_SRC = $(SRC_DIR)/interface/$(INTERFACE)

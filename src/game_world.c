@@ -220,6 +220,11 @@ void W_DrawLayer(uint8_t layer)
         px = ((i % world_width) * tile_width) - camera.x;
         py = ((i / world_width) * tile_height) - camera.y;
 
+        if (px + tile_width < 0 || px > VID_WIDTH)
+            continue;
+        if (py + tile_height < 0 || py > VID_HEIGHT)
+            continue;
+
         if (layer > 1) {
             if (world_bgtype & BG_SLOW) {
                 if (layer == 2) {
@@ -863,7 +868,6 @@ void W_UpdateWorldEdit(void)
                         break;
                     }
 
-
         mouse_tilex = (G_MouseAxis(PLAYER_ONE, MOUSE_POSX)+world_cam_x) / (tile_width*2);
         mouse_tiley = (G_MouseAxis(PLAYER_ONE, MOUSE_POSY)+world_cam_y - 41) / (tile_height*2);
         
@@ -1125,6 +1129,11 @@ void W_DrawWorldEdit(void)
         px = ((i % world_width) * tile_width) - world_cam_x/2;
         py = ((i / world_width) * tile_height) - world_cam_y/2;
 
+        if (px + tile_width < 0 || px > VID_WIDTH)
+            continue;
+        if (py + tile_height < 0 || py > VID_HEIGHT)
+            continue;
+
         if ((edit_renderone == 1 && edit_tiles2 && edit_bgtiles) || !edit_renderone || edit_renderone == 3)
             if (id4 != 0)
                 V_DrawCropped2x(
@@ -1165,6 +1174,11 @@ void W_DrawWorldEdit(void)
 
         px = ((i % world_width) * tile_width) - world_cam_x/2;
         py = ((i / world_width) * tile_height) - world_cam_y/2;
+
+        if (px + tile_width < 0 || px > VID_WIDTH)
+            continue;
+        if (py + tile_height < 0 || py > VID_HEIGHT)
+            continue;
 
         if ((edit_renderone == 1 && edit_tiles2 && edit_bgtiles == false) || !edit_renderone || edit_renderone == 2)
             if (id2 != 0)
@@ -1210,8 +1224,10 @@ void W_DrawWorldEdit(void)
                 );
             }
 
+        #ifndef DOS
         if ((px+tile_width)*2 < (tile_width*world_width)*2 && (py+tile_height)*2 < (tile_height*world_height)*2)
             V_DrawDot((px+tile_width)*2, 42+(py+tile_height)*2, 0xFFFF);
+        #endif        
     }
 
     if ((world_bgtype & (BG_FG|BG_WATER)) == (BG_FG|BG_WATER))
