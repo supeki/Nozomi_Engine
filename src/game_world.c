@@ -279,42 +279,64 @@ void W_DrawLayer(uint8_t layer)
 
 static uint16_t *second_buf = NULL;
 
+// using a LUT is even faster than still calculating per-phase
+static int8_t x_off_per_phase[180];
+
 void W_DrawWaveEffect(uint16_t color) 
 {
     uint32_t x, y;
+    uint32_t ticks = I_GetTicks();
+    int32_t sx, phase;
+    uint16_t *src, *dest;
 
+    // setup our second buffer
+    // this isn't currently freed at any time...
+    // maybe i can shove it in W_Free...??
+    // yup, doing that
     if (second_buf == NULL)
         second_buf = malloc(VID_WIDTH * VID_HEIGHT * sizeof(uint16_t));
 
     memcpy(second_buf, vid.buffer, VID_WIDTH * VID_HEIGHT * sizeof(uint16_t));
     
-    for (y = 0; y < VID_HEIGHT; y++)
-        for (x = 0; x < VID_WIDTH; x++) {
-            int32_t sx;
-            int32_t phase = (I_GetTicks() + x + y) % 180;
-            int32_t x_off;
-
-            // calculating the "phase" of a triangle wave is faster than using sin apparently
-            if (phase < 90)
-                x_off = (phase * 6 / 90) - 3;
+    // calculate x_off for each phase ONE TIME
+    // [0] should be -3 
+    if (x_off_per_phase[0] == 0)
+    {
+        for (x = 0; x < 180; x++)
+        {
+            if (x < 90)
+                x_off_per_phase[x] = (x * 6 / 90) - 3;
             else
-                x_off = 3 - ((phase - 90) * 6 / 90);
+                x_off_per_phase[x] = 3 - ((x - 90) * 6 / 90);
+        }
+    }
 
-            // for safety
-            if (x_off < -3)
-                x_off = -3;
-            if (x_off > 3)
-                x_off = 3;
+    for (y = 0; y < VID_HEIGHT; y++) {
+        // use similar method to how i rewrote game_video.c
+        src = &second_buf[y * VID_WIDTH];
+        dest = &vid.buffer[y * VID_WIDTH];
 
-            sx = x - x_off;
+        // it's OK to still use modulo but i wonder if i could speed this up too
+        phase = (ticks + y) % 180;
+
+        for (x = 0; x < VID_WIDTH; x++) {
+            // no more x_off variable~ (it was a waste of a byte anyways)
+            sx = x - x_off_per_phase[phase];
 
             if (sx < 0)
                 sx = 0;
             if (sx >= VID_WIDTH)
                 sx = VID_WIDTH - 1;
 
-            vid.buffer[x + y*VID_WIDTH] = V_MixColors(second_buf[sx + y*VID_WIDTH], color, 64);
+            // strangely the only use of 64 in V_MixColors right now lolsies
+            // makes it less tinted tho which gives a more natural look
+            dest[x] = V_MixColors(src[sx], color, 64);
+            phase++;
+
+            if (phase >= 180)
+                phase = 0;
         } 
+    }
 }
 
 void W_DrawWorld(void) {
@@ -367,6 +389,12 @@ void W_Free(void)
     if (tile_decorid != NULL) {
         free(tile_decorid);
         tile_decorid = NULL;
+    }
+
+    // the "second_buf" is only used here in the world drawing so i think i could free it here as need-be
+    if (second_buf != NULL) {
+        free(second_buf);
+        second_buf = NULL;
     }
 }
 
