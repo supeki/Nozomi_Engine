@@ -127,9 +127,9 @@ void FNT_FontEditDraw(void)
 	}
 	
 	for (y = 0; y < charh-1; y++)
-		V_DrawDot((curchar % 16) * charw + charw/2-1, (curchar / 16) * charh + y, col);
+		V_DrawDot((curchar % 16) * charw + charw/2-1, (curchar / 16) * charh + y, col, 0);
 	for (x = 0; x < charw-1; x++)
-		V_DrawDot((curchar % 16) * charw + x, (curchar / 16) * charh + charh/2-1, col);
+		V_DrawDot((curchar % 16) * charw + x, (curchar / 16) * charh + charh/2-1, col, 0);
 	
 	xoff = temp_font.offset[curchar] >> 8;
 	yoff = temp_font.offset[curchar] & 0xFF;
@@ -137,13 +137,13 @@ void FNT_FontEditDraw(void)
 	h = temp_font.size[curchar] & 0xFF;
 	
 	for (x = 0; x < charw*2 + 2; x++) {
-		V_DrawDot(VID_WIDTH - charw*4 - 1 + x, 2*charh - 1, col);
-		V_DrawDot(VID_WIDTH - charw*4 - 1 + x, 2*charh + 2*charh, col);
+		V_DrawDot(VID_WIDTH - charw*4 - 1 + x, 2*charh - 1, col, 0);
+		V_DrawDot(VID_WIDTH - charw*4 - 1 + x, 2*charh + 2*charh, col, 0);
 	}
 	
 	for (y = 0; y < charh*2 + 2; y++) {
-		V_DrawDot(VID_WIDTH - charw*4 - 1, 2*charh-1 + y, col);
-		V_DrawDot(VID_WIDTH - charw*4 + charw*2, 2*charh-1 + y, col);
+		V_DrawDot(VID_WIDTH - charw*4 - 1, 2*charh-1 + y, col, 0);
+		V_DrawDot(VID_WIDTH - charw*4 + charw*2, 2*charh-1 + y, col, 0);
 	}
 
 	V_DrawText(va("Offsets: %d, %d", xoff, yoff), 0, charw*charh+charh, 0);

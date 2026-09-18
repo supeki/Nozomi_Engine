@@ -999,12 +999,12 @@ void W_DrawWorldEdit(void)
 
         V_DrawText("Background Color:", VID_WIDTH - 128, 22, 0);
         for (i = 0; i < 64; i++) {
-            V_DrawDot(VID_WIDTH - 128 + i + 16, 35, (i/2 << 11));
-            V_DrawDot(VID_WIDTH - 128 + i + 16, 45, (i/2 << 5));
-            V_DrawDot(VID_WIDTH - 128 + i + 16, 55, i/2);
-            V_DrawDot(VID_WIDTH - 128 + i + 16, 36, (i/2 << 11));
-            V_DrawDot(VID_WIDTH - 128 + i + 16, 46, (i/2 << 5));
-            V_DrawDot(VID_WIDTH - 128 + i + 16, 56, i/2);
+            V_DrawDot(VID_WIDTH - 128 + i + 16, 35, (i/2 << 11), 0);
+            V_DrawDot(VID_WIDTH - 128 + i + 16, 45, (i/2 << 5), 0);
+            V_DrawDot(VID_WIDTH - 128 + i + 16, 55, i/2, 0);
+            V_DrawDot(VID_WIDTH - 128 + i + 16, 36, (i/2 << 11), 0);
+            V_DrawDot(VID_WIDTH - 128 + i + 16, 46, (i/2 << 5), 0);
+            V_DrawDot(VID_WIDTH - 128 + i + 16, 56, i/2, 0);
         }
 
         {
@@ -1021,10 +1021,10 @@ void W_DrawWorldEdit(void)
         V_DrawText("Preview World", 12, 96, 0);
 
         #if !defined(DOS)
-        V_DrawLine(VID_WIDTH - 16*9, 117, 90, 8*16, 0xFFFF);
-        V_DrawLine(VID_WIDTH - 16*9, 129, 90, 8*16, 0xFFFF);
+        V_DrawLine(VID_WIDTH - 16*9, 117, 90, 8*16, 0xFFFF, 0);
+        V_DrawLine(VID_WIDTH - 16*9, 129, 90, 8*16, 0xFFFF, 0);
         #else
-        V_DrawLine(VID_WIDTH - 16*9, 117, 90, 8*8, 0xFFFF);
+        V_DrawLine(VID_WIDTH - 16*9, 117, 90, 8*8, 0xFFFF, 0);
         #endif
 
         V_DrawText("Filename:", VID_WIDTH - 16*9, 96, 0);
@@ -1136,28 +1136,30 @@ void W_DrawWorldEdit(void)
 
         if ((edit_renderone == 1 && edit_tiles2 && edit_bgtiles) || !edit_renderone || edit_renderone == 3)
             if (id4 != 0)
-                V_DrawCropped2x(
+                V_DrawCroppedScaled(
                     gfx_tileset, // gfx
-                    px, // x 
-                    21 + py, // y
+                    px*2, // x 
+                    42 + py*2, // y
                     (id4 % tiles_per_row) * tile_width, // crop x
                     (id4 / tiles_per_row) * tile_height, // crop y
                     tile_width, // crop w
                     tile_height, // crop h
+                    (2 << 16), // 2x
                     0 // flags
                 );
 
         if ((world_bgtype & BG_FG) == 0)
         if ((edit_renderone == 1 && edit_tiles2 == false && edit_bgtiles) || !edit_renderone || edit_renderone == 3)
             if (id3 != 0)
-                V_DrawCropped2x(
+                V_DrawCroppedScaled(
                     gfx_tileset, // gfx
-                    px, // x 
-                    21 + py, // y
+                    px*2, // x 
+                    42 + py*2, // y
                     (id3 % tiles_per_row) * tile_width, // crop x
                     (id3 / tiles_per_row) * tile_height, // crop y
                     tile_width, // crop w
                     tile_height, // crop h
+                    (2 << 16), // 2x
                     0 // flags
                 );
     }
@@ -1182,27 +1184,29 @@ void W_DrawWorldEdit(void)
 
         if ((edit_renderone == 1 && edit_tiles2 && edit_bgtiles == false) || !edit_renderone || edit_renderone == 2)
             if (id2 != 0)
-                V_DrawCropped2x(
+                V_DrawCroppedScaled(
                     gfx_tileset, // gfx
-                    px, // x 
-                    21 + py, // y
+                    px*2, // x 
+                    42 + py*2, // y
                     (id2 % tiles_per_row) * tile_width, // crop x
                     (id2 / tiles_per_row) * tile_height, // crop y
                     tile_width, // crop w
                     tile_height, // crop h
+                    (2 << 16), // 2x
                     0 // flags
                 );
 
         if ((edit_renderone == 1 && edit_tiles2 == false && edit_bgtiles == false) || !edit_renderone || edit_renderone == 2)
             if (id != 0)
-                V_DrawCropped2x(
+                V_DrawCroppedScaled(
                     gfx_tileset, // gfx
-                    px, // x 
-                    21 + py, // y
+                    px*2, // x 
+                    42 + py*2, // y
                     (id % tiles_per_row) * tile_width, // crop x
                     (id / tiles_per_row) * tile_height, // crop y
                     tile_width, // crop w
                     tile_height, // crop h
+                    (2 << 16), // 2x
                     0 // flags
                 );
         if (world_bgtype & BG_FG)
@@ -1212,26 +1216,32 @@ void W_DrawWorldEdit(void)
                 if (world_bgtype & BG_TRANSLUCENT)
                     flags |= V_HALFTRANS;
 
-                V_DrawCropped2x(
+                V_DrawCroppedScaled(
                     gfx_tileset, // gfx
-                    px, // x 
-                    21 + py, // y
+                    px*2, // x 
+                    42 + py*2, // y
                     (id3 % tiles_per_row) * tile_width, // crop x
                     (id3 / tiles_per_row) * tile_height, // crop y
                     tile_width, // crop w
                     tile_height, // crop h
+                    (2 << 16), // 2x
                     flags // flags
                 );
-            }
-
-        #ifndef DOS
-        if ((px+tile_width)*2 < (tile_width*world_width)*2 && (py+tile_height)*2 < (tile_height*world_height)*2)
-            V_DrawDot((px+tile_width)*2, 42+(py+tile_height)*2, 0xFFFF);
-        #endif        
+            }      
     }
-
+    
     if ((world_bgtype & (BG_FG|BG_WATER)) == (BG_FG|BG_WATER))
         W_DrawWaveEffect(world_bgcolor);
+
+    for (i = 0; i < world_width; i++) {
+        V_DrawLine((i % (VID_WIDTH/tile_width))*tile_width*2 + tile_width*2 - world_cam_x, 42, 180, world_height*tile_height*2, 0xFFFF, V_HALFTRANS);
+        V_DrawLine((i % (VID_WIDTH/tile_width))*tile_width*2 + tile_width*2 - world_cam_x - 1, 42, 180, world_height*tile_height*2, 0xFFFF, V_HALFTRANS);
+    }
+
+    for (i = 0; i < world_height; i++) {
+        V_DrawLine(0, 42 + (i % (VID_HEIGHT/tile_height))*tile_height*2 + tile_height*2 - world_cam_y, 90, world_width*tile_width*2, 0xFFFF, V_HALFTRANS);
+        V_DrawLine(0, 42 + (i % (VID_HEIGHT/tile_height))*tile_height*2 + tile_height*2 - world_cam_y - 1, 90, world_width*tile_width*2, 0xFFFF, V_HALFTRANS);
+    }
 
     // directly writing to the buffer is bad but i need to
     {
@@ -1287,21 +1297,22 @@ void W_DrawWorldEdit(void)
         if (i%tiles_per_row - tile_offx > tiles_per_row/2 - 1)
             continue;
 
-        V_DrawCropped2x(
+        V_DrawCroppedScaled(
             gfx_tileset, // gfx
-            px, // x 
-            py, // y
+            px*2, // x 
+            py*2, // y
             (i % tiles_per_row) * tile_width, // crop x
             (i / tiles_per_row) * tile_height, // crop y
             tile_width, // crop w
             tile_height, // crop h
+            (2 << 16), // 2x
             0 // flags
         );
     }
 
-    V_DrawBox(VID_WIDTH/2 + cur_posx - (tile_offx * (2*tile_width+2)) - tile_width*2 - tile_width/2 - 1, cur_posy - (tile_offy * (2*tile_height+2)) + 1, 0, 2*tile_width + 2, 2*tile_height + 2, 0xFFFF);
-    V_DrawLine(0, 42, 90, VID_WIDTH, 0xFFFF);
-    V_DrawLine(VID_WIDTH/2 - tile_width*2 - (tile_width-1), 0, 180, 42, 0xFFFF);
+    V_DrawBox(VID_WIDTH/2 + cur_posx - (tile_offx * (2*tile_width+2)) - tile_width*2 - tile_width/2 - 1, cur_posy - (tile_offy * (2*tile_height+2)) + 1, 0, 2*tile_width + 2, 2*tile_height + 2, 0xFFFF, 0);
+    V_DrawLine(0, 42, 90, VID_WIDTH, 0xFFFF, 0);
+    V_DrawLine(VID_WIDTH/2 - tile_width*2 - (tile_width-1), 0, 180, 42, 0xFFFF, 0);
 
     if (tile_attributes[current_tile] & TILE_SOLID) 
         V_DrawText("Solid", 2, 3, V_JUMPYTEXT);
@@ -1648,10 +1659,10 @@ void W_DrawTilesetEdit(void)
         );
     }
 
-    V_DrawLine(tile_screenw * (tile_height + 1) + 3, 0, 180, tile_screenh * (tile_height + 1) + 4, 0xFFFF);
-    V_DrawLine(0, tile_screenh * (tile_height + 1 ) + 3, 90, tile_screenw * (tile_height + 1) + 4, 0xFFFF);
+    V_DrawLine(tile_screenw * (tile_height + 1) + 3, 0, 180, tile_screenh * (tile_height + 1) + 4, 0xFFFF, 0);
+    V_DrawLine(0, tile_screenh * (tile_height + 1 ) + 3, 90, tile_screenw * (tile_height + 1) + 4, 0xFFFF, 0);
 
-    V_DrawBox(cur_posx - (tile_offx * (tile_width+1)), cur_posy - (tile_offy * (tile_height+1)), 0, tile_width + 2, tile_height + 2, 0xFFFF);
+    V_DrawBox(cur_posx - (tile_offx * (tile_width+1)), cur_posy - (tile_offy * (tile_height+1)), 0, tile_width + 2, tile_height + 2, 0xFFFF, 0);
     V_DrawText(
         va("Tile: %03d/%03d", current_tile+1, num_tiles),
         0,

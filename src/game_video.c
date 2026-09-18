@@ -85,142 +85,146 @@ void V_Free(void)
 
 void V_FillScreen(uint16_t col)
 {
-	uint16_t i;
+	uint32_t i;
 	for (i = 0; i < VID_WIDTH*VID_HEIGHT; i++)
 		vid.buffer[i] = col;
 }
 
-void V_DrawDot(int16_t x, int16_t y, uint16_t col)
+void V_DrawDot(int32_t x, int32_t y, uint16_t col, uint32_t flags)
 {	
+	uint16_t *dest;
+
 	if (x < 0 || y < 0 || x >= VID_WIDTH || y >= VID_HEIGHT || col == 0)
         return;
+
+	dest = &vid.buffer[x + (y*VID_WIDTH)];
 	
-	vid.buffer[x+(y*VID_WIDTH)] = col;
+	if (flags & V_HALFTRANS)
+		*dest = V_MixColors(*dest, col, 127);
+	else
+		*dest = col;
 }
 
-void V_DrawLine(int16_t x, int16_t y, int32_t angle, uint16_t length, uint16_t col)
+void V_DrawLine(int32_t x, int32_t y, int32_t angle, uint16_t length, uint16_t col, uint32_t flags)
 {	
 	uint16_t i;
+	int32_t px = x << 16, py = y << 16;
+	int32_t dx, dy;
+	uint16_t *dest;
 
 	if (col == 0)
 		return; // bow wow wow yippee yo yippee yay
 
+	dx = (int32_t)(cos((angle-90) * (PI/180.0)) * 65536);
+	dy = (int32_t)(sin((angle-90) * (PI/180.0)) * 65536);
+
 	for (i = 0; i < length; i++)
-	{
-		int16_t px = x, py = y;
+	{ 
+		int16_t vx = px >> 16, vy = py >> 16;
 
-		px += i * cos((angle-90) * (PI/180.0));
-		py += i * sin((angle-90) * (PI/180.0));
-
-		if (px < 0 || py < 0 || px >= VID_WIDTH || py >= VID_HEIGHT)
+		if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT)
        		return;
 
-		vid.buffer[px+(py*VID_WIDTH)] = col;
+		dest = &vid.buffer[vx + (vy*VID_WIDTH)];
+
+		if (flags & V_HALFTRANS)
+			*dest = V_MixColors(*dest, col, 127);
+		else
+			*dest = col;
+
+		px += dx;
+		py += dy;
 	}
 }
 
-void V_DrawBox(int16_t x, int16_t y, int32_t angle, uint16_t width, uint16_t height, uint16_t col)
+void V_DrawBox(int32_t x, int32_t y, int32_t angle, uint16_t width, uint16_t height, uint16_t col, uint32_t flags)
 {
-	int16_t offx, offy, offx2, offy2;
+	int32_t offx, offy, offx2, offy2;
 	double rad_width = (angle + 90) * (PI/180.0);
 	double rad_height = (angle + 180) * (PI/180.0);
 
-	V_DrawLine(x, y, angle+180, height, col);
-	V_DrawLine(x, y, angle+90, width, col);
+	V_DrawLine(x, y, angle+180, height, col, flags);
+	V_DrawLine(x, y, angle+90, width, col, flags);
 
-	offx = (int16_t)(-sin(rad_height) * height);
-    offy = (int16_t)(-cos(rad_height) * height); 
-    offx2 = (int16_t)(-sin(rad_width) * width);
-    offy2 = (int16_t)(-cos(rad_width) * width);
+	offx = (int32_t)(-sin(rad_height) * height);
+    offy = (int32_t)(-cos(rad_height) * height); 
+    offx2 = (int32_t)(-sin(rad_width) * width);
+    offy2 = (int32_t)(-cos(rad_width) * width);
 
-	V_DrawLine(x - offx2 - 1, y + offy2, angle+180, height, col);
-	V_DrawLine(x - offx, y + offy - 1, angle+90, width, col);
+	V_DrawLine(x - offx2 - 1, y + offy2, angle+180, height, col, flags);
+	V_DrawLine(x - offx, y + offy - 1, angle+90, width, col, flags);
 }
 
-void V_DrawCroppedAnimated(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t frames, uint32_t fps, uint32_t flags)
+void V_DrawCroppedAnimated(gfx_t gfx, int32_t x, int32_t y, int32_t sx, int32_t sy, uint16_t w, uint16_t h, uint32_t frames, uint32_t fps, uint32_t flags)
 {	
 	uint32_t ticks = FRAMERATE / fps;
 	sx += ((I_GetTicks()/ticks) % frames)*w;
 	V_DrawCropped(gfx, x, y, sx, sy, w, h, flags);
 }
 
-void V_DrawCropped2x(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
+void V_DrawCroppedScaled(gfx_t gfx, int32_t x, int32_t y, int32_t sx, int32_t sy, uint16_t w, uint16_t h, uint32_t scale, uint32_t flags)
 {	
-	int zx, zy;
+	int vx, vy, zx, zy, dx, dy, px, py;
+	int32_t dest_x, dest_y = 0;
+	uint16_t *src, *dest;
 
 	if ((gfx.width * gfx.height) <= 0)
         return;
 	
 	// completely out of bounds
-	if (x*2 >= VID_WIDTH || y*2 >= VID_HEIGHT || x*2+w*2 < 0 || y*2+h*2 < 0)
+	if (x >= VID_WIDTH || y >= VID_HEIGHT || x+(w*scale >> 16) < 0 || y+(h*scale >> 16) < 0 || scale == 0)
 		return;
 	
-	for (zy = 0; zy < h; zy++)
-		for (zx = 0; zx < w; zx++)
-		{
-			int i = sx + sy*gfx.width + zx + zy*gfx.width;
-			int vx = x*2 + zx*2;
-			int vy = y*2 + zy*2;
+	for (zy = 0; zy < h; zy++) {
+		dest_x = 0;
+
+		for (zx = 0; zx < w; zx++) {
+
+			src = &gfx.data[sx + sy*gfx.width + zx + zy*gfx.width];
+
+			vx = x + (dest_x >> 16);
+			vy = y + (dest_y >> 16);
 			
-			if (flags & V_SMALL)
-			{
-				vx -= zx;
-				vy -= zy;
-			}
+			dx = x + ((dest_x+scale) >> 16);
+			dy = y + ((dest_y+scale) >> 16);
 			
-			if (i >= gfx.width * gfx.height)
-				return;
-			
-			if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT || gfx.data[i] == 0)
+			if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT || *src == 0) {
+				dest_x += scale;
 				continue;
-			
-			if (flags & V_HALFTRANS) {
-				vid.buffer[vx+(vy*VID_WIDTH)] = V_MixColors(vid.buffer[vx+(vy*VID_WIDTH)], gfx.data[i], 127);
-				vid.buffer[vx+1+(vy*VID_WIDTH)] = V_MixColors(vid.buffer[vx+1+(vy*VID_WIDTH)], gfx.data[i], 127);
-				vid.buffer[vx+((vy+1)*VID_WIDTH)] = V_MixColors(vid.buffer[vx+((vy+1)*VID_WIDTH)], gfx.data[i], 127);
-				vid.buffer[vx+1+((vy+1)*VID_WIDTH)] = V_MixColors(vid.buffer[vx+1+((vy+1)*VID_WIDTH)], gfx.data[i], 127);
-			} else {
-				vid.buffer[vx+(vy*VID_WIDTH)] = gfx.data[i];
-				vid.buffer[vx+1+(vy*VID_WIDTH)] = gfx.data[i];
-				vid.buffer[vx+((vy+1)*VID_WIDTH)] = gfx.data[i];
-				vid.buffer[vx+1+((vy+1)*VID_WIDTH)] = gfx.data[i];
 			}
+
+			for (py = vy; py < dy; py++)
+			{
+				if (py < 0 || py >= VID_HEIGHT)
+					continue;
+
+				dest = &vid.buffer[vx+(py*VID_WIDTH)];
+
+				for (px = vx; px < dx; px++)
+				{
+					if (px < 0 || px >= VID_WIDTH)
+						continue;
+
+					if (flags & V_HALFTRANS)
+						*dest = V_MixColors(*dest, *src, 127);
+					else
+						*dest = *src;
+
+					dest++;
+				}
+			}
+
+			dest_x += scale;
 		}
+
+		dest_y += scale;
+	}
 }
 
-void V_DrawCroppedNoCheck(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
+void V_DrawCropped(gfx_t gfx, int32_t x, int32_t y, int32_t sx, int32_t sy, uint16_t w, uint16_t h, uint32_t flags)
 {	
-	int zx, zy;
-
-	for (zy = 0; zy < h; zy++)
-		for (zx = 0; zx < w; zx++)
-		{
-			int i = sx + sy*gfx.width + zx + zy*gfx.width;
-			int vx = x + zx;
-			int vy = y + zy;
-			
-			if (flags & V_SMALL)
-			{
-				vx -= zx/2;
-				vy -= zy/2;
-			}
-
-			if (i >= gfx.width * gfx.height)
-				return;
-			
-			if (gfx.data[i] == 0)
-				continue;
-			
-			if (flags & V_HALFTRANS)
-				vid.buffer[vx+(vy*VID_WIDTH)] = V_MixColors(vid.buffer[vx+(vy*VID_WIDTH)], gfx.data[i], 127);
-			else
-				vid.buffer[vx+(vy*VID_WIDTH)] = gfx.data[i];
-		}
-}
-
-void V_DrawCropped(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint16_t w, uint16_t h, uint32_t flags)
-{	
-	int zx, zy;
+	int zx, zy, vx, vy;
+	uint16_t *src, *dest;
 
 	if ((gfx.width * gfx.height) <= 0)
         return;
@@ -229,61 +233,52 @@ void V_DrawCropped(gfx_t gfx, int16_t x, int16_t y, int16_t sx, int16_t sy, uint
 	if (x >= VID_WIDTH || y >= VID_HEIGHT || x+w < 0 || y+h < 0)
 		return;
 	
-	// completely within bounds
-	if (x >= 0 && y >= 0 && x+w < VID_WIDTH && y+h < VID_HEIGHT) {
-		V_DrawCroppedNoCheck(gfx, x, y, sx, sy, w, h, flags);
-		return;
-	}
-	
 	for (zy = 0; zy < h; zy++)
 		for (zx = 0; zx < w; zx++)
 		{
-			int i = sx + sy*gfx.width + zx + zy*gfx.width;
-			int vx = x + zx;
-			int vy = y + zy;
+			src = &gfx.data[sx + sy*gfx.width + zx + zy*gfx.width];
 			
-			if (flags & V_SMALL)
-			{
-				vx -= zx/2;
-				vy -= zy/2;
-			}
+			vx = x + zx;
+			vy = y + zy;
 			
-			if (i >= gfx.width * gfx.height)
+			if (vy > VID_HEIGHT)
 				return;
 			
-			if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT || gfx.data[i] == 0)
+			if (vx < 0 || vy < 0 || vx >= VID_WIDTH || *src == 0)
 				continue;
+
+			dest = &vid.buffer[vx+(vy*VID_WIDTH)];
 			
 			if (flags & V_HALFTRANS)
-				vid.buffer[vx+(vy*VID_WIDTH)] = V_MixColors(vid.buffer[vx+(vy*VID_WIDTH)], gfx.data[i], 127);
+				*dest = V_MixColors(*dest, *src, 127);
 			else
-				vid.buffer[vx+(vy*VID_WIDTH)] = gfx.data[i];
+				*dest = *src;
 		}
 }
 
-void V_DrawTiled(gfx_t gfx, int16_t x, int16_t y, uint32_t flags)
+void V_DrawTiled(gfx_t gfx, int32_t x, int32_t y, uint32_t flags)
 {
-	int16_t sx, sy;
+	int32_t sx, sy;
 
 	for (sy = y; sy < VID_HEIGHT; sy += gfx.height)
 		for (sx = x; sx < VID_WIDTH; sx += gfx.width)
 			V_Draw(gfx, sx, sy, flags);
 }
 
-void V_Draw(gfx_t gfx, int16_t x, int16_t y, uint32_t flags)
+void V_Draw(gfx_t gfx, int32_t x, int32_t y, uint32_t flags)
 {
 	V_DrawCropped(gfx, x, y, 0, 0, gfx.width, gfx.height, flags);
 }
 
 // Text functions
 
-void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, uint32_t flags)
+void V_DrawTextFromFont(font_t font, const char* string, int32_t x, int32_t y, uint32_t flags)
 {
-	int16_t bx = x, by = y;
+	int32_t bx = x, by = y;
 	uint8_t charw = font.charsize >> 8, charh = font.charsize & 0xFF;
 	int i;
 
-	for (i = 0; i < strlen(string); i++) {
+	for (i = 0; string[i] != '\0'; i++) {
 		int c = (int)string[i];
 		int8_t xoff = font.offset[c] >> 8, yoff = font.offset[c] & 0xFF;
 		uint8_t w = font.size[c] >> 8, h = font.size[c] & 0xFF;
@@ -321,7 +316,7 @@ void V_DrawTextFromFont(font_t font, const char* string, int16_t x, int16_t y, u
 	}
 }
 
-void V_DrawText(const char* string, int16_t x, int16_t y, uint32_t flags)
+void V_DrawText(const char* string, int32_t x, int32_t y, uint32_t flags)
 {
 	V_DrawTextFromFont(font_default, string, x, y, flags);
 }
