@@ -29,9 +29,9 @@ uint32_t I_GetTicks(void)
 
 void Pause(uint32_t ms)
 {
-	u32 now;
+	uint32_t now;
 	now=timers2ms(TIMER0_DATA, TIMER1_DATA);
-	while((u32)timers2ms(TIMER0_DATA, TIMER1_DATA)<now+ms);
+	while((uint32_t)timers2ms(TIMER0_DATA, TIMER1_DATA)<now+ms);
 }
 
 uint32_t I_GetTime(void)

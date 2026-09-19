@@ -7,6 +7,7 @@
 #include "game_world.h"
 
 object_t objects;
+object_info_t *object_info; // stores object information for every object
 
 // The camera is its own type, but we'll include it here ya
 camera_t camera;
@@ -51,24 +52,24 @@ void OBJ_FreeObjects(void)
 	}
 }
 
-object_t *OBJ_CreateObject(uint16_t x, uint16_t y, int type)
+object_t *OBJ_CreateObject(uint16_t x, uint16_t y, uint16_t type)
 {
 	object_t *obj;
+	int i;
+
 	obj = malloc(sizeof(object_t));
 	memset(obj, 0, sizeof(object_t));
 	
 	obj->type = type;
 	obj->x = x;
 	obj->y = y;
-	
-	switch (obj->type) {
-		default:
-			obj->hit[0] = 0;
-			obj->hit[1] = 0;
-			obj->hit[2] = 15;
-			obj->hit[3] = 15;
-			break;
-	}
+
+	// object info
+	obj->info = &object_info[type];
+	obj->health = obj->info->health;
+	obj->flags = obj->info->flags;
+	for (i = 0; i < 4; i++)
+		obj->hit[i] = obj->info->hit[i];
 	
 	// add this object to the list of objects
 	objects.prev->next = obj;
@@ -111,3 +112,4 @@ bool OBJ_TryMovement(object_t *obj, int8_t x, int8_t y)
 {	
 	
 }
+

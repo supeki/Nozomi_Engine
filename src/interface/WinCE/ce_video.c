@@ -25,25 +25,30 @@ void I_ShutdownGraphics(void)
 
 void I_PushGraphics(void)
 {
-	int i;
+    uint16_t dx, dy;
+    uint32_t *dest = dibPixels;
 
-    for (i = 0; i < VID_WIDTH * VID_HEIGHT; ++i)
+    // our y is now actually our x
+    for (dy = 0; dy < VID_WIDTH; dy++)
     {
-        uint16_t p = vid.buffer[i];
-
-        uint32_t r = (p >> 11) & 0x1F;
-        uint32_t g = (p >> 5)  & 0x3F;
-        uint32_t b = p & 0x1F;
+        uint16_t src_x = VID_WIDTH - 1 - dy;
         
-        r = (r << 3) | (r >> 2);
-        g = (g << 2) | (g >> 4);
-        b = (b << 3) | (b >> 2);
+        // and vice-versa
+        for (dx = 0; dx < 192; dx++)
+        {
+            uint16_t src_y = dx;
+            uint16_t p = vid.buffer[src_x + src_y * VID_WIDTH];
+            uint32_t r = (p >> 11) & 0x1F;
+            uint32_t g = (p >> 5)  & 0x3F;
+            uint32_t b = p & 0x1F;
+            
+            r = (r << 3) | (r >> 2);
+            g = (g << 2) | (g >> 4);
+            b = (b << 3) | (b >> 2);
 
-        dibPixels[i] =
-            (r << 16) |
-            (g << 8)  |
-            b;
+            *dest++ = (r << 16) | (g << 8) | b;
+        }
     }
 
-	InvalidateRect(g_hWnd, NULL, FALSE);
+    InvalidateRect(g_hWnd, NULL, FALSE);
 }

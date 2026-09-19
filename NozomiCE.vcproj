@@ -373,6 +373,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\i_net.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\i_sound.h"
 				>
 			</File>

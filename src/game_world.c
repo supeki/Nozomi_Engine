@@ -11,6 +11,8 @@
 uint8_t tile_width, tile_height; // 256x256 is pretty big for one tile as-is
 uint32_t *tile_attributes; // per-tile attributes (basically just flags)
 uint8_t *tile_decorid; // new thing for random decor placements
+uint8_t *tile_anim_frames; // new thing for animated tiles
+uint8_t *tile_anim_fps; // new thing for animated tiles
 uint32_t num_tiles; // for safe keeping
 
 uint16_t world_width, world_height; // shouldn't need larger than 65536x65536 tiles right
@@ -32,12 +34,15 @@ static void W_LoadTileset(const char *filename)
     FILE *fp = fopen(filename, "rb");
     char graphic_name[33];
     uint32_t i;
+    size_t read;
+
+    I_printf("%s\n", filename);
 
     // load tileset graphics
     fread(&graphic_name, sizeof(char), 32, fp);
     graphic_name[32] = '\0';
 
-    if (&gfx_tileset)
+    if (gfx_tileset.data != NULL)
         GFX_FreeGFX(&gfx_tileset);
 
     gfx_tileset = GFX_LoadGFX(va("%s/data/tiles/%s.bmp", I_GetHomeDir(), graphic_name));
@@ -54,9 +59,13 @@ static void W_LoadTileset(const char *filename)
     // get tile attributes from file
     tile_attributes = malloc(num_tiles * sizeof(uint32_t));
     tile_decorid = malloc(num_tiles * sizeof(uint8_t));
+    tile_anim_frames = malloc(num_tiles * sizeof(uint8_t));
+    tile_anim_fps = malloc(num_tiles * sizeof(uint8_t));
     for (i = 0; i < num_tiles; i++) {
         fread(&tile_attributes[i], sizeof(uint32_t), 1, fp);
         fread(&tile_decorid[i], sizeof(uint8_t), 1, fp);
+        fread(&tile_anim_frames[i], sizeof(uint8_t), 1, fp);
+        fread(&tile_anim_fps[i], sizeof(uint8_t), 1, fp);
     }
 
     fclose(fp);
@@ -78,6 +87,8 @@ static void W_SaveTileset(const char *name)
     for (i = 0; i < num_tiles; i++) {
         fwrite(&tile_attributes[i], sizeof(uint32_t), 1, fp);
         fwrite(&tile_decorid[i], sizeof(uint8_t), 1, fp);
+        fwrite(&tile_anim_frames[i], sizeof(uint8_t), 1, fp);
+        fwrite(&tile_anim_fps[i], sizeof(uint8_t), 1, fp);
     }
 
     fclose(fp);
@@ -259,8 +270,8 @@ void W_DrawLayer(uint8_t layer)
                 (id / tiles_per_row) * tile_height, // crop y
                 tile_width, // crop w
                 tile_height, // crop h
-                3, // frames
-                3, // frames per second
+                tile_anim_frames[id], // frames
+                tile_anim_fps[id], // frames per second
                 flags // flags
             );
         else
@@ -391,6 +402,16 @@ void W_Free(void)
         tile_decorid = NULL;
     }
 
+    if (tile_anim_frames != NULL) {
+        free(tile_anim_frames);
+        tile_anim_frames = NULL;
+    }
+
+    if (tile_anim_fps != NULL) {
+        free(tile_anim_fps);
+        tile_anim_fps = NULL;
+    }
+
     // the "second_buf" is only used here in the world drawing so i think i could free it here as need-be
     if (second_buf != NULL) {
         free(second_buf);
@@ -409,9 +430,13 @@ void W_CreateTilesetFromFile(const char *input, uint8_t tile_size)
     
     tile_attributes = malloc(num_tiles * sizeof(uint32_t));
     tile_decorid = malloc(num_tiles * sizeof(uint8_t));
+    tile_anim_frames = malloc(num_tiles * sizeof(uint8_t));
+    tile_anim_fps = malloc(num_tiles * sizeof(uint8_t));
     for (i = 0; i < num_tiles; i++) {
         tile_attributes[i] = 0;
         tile_decorid[i] = 0;
+        tile_anim_frames[i] = 0;
+        tile_anim_fps[i] = 0;
     }
 }
 
@@ -478,7 +503,7 @@ static bool world_preview = false; // preview mode
 static bool world_properties = false; // properties menu
 static int8_t world_properties_option = 0;
 static int32_t image_sel_option = 0;
-static int32_t menu_world_width = 32, menu_world_height = 25;
+static int32_t menu_world_width = 32, menu_world_height = 24;
 static int64_t last_pos = -1;
 
 #if !defined(DOS)
@@ -589,6 +614,7 @@ void W_UpdateWorldEdit(void)
             name_len = strlen(filename) + 1;
             name = malloc((name_len-4) * sizeof(char)); 
             snprintf(name, name_len-4, "%s", filename);
+            name[name_len-5] = '\0'; // fix wince port
 
             if (!strcmp(dot, ".set") || !strcmp(dot, ".SET"))
                 W_StartWorldEdit(name, NULL);
@@ -694,8 +720,8 @@ void W_UpdateWorldEdit(void)
 
                 filename = background_dirfiles.filenames[image_sel_option];
                 name_len = strlen(filename) + 1;
-                name = malloc((name_len-4) * sizeof(char)); 
-                snprintf(name, name_len-4, "%s", filename);
+                name = malloc((name_len-5) * sizeof(char)); 
+                snprintf(name, name_len-5, "%s", filename);
                 sprintf(temp_bg_name, "%s", name);
                 free(name);
             }
@@ -1017,8 +1043,8 @@ void W_DrawWorldEdit(void)
 
             filename = background_dirfiles.filenames[image_sel_option];
             name_len = strlen(filename) + 1;
-            name = malloc((name_len-4) * sizeof(char)); 
-            snprintf(name, name_len-4, "%s", filename);
+            name = malloc((name_len-5) * sizeof(char)); 
+            snprintf(name, name_len-5, "%s", filename);
 
             V_DrawText(va("%s.bmp", name), VID_WIDTH - 128, 12, 0);
 
@@ -1531,8 +1557,8 @@ void W_UpdateTilesetEdit(void)
             dot = strrchr(filename, '.');
 
             name_len = strlen(filename) + 1;
-            name = malloc((name_len-4) * sizeof(char)); 
-            snprintf(name, name_len-4, "%s", filename);
+            name = malloc((name_len-5) * sizeof(char)); 
+            snprintf(name, name_len-5, "%s", filename);
 
             if (!strcmp(dot, ".bmp") || !strcmp(dot, ".BMP")) {
                 W_StartTilesetEdit(name, NULL);
@@ -1601,10 +1627,26 @@ void W_UpdateTilesetEdit(void)
             else
                 tile_attributes[current_tile] |= (1<<tile_sel_option);
 
-        if (G_ControlDown(PLAYER_ONE, CON_Y, true))
-            tile_decorid[current_tile]--;
-        if (G_ControlDown(PLAYER_ONE, CON_Z, true))
-            tile_decorid[current_tile]++;
+        if (G_ControlDown(PLAYER_ONE, CON_C, false)) {
+            if (G_ControlDown(PLAYER_ONE, CON_X, true))
+                tile_decorid[current_tile]--;
+            if (G_ControlDown(PLAYER_ONE, CON_Z, true))
+                tile_decorid[current_tile]++;
+        }
+
+        if (G_ControlDown(PLAYER_ONE, CON_Y, false)) {
+            if (G_ControlDown(PLAYER_ONE, CON_X, true))
+                tile_anim_frames[current_tile]--;
+            if (G_ControlDown(PLAYER_ONE, CON_Z, true))
+                tile_anim_frames[current_tile]++;
+        }
+
+        if (G_ControlDown(PLAYER_ONE, CON_SELECT, false)) {
+            if (G_ControlDown(PLAYER_ONE, CON_X, true))
+                tile_anim_fps[current_tile]--;
+            if (G_ControlDown(PLAYER_ONE, CON_Z, true))
+                tile_anim_fps[current_tile]++;
+        }
     } else {
         if (G_ControlDown(PLAYER_ONE, CON_A, true))
             tile_selected = true;
@@ -1718,6 +1760,8 @@ void W_DrawTilesetEdit(void)
     V_DrawText("Jump Right", VID_WIDTH-108, 114, 0);
     V_DrawText("Pit", VID_WIDTH-108, 126, 0);
     V_DrawText(va("Decor. ID %02d", tile_decorid[current_tile]), VID_WIDTH-108, 138, 0);
+    V_DrawText(va("Anim. Frames %02d", tile_anim_frames[current_tile]), VID_WIDTH-108, 150, 0);
+    V_DrawText(va("Anim. FPS %02d", tile_anim_fps[current_tile]), VID_WIDTH-108, 162, 0);
 
     if (tile_attributes[current_tile] & TILE_SOLID) 
         V_DrawText("Yes", VID_WIDTH-24, 30, V_JUMPYTEXT);

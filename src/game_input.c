@@ -9,6 +9,7 @@
 #include <SDL2/SDL.h>
 #elif defined(WINCE)
 #include <windows.h>
+#include <winuser.h>
 #elif defined(DOS)
 #include <allegro.h>
 #endif
@@ -98,12 +99,18 @@ void G_DefaultControls(void)
 		gamecontrolbinds[j][CON_CONFIRM][1] = SDL_CONTROLLER_BUTTON_A;
 		gamecontrolbinds[j][CON_BACK][1] = SDL_CONTROLLER_BUTTON_B;
 	#elif defined(WINCE)
-		gamecontrolbinds[j][CON_UP][0] = VK_UP;
-		gamecontrolbinds[j][CON_DOWN][0] = VK_DOWN;
-		gamecontrolbinds[j][CON_LEFT][0] = VK_LEFT;
-		gamecontrolbinds[j][CON_RIGHT][0] = VK_RIGHT;
-		gamecontrolbinds[j][CON_A][0] = VK_RETURN;
-		gamecontrolbinds[j][CON_CONFIRM][0] = VK_RETURN;
+		gamecontrolbinds[j][CON_UP][0] = VK_LEFT;
+		gamecontrolbinds[j][CON_DOWN][0] = VK_RIGHT;
+		gamecontrolbinds[j][CON_LEFT][0] = VK_DOWN;
+		gamecontrolbinds[j][CON_RIGHT][0] = VK_UP;
+		gamecontrolbinds[j][CON_A][0] = 0x5A;
+		gamecontrolbinds[j][CON_B][0] = 0x58;
+		gamecontrolbinds[j][CON_C][0] = 0x43;
+		gamecontrolbinds[j][CON_X][0] = 0x41;
+		gamecontrolbinds[j][CON_Y][0] = 0x53;
+		gamecontrolbinds[j][CON_Z][0] = 0x44;
+		gamecontrolbinds[j][CON_START][0] = VK_RETURN;
+		gamecontrolbinds[j][CON_SELECT][0] = VK_RSHIFT;
 	#elif defined(DOS)
 		gamecontrolbinds[j][CON_UP][0] = KEY_UP;
 		gamecontrolbinds[j][CON_DOWN][0] = KEY_DOWN;

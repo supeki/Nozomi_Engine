@@ -8,5 +8,6 @@
 #include "../../game_defs.h"
 #include "../../game_video.h"
 extern DWORD dibPixels[VID_WIDTH * VID_HEIGHT];
+extern int mouse_offx, mouse_offy;
 
 #endif

@@ -24,18 +24,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 			ZeroMemory(&bmi, sizeof(bmi));
 
 			bmi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
-			bmi.bmiHeader.biWidth       = VID_WIDTH;
-			bmi.bmiHeader.biHeight      = -VID_HEIGHT;
+			bmi.bmiHeader.biWidth       = VID_HEIGHT;
+			bmi.bmiHeader.biHeight      = -VID_WIDTH;
 			bmi.bmiHeader.biPlanes      = 1;
 			bmi.bmiHeader.biBitCount    = 32;
 			bmi.bmiHeader.biCompression = BI_RGB;
 		
 			StretchDIBits(
 				hdc,
-				-8, 64,
-				VID_WIDTH, VID_HEIGHT,
+				24, 32,
+				VID_HEIGHT, VID_WIDTH,
 				0, 0,
-				VID_WIDTH, VID_HEIGHT,
+				VID_HEIGHT, VID_WIDTH,
 				dibPixels,
 				&bmi,
 				DIB_RGB_COLORS,
@@ -82,6 +82,9 @@ int WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPTSTR lpCmdLine, int nCmdShow) {
         240, 320,            
         NULL, NULL, hInst, NULL
     );
+
+	mouse_offx = (320 - 256)/2; 
+	mouse_offy = (240 - 192)/2;
 
 	ShowWindow(g_hWnd, nCmdShow);
     UpdateWindow(g_hWnd);

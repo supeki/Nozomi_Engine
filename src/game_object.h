@@ -7,6 +7,22 @@
 #include "game_defs.h"
 #include "game_video.h"
 
+typedef enum
+{
+	ANIM_STAND, // standing
+	ANIM_IDLE, // idle
+	ANIM_MOVE, // moving
+	ANIM_PUSH, // pushing against something
+	ANIM_SWIM, // swimmers
+	ANIM_SWIM_MOVE, // the swimmers but you move or something
+	ANIM_JUMP, // jumping
+	ANIM_ATTACK, // attacking
+	ANIM_ITEMGET, // item getting
+	ANIM_OHDEARGODIMFALLING, // falling into a pit
+	ANIM_DEAD, // you died
+	NUM_ANIMS 
+} obj_anims_e;
+
 typedef struct 
 {
 	uint8_t x_off;
@@ -17,7 +33,6 @@ typedef struct
 
 typedef struct
 {
-	char name[32];
 	uint8_t fps;
 	uint8_t num_frames;
 	uint8_t dir_type;
@@ -25,7 +40,7 @@ typedef struct
 	object_animframe_t *frames;
 } object_animtype_t;
 
-typedef struct
+typedef struct object_info_s
 {
 	uint8_t health;
 	uint32_t flags;
@@ -35,7 +50,7 @@ typedef struct
 	uint32_t active_logic;
 	uint32_t death_logic;
 
-	object_animtype_t *anims;
+	object_animtype_t anims[NUM_ANIMS];
 } object_info_t;
 
 typedef struct object_s
@@ -44,6 +59,9 @@ typedef struct object_s
 	uint16_t type; // obj type
 	struct object_s *prev; // previous obj
 	struct object_s *next; // next obj
+
+	// object info reference pointer
+	struct object_info_s *info;
 
 	// utility variables
 	uint8_t health;
@@ -57,7 +75,7 @@ typedef struct object_s
 	int8_t momy; // obj momy
 	uint8_t dir_layer; // LLLLLLDD L - layer D - dir
 	
-	uint8_t anim_state; // obj anim state
+	obj_anims_e anim_state; // obj anim state
 	uint16_t anim_timer; // current anim tick
 
 	// player reference pointer - player objs
@@ -66,11 +84,12 @@ typedef struct object_s
 
 typedef enum
 {
-	OBJ_NULL,
+	OBJ_NULL, 
 	OBJ_PLAYER
-} object_types_e;
+} object_types_e; // these two object types already exist for pretty obvious reasons
 
 extern object_t objects;
+extern object_info_t *object_info;
 
 // Including the camera in the object code out of laziness?
 typedef struct camera_s
@@ -91,7 +110,7 @@ extern camera_t camera;
 void OBJ_InitObjects(void);
 void OBJ_RunObjects(void);
 void OBJ_FreeObjects(void);
-object_t *OBJ_CreateObject(uint16_t x, uint16_t y, int type);
+object_t *OBJ_CreateObject(uint16_t x, uint16_t y, uint16_t type);
 void OBJ_RemoveObject(object_t *obj);
 void OBJ_DrawObjectLayer(uint8_t layer);
 bool OBJ_TryMovement(object_t *obj, int8_t x, int8_t y);
