@@ -74,7 +74,6 @@ uint16_t V_MixColors(uint16_t c, uint16_t c2, uint8_t a)
     return (r_out << 11) | (g_out << 5) | b_out;
 }
 
-
 void V_Free(void)
 {
 	if (palette != NULL)

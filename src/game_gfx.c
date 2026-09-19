@@ -78,6 +78,20 @@ gfx_t GFX_LoadGFX(const char *filename)
 					gfx.data[(bitmap.height - (y+1)) * bitmap.width + (x/3)] = ((pal.r >> 3) << 11) | ((pal.g >> 2) << 5) | (pal.b >> 3);
 				}
 			break;
+		case 32:
+			for (y = 0; y < bitmap.height; y++)
+				for (x = 0; x < bitmap.width*4; x+=4)
+				{
+					uint32_t index = y * (bitmap.width*4) + x;
+					rgb_t pal;
+					
+					pal.b = bitmap.pixel_data[index];
+					pal.g = bitmap.pixel_data[index+1];
+					pal.r = bitmap.pixel_data[index+2];
+					
+					gfx.data[(bitmap.height - (y+1)) * bitmap.width + (x/4)] = ((pal.r >> 3) << 11) | ((pal.g >> 2) << 5) | (pal.b >> 3);
+				}
+			break;
 		default:
 			I_printf("Unsupported Bitmap BitsPerPixel!\n");
 			return gfx;

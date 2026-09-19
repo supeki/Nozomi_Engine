@@ -34,9 +34,6 @@ static void W_LoadTileset(const char *filename)
     FILE *fp = fopen(filename, "rb");
     char graphic_name[33];
     uint32_t i;
-    size_t read;
-
-    I_printf("%s\n", filename);
 
     // load tileset graphics
     fread(&graphic_name, sizeof(char), 32, fp);
@@ -614,7 +611,7 @@ void W_UpdateWorldEdit(void)
             name_len = strlen(filename) + 1;
             name = malloc((name_len-4) * sizeof(char)); 
             snprintf(name, name_len-4, "%s", filename);
-            name[name_len-5] = '\0'; // fix wince port
+            name[name_len-4] = '\0'; // fix wince port
 
             if (!strcmp(dot, ".set") || !strcmp(dot, ".SET"))
                 W_StartWorldEdit(name, NULL);
@@ -720,8 +717,8 @@ void W_UpdateWorldEdit(void)
 
                 filename = background_dirfiles.filenames[image_sel_option];
                 name_len = strlen(filename) + 1;
-                name = malloc((name_len-5) * sizeof(char)); 
-                snprintf(name, name_len-5, "%s", filename);
+                name = malloc((name_len-4) * sizeof(char)); 
+                snprintf(name, name_len-4, "%s", filename);
                 sprintf(temp_bg_name, "%s", name);
                 free(name);
             }
@@ -1043,8 +1040,8 @@ void W_DrawWorldEdit(void)
 
             filename = background_dirfiles.filenames[image_sel_option];
             name_len = strlen(filename) + 1;
-            name = malloc((name_len-5) * sizeof(char)); 
-            snprintf(name, name_len-5, "%s", filename);
+            name = malloc((name_len-4) * sizeof(char)); 
+            snprintf(name, name_len-4, "%s", filename);
 
             V_DrawText(va("%s.bmp", name), VID_WIDTH - 128, 12, 0);
 
@@ -1557,8 +1554,8 @@ void W_UpdateTilesetEdit(void)
             dot = strrchr(filename, '.');
 
             name_len = strlen(filename) + 1;
-            name = malloc((name_len-5) * sizeof(char)); 
-            snprintf(name, name_len-5, "%s", filename);
+            name = malloc((name_len-4) * sizeof(char)); 
+            snprintf(name, name_len-4, "%s", filename);
 
             if (!strcmp(dot, ".bmp") || !strcmp(dot, ".BMP")) {
                 W_StartTilesetEdit(name, NULL);

@@ -27,10 +27,7 @@ void gameMain(void)
 {
 	I_printf("Initializing video...\n");
 	V_Init();
-	
-	I_printf("Loading palette...\n");
-	V_LoadPalette(va("%s/data/palette.mpl", I_GetHomeDir()), palette);
-	
+		
 	I_printf("Starting graphics backend...\n");
 	I_StartupGraphics();
 	
