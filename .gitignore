@@ -5,6 +5,14 @@ obj/*
 # if ur using WSL2
 *.Identifier
 
+# misc stuff (irrelevant)
+assets/speccy_game
+assets/speccy_game/*
+
+# nds port
+assets/NDS
+assets/NDS/*
+
 # psp port
 *.SFO
 *.elf
