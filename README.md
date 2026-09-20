@@ -110,7 +110,8 @@ instructions on how to compile for those platforms will not be a concern as of n
 
 ## Copyright & Misc. Information
 Nozomi Engine is the intellectual property of Marilyn Nozomi (aka [supeki](https://github.com/supeki)).<br>
-Nozomi Engine and other related works are Copyright © 2026 Marilyn Nozomi
+Nozomi Engine and other related works are Copyright © 2026 Marilyn Nozomi<br>
+GLFW and MacOS backends by [xdf](https://github.com/xdf22)
 
 All non-original code belongs to their authors, contributors own the rights to their own code until it is merged into Nozomi Engine.
 If you suspect that your code, or other assets are being misused, please contact me at `admin@maril.dev`, or visit my contacts page at [https://contacts.maril.dev](https://contacts.maril.dev) for other ways to reach out.
