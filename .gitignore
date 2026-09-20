@@ -5,6 +5,9 @@ obj/*
 # if ur using WSL2
 *.Identifier
 
+# or macos
+*.DS_Store
+
 # misc stuff (irrelevant)
 assets/speccy_game
 assets/speccy_game/*

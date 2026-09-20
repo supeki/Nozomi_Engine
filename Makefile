@@ -149,6 +149,30 @@ ifeq ($(LINUX),1)
 	LDFLAGS := $(LDFLAGS) -Wl,-rpath,'/lib' $(pkg-config sdl2 SDL2_mixer --libs)
 endif
 
+ifeq ($(MACOS),1)
+# needs shell to work for some reason
+	CFLAGS := $(CFLAGS) $(shell pkg-config sdl2 SDL2_mixer --cflags) -O3 -std=gnu17 -w -DLINUX -fno-exceptions -s
+	LDFLAGS := $(LDFLAGS) -Wl,-rpath,'/lib' $(shell pkg-config sdl2 SDL2_mixer --libs)
+
+# the rest is app bundle stuff
+	APP_NAME := Nozomi Engine
+	APP_BUNDLE := bin/SDL/$(APP_NAME).app
+	APP_MACOS := $(APP_BUNDLE)/Contents/MacOS
+	APP_RESOURCES := $(APP_BUNDLE)/Contents/Resources
+
+all:
+	@rm -rf "$(APP_BUNDLE)"
+	@mkdir -p "$(APP_MACOS)" "$(APP_RESOURCES)"
+
+# copy stuff
+	@cp bin/SDL/game "$(APP_MACOS)/game"
+	@cp assets/macOS/Info.plist "$(APP_BUNDLE)/Contents/"
+	@cp -R assets/data "$(APP_RESOURCES)/"
+
+# compile icon to the correct place
+	actool assets/icons/icon.icon --compile "$(APP_RESOURCES)" --platform macosx --minimum-deployment-target 10.13 > /dev/null
+endif
+
 ifeq ($(LINUX_32),1)
 	CFLAGS := $(CFLAGS) -m32 -O3 -std=gnu17 -fno-exceptions -s
 endif

@@ -83,6 +83,23 @@ When it's done, move into the repo folder and build Nozomi Engine for GLFW:
 `cd Nozomi_Engine && make LINUX=1 GLFW=1 SDL=0`
 
 Unlike SDL builds, GLFW builds should show under `bin/GLFW`.
+### macOS
+You need the [brew package manager](https://brew.sh).
+Xcode is also needed (only the commandline tools)
+macOS only works with the SDL backend for now, so run this command to install the required dependencies
+
+`brew install sdl2-compat sdl2_mixer`
+Note: since SDL2 is deprecated, brew only has sdl2-compat currently
+
+Using Git, clone the Nozomi Engine repository:
+
+`git clone https://github.com/supeki/Nozomi_Engine`
+
+In the repository folder, run this command to compile
+
+`make LINUX=1 SDL=1 MACOS=1`
+
+Binary and app bundle will show up in `bin/SDL`
 ### Windows CE (Windows Mobile 5)
 You can compile Nozomi Engine for Windows CE provided you have a copy of Visual Studio 2005, and have the Windows Mobile 5.0 SDK installed. Just open `NozomiCE.vcproj` and build the project.
 

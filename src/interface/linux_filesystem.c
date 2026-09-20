@@ -5,6 +5,11 @@
 #include "../game_defs.h"
 #include "../i_system.h"
 
+// maybe i shouldn't use sdl for this?
+#ifdef __APPLE__
+#include <SDL2/SDL.h>
+#endif
+
 #include <dirent.h>
 #include <sys/stat.h>
 
@@ -15,6 +20,20 @@ const char *I_GetHomeDir(void)
     return va("sd:/%s/", GAME_NAME); // moved to sd:/ but it might not be supported on flashcards, we'll see
     #elif defined(PSP)
     return va("ms0:/PSP/GAME/%s/", GAME_NAME);
+    #elif defined(__APPLE__)
+        char *base = SDL_GetBasePath();
+
+        if (base != NULL)
+        {
+            static char path[1024];
+
+            snprintf(path, sizeof(path), "%s../Resources/", base);
+            SDL_free(base);
+
+            return path;
+        }
+
+        return ".";
     #else
     const char *home = NULL;
 
