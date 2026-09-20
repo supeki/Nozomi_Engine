@@ -19,7 +19,7 @@ int jadefrac_to_maxmod[NUMMUSIC] = {
 
 void I_StartupSound(void)
 {
-	mmInitDefault("nitro:/soundbank.bin");
+	mmInitDefault(va("%s/data/soundbank.bin", I_GetHomeDir()));
 }
 
 void I_ShutdownSound(void)

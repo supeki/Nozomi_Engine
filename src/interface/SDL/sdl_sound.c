@@ -22,18 +22,7 @@ const char *jadefrac_to_sdl[NUMMUSIC] = {
 
 void I_StartupSound(void)
 {
-	Mix_Init(MIX_INIT_MID|MIX_INIT_OGG);
-	
-	// Use Native MIDI on Windows :3
-	#if !defined(WINDOWS)
-	Mix_SetSoundFonts("data/soundfont.sf2");
-	#endif
-	
-	// PSP doesn't support MIDI playback!?
-	#if defined(PSP)
-	use_midi = false;
-	#endif
-	
+	Mix_Init(MIX_INIT_OGG);
 	Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
 }
 

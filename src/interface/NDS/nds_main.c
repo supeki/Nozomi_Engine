@@ -26,9 +26,6 @@ int main(int argc, char *argv[])
 	TIMER0_CR=TIMER_DIV_1024 | TIMER_ENABLE;
 	TIMER1_CR=TIMER_CASCADE | TIMER_ENABLE;
 	
-	I_printf("Initializing NitroFS...\n");
-	if (!nitroFSInit(NULL))
-		I_Error("NitroFS failed to initialize!\nCannot proceed!\n");
 	I_printf("Initializing FAT filesystem...\n");
 	if (!fatInitDefault())
 		I_printf("FAT filesystem failed to initialize!\nWon't be able to save files!\n");

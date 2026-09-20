@@ -7,8 +7,6 @@
 #include "game_sound.h"
 
 music_t music;
-bool use_midi = false;
-
 int8_t sound_volume = 64, music_volume = 64;
 
 void S_Init(void)

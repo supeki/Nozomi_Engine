@@ -136,30 +136,22 @@ make -j2 SDL=0 LINUX=1 GLFW=1
 # Clean obj directory to prepare for NDS
 make clean NDS=1
 
-# Make a new nitrofs directory
-rm -rf assets/NDS/nitrofs
-mkdir -p assets/NDS/nitrofs
+# Remove pre-existing binaries
+rm -rf bin/NDS
+mkdir -p bin/NDS
 
 # Remove soundbank header
 rm -rf src/interface/NDS/soundbank.h
 
 # Copy game data
-cp -r assets/data assets/NDS/nitrofs/data
+cp -r assets/data bin/NDS/data
 rm -rf assets/NDS/icon.gif
 cp -r assets/icons/icon.gif assets/NDS/icon.gif
 
-# Remove and copy audio data
-rm -rf assets/NDS/audio
-cp -r assets/data/audio assets/NDS/audio
-
-# NDS also doesn't need the audio folder!
-rm -rf assets/NDS/nitrofs/data/audio
+# NDS doesn't need the audio folder!
+rm -rf bin/NDS/data/audio
 # uhhh it also doesn't need gamecontrollerdb.txt lmfaooo
-rm -rf assets/NDS/nitrofs/data/gamecontrollerdb.txt
-
-# Remove pre-existing binaries
-rm -rf bin/NDS
-mkdir -p bin/NDS
+rm -rf bin/NDS/data/gamecontrollerdb.txt
 
 # Copy required licenses/credits
 cp -r assets/credits/NDS_LICENSES.txt bin/NDS/NDS_LICENSES.txt
