@@ -33,7 +33,7 @@ const char *I_GetHomeDir(void)
             return path;
         }
 
-        return ".";
+        return "./";
     #else
     const char *home = NULL;
 
@@ -41,7 +41,7 @@ const char *I_GetHomeDir(void)
     //home = getenv("HOME");
 
     if (home == NULL)
-        home = ".";
+        home = "./";
 
     return home;
     #endif

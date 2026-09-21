@@ -23,6 +23,7 @@ GAME_VERSION ?= v1.0.0
 WINDOWS ?= 1
 WIN_32 ?= 0
 DOS ?= 0
+AMIGA ?= 0
 LINUX ?= 0
 LINUX_32 ?= 0
 GLFW ?= 0
@@ -36,6 +37,14 @@ endif
 
 ifeq ($(DOS), 1)
 WINDOWS = 0
+LINUX = 0
+SDL = 0
+GLFW = 0
+endif
+
+ifeq ($(AMIGA), 1)
+WINDOWS = 0
+DOS = 0
 LINUX = 0
 SDL = 0
 GLFW = 0
@@ -139,6 +148,21 @@ ifeq ($(DOS),1)
 	LIBS := $(LIBS) -lm -lalleg
 	LDFLAGS := $(LDFLAGS) -L/home/marilyn/djgpp/lib -L/home/marilyn/djgpp/i386-pc-msdosdjgpp/lib
 	CFLAGS := $(CFLAGS) $(OPTS) $(DEFINES) -Os -std=gnu17 -fgnu89-inline -fno-exceptions -s
+endif
+
+ifeq ($(AMIGA), 1)
+	CC = m68k-amigaos-gcc
+	INTERFACE = AMIGA
+	i_main = amiga_main
+	i_event = amiga_event
+	i_system = amiga_system
+	i_video = amiga_video
+
+	EXEC_EXT =
+
+	DEFINES := -DAMIGA 
+	LIBS := $(LIBS) -mcrt=nix13
+	CFLAGS := $(DEFINES) -Os -fno-exceptions -s -m68000 -msoft-float
 endif
 
 ifeq ($(LINUX),1)
@@ -284,6 +308,11 @@ endif
 ifeq ($(DOS),1)
 i_filesystem = dos_filesystem
 INTERFACE_BIN = $(BIN_DIR)/DOS
+endif
+
+ifeq ($(AMIGA),1)
+i_filesystem = amiga_filesystem
+INTERFACE_BIN = $(BIN_DIR)/Amiga
 endif
 
 ifeq ($(LINUX_32), 1)

@@ -18,7 +18,7 @@ void V_Init(void)
 	vid.buffer = malloc(VID_WIDTH * VID_HEIGHT * sizeof(uint16_t));
 	memset(vid.buffer, 0, VID_WIDTH * VID_HEIGHT * sizeof(uint16_t));
 
-	font_default = FNT_LoadFont(va("%s/data/fonts/default.fnt", I_GetHomeDir()));
+	font_default = FNT_LoadFont(va("%sdata/fonts/default.fnt", I_GetHomeDir()));
 }
 
 // Load the palette into vid.palette :3 Nozomi
@@ -114,8 +114,12 @@ void V_DrawLine(int32_t x, int32_t y, int32_t angle, uint16_t length, uint16_t c
 	if (col == 0)
 		return; // bow wow wow yippee yo yippee yay
 
-	dx = (int32_t)(cos((angle-90) * (PI/180.0)) * 65536);
-	dy = (int32_t)(sin((angle-90) * (PI/180.0)) * 65536);
+	angle = (angle - 90) % 360;
+	if (angle < 0)
+		angle += 360;
+
+	dx = COS_LUT[angle];
+	dy = SIN_LUT[angle];
 
 	for (i = 0; i < length; i++)
 	{ 
@@ -139,16 +143,22 @@ void V_DrawLine(int32_t x, int32_t y, int32_t angle, uint16_t length, uint16_t c
 void V_DrawBox(int32_t x, int32_t y, int32_t angle, uint16_t width, uint16_t height, uint16_t col, uint32_t flags)
 {
 	int32_t offx, offy, offx2, offy2;
-	double rad_width = (angle + 90) * (PI/180.0);
-	double rad_height = (angle + 180) * (PI/180.0);
+	int32_t rad_width = (angle + 90) % 360;
+	int32_t rad_height = (angle + 180) % 360;
+
+	if (rad_width < 0)
+		rad_width += 360;
+
+	if (rad_height < 0)
+		rad_height += 360;
 
 	V_DrawLine(x, y, angle+180, height, col, flags);
 	V_DrawLine(x, y, angle+90, width, col, flags);
 
-	offx = (int32_t)(-sin(rad_height) * height);
-    offy = (int32_t)(-cos(rad_height) * height); 
-    offx2 = (int32_t)(-sin(rad_width) * width);
-    offy2 = (int32_t)(-cos(rad_width) * width);
+	offx = (-SIN_LUT[rad_height] * height) >> 16;
+	offy = (-COS_LUT[rad_height] * height) >> 16;
+	offx2 = (-SIN_LUT[rad_width] * width) >> 16;
+	offy2 = (-COS_LUT[rad_width] * width) >> 16;
 
 	V_DrawLine(x - offx2 - 1, y + offy2, angle+180, height, col, flags);
 	V_DrawLine(x - offx, y + offy - 1, angle+90, width, col, flags);

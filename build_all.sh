@@ -52,6 +52,26 @@ make -j2 DOS=1
 cp -r assets/DOS/* bin/DOS/
 mv bin/DOS/audio bin/DOS/data/audio
 
+# Clean obj directory to prepare for Amiga
+make clean AMIGA=1
+
+# Remove pre-existing binaries
+rm -rf bin/Amiga
+mkdir -p bin/Amiga
+
+# Copy game data
+cp -r assets/data bin/Amiga/data
+rm -rf bin/Amiga/data/gamecontrollerdb.txt
+rm -rf bin/Amiga/data/audio
+
+# Copy required licenses/credits
+# add later
+
+# Make and move Amiga binary and stuff
+make -j2 AMIGA=1
+#cp -r assets/Amiga/* bin/Amiga/
+#mv bin/Amiga/audio bin/Amiga/data/audio
+
 # Clean obj directory to prepare for Linux (SDL)
 make clean LINUX=1
 

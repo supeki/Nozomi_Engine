@@ -126,6 +126,21 @@ void G_DefaultControls(void)
 		gamecontrolbinds[j][CON_Z][0] = KEY_D;
 		gamecontrolbinds[j][CON_CONFIRM][0] = KEY_Z;
 		gamecontrolbinds[j][CON_BACK][0] = KEY_X;
+	#elif defined(AMIGA)
+		gamecontrolbinds[j][CON_UP][0] = 0x4C;
+		gamecontrolbinds[j][CON_DOWN][0] = 0x4D;
+		gamecontrolbinds[j][CON_LEFT][0] = 0x4F;
+		gamecontrolbinds[j][CON_RIGHT][0] = 0x4E;
+		gamecontrolbinds[j][CON_A][0] = 0x31;
+		gamecontrolbinds[j][CON_B][0] = 0x32;
+		gamecontrolbinds[j][CON_C][0] = 0x33;
+		gamecontrolbinds[j][CON_START][0] = 0x44;
+		gamecontrolbinds[j][CON_SELECT][0] = 0x61;
+		gamecontrolbinds[j][CON_X][0] = 0x20;
+		gamecontrolbinds[j][CON_Y][0] = 0x21;
+		gamecontrolbinds[j][CON_Z][0] = 0x22;
+		gamecontrolbinds[j][CON_CONFIRM][0] = 0x31;
+		gamecontrolbinds[j][CON_BACK][0] = 0x32;
 	#endif
 	}
 }

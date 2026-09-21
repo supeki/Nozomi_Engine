@@ -7,7 +7,7 @@
 
 const char *I_GetHomeDir(void)
 {
-    return ".";
+    return "./";
 }
 
 dirfiles_t I_GetDir(const char *path)

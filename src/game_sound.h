@@ -19,7 +19,6 @@ typedef struct
 } music_t;
 
 extern music_t music;
-extern bool use_midi;
 extern int8_t sound_volume, music_volume;
 
 void S_ChangeSoundVolume(int8_t value);

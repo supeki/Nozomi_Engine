@@ -20,6 +20,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #endif
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,5 +71,14 @@ char *va(const char *format, ...);
 #endif
 
 #define PU 65536
+
+// 16.16 luts so i don't have to use sin or cos ever again in my life :3
+extern const int32_t SIN_LUT[360];
+extern const int32_t COS_LUT[360];
+
+uint16_t FIL_ReadU16(FILE *fp);
+int16_t FIL_ReadS16(FILE *fp);
+uint32_t FIL_ReadU32(FILE *fp);
+int32_t FIL_ReadS32(FILE *fp);
 
 #endif

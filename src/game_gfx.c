@@ -11,7 +11,7 @@ gfx_t gfx_textbox;
 
 void GFX_InitGFX(void)
 {
-	gfx_textbox = GFX_LoadGFX(va("%s/data/textbox.bmp", I_GetHomeDir()));
+	gfx_textbox = GFX_LoadGFX(va("%sdata/textbox.bmp", I_GetHomeDir()));
 }
 
 // Load a Bitmap and convert it to our GFX format
@@ -129,10 +129,10 @@ gfx_t GFX_LoadLegacyGFX(const char *filename)
 	memset(&gfx, 0, sizeof(gfx_t));
 	
 	// read gfx header		
-	fread(&size, sizeof(uint32_t), 1, file);
+	size = FIL_ReadU32(file);
 	size++;
 	
-	fread(&gfx.width, sizeof(uint16_t), 1, file);
+	gfx.width = FIL_ReadU16(file);
 	gfx.width++;
 	gfx.height = size / gfx.width;
 	

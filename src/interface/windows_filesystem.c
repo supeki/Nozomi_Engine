@@ -48,7 +48,7 @@ const char *I_GetHomeDir(void)
     len = GetModuleFileName(NULL, wpath, MAX_PATH);
 
     if (len == 0)
-        return ".";
+        return "./";
 
     I_WideToChar(wpath, path, MAX_PATH);
 
@@ -57,14 +57,14 @@ const char *I_GetHomeDir(void)
     if (slash != NULL)
         *slash = '\0';
 
-    return path;
+    return va("%s/", path);
     #elif defined(XBOX)
-    return ".";
+    return "./";
     #else
     static char path[MAX_PATH];
 
     if (GetCurrentDirectoryA(MAX_PATH, path) == 0)
-        return ".";
+        return "./";
 
     return path;
     #endif

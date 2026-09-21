@@ -42,7 +42,7 @@ static void W_LoadTileset(const char *filename)
     if (gfx_tileset.data != NULL)
         GFX_FreeGFX(&gfx_tileset);
 
-    gfx_tileset = GFX_LoadGFX(va("%s/data/tiles/%s.bmp", I_GetHomeDir(), graphic_name));
+    gfx_tileset = GFX_LoadGFX(va("%sdata/tiles/%s.bmp", I_GetHomeDir(), graphic_name));
 
     // load tileset data
     // get tile width/height
@@ -59,7 +59,7 @@ static void W_LoadTileset(const char *filename)
     tile_anim_frames = malloc(num_tiles * sizeof(uint8_t));
     tile_anim_fps = malloc(num_tiles * sizeof(uint8_t));
     for (i = 0; i < num_tiles; i++) {
-        fread(&tile_attributes[i], sizeof(uint32_t), 1, fp);
+        tile_attributes[i] = FIL_ReadU32(fp);
         fread(&tile_decorid[i], sizeof(uint8_t), 1, fp);
         fread(&tile_anim_frames[i], sizeof(uint8_t), 1, fp);
         fread(&tile_anim_fps[i], sizeof(uint8_t), 1, fp);
@@ -70,7 +70,7 @@ static void W_LoadTileset(const char *filename)
 
 static void W_SaveTileset(const char *name)
 {
-    FILE *fp = fopen(va("%s/data/tiles/%s.set", I_GetHomeDir(), name), "wb+");
+    FILE *fp = fopen(va("%sdata/tiles/%s.set", I_GetHomeDir(), name), "wb+");
     gfx_t gfx_temptileset;
     uint32_t i;
     char gfx_name[33];
@@ -117,16 +117,16 @@ void W_LoadWorldFile(const char *filename)
     tileset_name[32] = '\0';
 
     I_printf("Loading Tileset: %s...\n", tileset_name);
-    W_LoadTileset(va("%s/data/tiles/%s.set", I_GetHomeDir(), tileset_name));
+    W_LoadTileset(va("%sdata/tiles/%s.set", I_GetHomeDir(), tileset_name));
     sprintf(temp_tile_name, "%s", tileset_name);
 
     // get world width and height
     I_printf("Getting world data...\n");
-    fread(&world_width, sizeof(uint16_t), 1, fp);
-    fread(&world_height, sizeof(uint16_t), 1, fp);
+    world_width = FIL_ReadU16(fp);
+    world_height = FIL_ReadU16(fp);
 
     // read world data
-    fread(&world_bgtype, sizeof(uint32_t), 1, fp);
+    world_bgtype = FIL_ReadU32(fp);
 
     // load background if not using tiles
     if (world_bgtype & BG_IMAGE) {
@@ -140,12 +140,12 @@ void W_LoadWorldFile(const char *filename)
         }
             
         I_printf("Loading new background...\n");
-        gfx_worldbg = GFX_LoadGFX(va("%s/data/back/%s.bmp", I_GetHomeDir(), background_name));
+        gfx_worldbg = GFX_LoadGFX(va("%sdata/back/%s.bmp", I_GetHomeDir(), background_name));
     }
 
     if (world_bgtype & BG_COLOR) {
         I_printf("Setting background color...\n");
-        fread(&world_bgcolor, sizeof(uint16_t), 1, fp);
+        world_bgcolor = FIL_ReadU16(fp);
     }
 
     // read world tiles
@@ -155,14 +155,14 @@ void W_LoadWorldFile(const char *filename)
     world_bgtiles = malloc(world_width * world_height * sizeof(uint16_t));
     world_bgtiles2 = malloc(world_width * world_height * sizeof(uint16_t));
     for (i = 0; i < world_width * world_height; i++) {
-        fread(&world_tiles[i], sizeof(uint16_t), 1, fp);
-        fread(&world_tiles2[i], sizeof(uint16_t), 1, fp);
-        fread(&world_bgtiles[i], sizeof(uint16_t), 1, fp);
-        fread(&world_bgtiles2[i], sizeof(uint16_t), 1, fp);
+        world_tiles[i] = FIL_ReadU16(fp);
+        world_tiles2[i] = FIL_ReadU16(fp);
+        world_bgtiles[i] = FIL_ReadU16(fp);
+        world_bgtiles2[i] = FIL_ReadU16(fp);
     }
 
     // load objects into world
-    fread(&num_objs, sizeof(uint32_t), 1, fp); // i'm lazyy so i'll store num of objs in file
+    num_objs = FIL_ReadU32(fp); // i'm lazyy so i'll store num of objs in file
 
     if (num_objs > 0) {
         I_printf("Spawning objects...\n");
@@ -173,11 +173,11 @@ void W_LoadWorldFile(const char *filename)
             uint8_t dir_layer;
             uint32_t flags;
 
-            fread(&type, sizeof(uint16_t), 1, fp);
-            fread(&x, sizeof(uint16_t), 1, fp);
-            fread(&y, sizeof(uint16_t), 1, fp);
+            type = FIL_ReadU16(fp);
+            x = FIL_ReadU16(fp);
+            y = FIL_ReadU16(fp);
             fread(&dir_layer, sizeof(uint8_t), 1, fp);
-            fread(&flags, sizeof(uint32_t), 1, fp);
+            flags = FIL_ReadU32(fp);
 
             obj = OBJ_CreateObject(x, y, type);
             obj->dir_layer = dir_layer;
@@ -420,7 +420,7 @@ void W_CreateTilesetFromFile(const char *input, uint8_t tile_size)
 {
     uint32_t i;
 
-    gfx_tileset = GFX_LoadGFX(va("%s/data/tiles/%s.bmp", I_GetHomeDir(), input));
+    gfx_tileset = GFX_LoadGFX(va("%sdata/tiles/%s.bmp", I_GetHomeDir(), input));
 
     tile_width = tile_height = tile_size;
     num_tiles = (gfx_tileset.width / tile_width) * (gfx_tileset.height / tile_height);
@@ -441,7 +441,7 @@ void W_CreateWorldFromTilesetFile(const char *input, uint16_t width, uint16_t he
 {
     uint32_t i;
 
-    W_LoadTileset(va("%s/data/tiles/%s.set", I_GetHomeDir(), input));
+    W_LoadTileset(va("%sdata/tiles/%s.set", I_GetHomeDir(), input));
     sprintf(temp_tile_name, "%s", input);
     temp_tile_name[strlen(input)] = '\0';
 
@@ -455,7 +455,7 @@ void W_CreateWorldFromTilesetFile(const char *input, uint16_t width, uint16_t he
     world_bgtiles = malloc(world_width * world_height * sizeof(uint16_t));
     world_bgtiles2 = malloc(world_width * world_height * sizeof(uint16_t));
     GFX_FreeGFX(&gfx_worldbg);
-    gfx_worldbg = GFX_LoadGFX(va("%s/data/back/dummy.bmp", I_GetHomeDir()));
+    gfx_worldbg = GFX_LoadGFX(va("%sdata/back/dummy.bmp", I_GetHomeDir()));
 
     for (i = 0; i < world_width * world_height; i++) {
         world_tiles[i] = 0; // default of the top-left tile // might want it to be transparent...
@@ -516,14 +516,14 @@ void W_StartWorldEdit(const char *tileset_name, const char *world_name)
         world_edit = true;
         file_menu = true;
         tile_sel_option = 0;
-        W_UpdateFiles(&tileset_dirfiles, va("%s/data/tiles", I_GetHomeDir())); // we need these too
-        W_UpdateFiles(&world_dirfiles, va("%s/data/worlds", I_GetHomeDir()));
-        W_UpdateFiles(&background_dirfiles, va("%s/data/back", I_GetHomeDir())); // and these
+        W_UpdateFiles(&tileset_dirfiles, va("%sdata/tiles", I_GetHomeDir())); // we need these too
+        W_UpdateFiles(&world_dirfiles, va("%sdata/worlds", I_GetHomeDir()));
+        W_UpdateFiles(&background_dirfiles, va("%sdata/back", I_GetHomeDir())); // and these
         return;
     }
 
     if (tileset_name == NULL) {
-        W_LoadWorldFile(va("%s/data/worlds/%s.wld", I_GetHomeDir(), world_name));
+        W_LoadWorldFile(va("%sdata/worlds/%s.wld", I_GetHomeDir(), world_name));
         sprintf(temp_world_name, world_name);
     } else {
         W_CreateWorldFromTilesetFile(tileset_name, menu_world_width, menu_world_height);
@@ -713,7 +713,7 @@ void W_UpdateWorldEdit(void)
                 int name_len;
 
                 GFX_FreeGFX(&gfx_worldbg);
-                gfx_worldbg = GFX_LoadGFX(va("%s/data/back/%s", I_GetHomeDir(), background_dirfiles.filenames[image_sel_option]));
+                gfx_worldbg = GFX_LoadGFX(va("%sdata/back/%s", I_GetHomeDir(), background_dirfiles.filenames[image_sel_option]));
 
                 filename = background_dirfiles.filenames[image_sel_option];
                 name_len = strlen(filename) + 1;
@@ -1403,7 +1403,7 @@ void W_SaveWorldFile(const char *filename)
         }
 
     I_printf("Opening file to save...\n");
-    fp = fopen(va("%s/data/worlds/%s.wld", I_GetHomeDir(), file_name), "wb+");
+    fp = fopen(va("%sdata/worlds/%s.wld", I_GetHomeDir(), file_name), "wb+");
 
     // write world header
 
@@ -1486,12 +1486,12 @@ void W_StartTilesetEdit(const char *gfx_name, const char *tileset_name)
         tileset_edit = true;
         file_menu = true;
         tile_sel_option = 0;
-        W_UpdateFiles(&tileset_dirfiles, va("%s/data/tiles", I_GetHomeDir()));
+        W_UpdateFiles(&tileset_dirfiles, va("%sdata/tiles", I_GetHomeDir()));
         return;
     }
 
     if (gfx_name == NULL) { // didn't specify a graphics file to base from
-        W_LoadTileset(va("%s/data/tiles/%s.set", I_GetHomeDir(), tileset_name)); // so you must want to edit a pre-made file
+        W_LoadTileset(va("%sdata/tiles/%s.set", I_GetHomeDir(), tileset_name)); // so you must want to edit a pre-made file
         sprintf(temp_tile_name, "%s", tileset_name);
     } else if (tileset_name == NULL) { // no tileset file
         W_CreateTilesetFromFile(gfx_name, 8); // so you're ok with the

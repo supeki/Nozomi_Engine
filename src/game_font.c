@@ -21,16 +21,16 @@ font_t FNT_LoadFont(const char *filename)
 
 	fread(gfx_name, sizeof(char), 32, fp);
 	gfx_name[32] = '\0';
-	font.gfx = GFX_LoadGFX(va("%s/data/fonts/%s.bmp", I_GetHomeDir(), gfx_name));
 
-	fread(&font.charsize, sizeof(uint16_t), 1, fp);
+	font.gfx = GFX_LoadGFX(va("%sdata/fonts/%s.bmp", I_GetHomeDir(), gfx_name));
+	font.charsize = FIL_ReadU16(fp);
 	font.offset = malloc(256*sizeof(int16_t));
 	font.size = malloc(256*sizeof(uint16_t));
 	
 	for (i = 0; i < 256; i++)
-		fread(&font.offset[i], sizeof(int16_t), 1, fp);
+		font.offset[i] = FIL_ReadS16(fp);
 	for (i = 0; i < 256; i++)
-		fread(&font.size[i], sizeof(uint16_t), 1, fp);
+		font.size[i] = FIL_ReadS16(fp);
 
 	return font;
 }
@@ -41,7 +41,7 @@ uint8_t curchar = 0;
 
 void FNT_StartFontEdit(void)
 {
-	temp_font = FNT_LoadFont(va("%s/data/fonts/default.fnt", I_GetHomeDir()));
+	temp_font = FNT_LoadFont(va("%sdata/fonts/default.fnt", I_GetHomeDir()));
 	font_edit = true;
 }
 
@@ -157,7 +157,7 @@ void FNT_FontEditDraw(void)
 
 void FNT_SaveTempFont(void)
 {
-	FILE *fp = fopen(va("%s/data/fonts/temp.fnt", I_GetHomeDir()), "wb+");
+	FILE *fp = fopen(va("%sdata/fonts/temp.fnt", I_GetHomeDir()), "wb+");
 	char gfx_name[33];
 	int i;
 
