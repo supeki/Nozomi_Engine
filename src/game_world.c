@@ -468,24 +468,7 @@ void W_CreateWorldFromTilesetFile(const char *input, uint16_t width, uint16_t he
 // idk if this needs to be here honestly, but i wanna multipurpose it now
 static bool file_menu = false;
 static dirfiles_t world_dirfiles, tileset_dirfiles, background_dirfiles;
-static char *last_path;
 static uint8_t tile_sel_option = 0;
-
-static void W_UpdateFiles(dirfiles_t *dirfiles, const char *path)
-{
-    if (dirfiles != NULL)
-        DF_Free(dirfiles);
-
-    *dirfiles = I_GetDir(path);
-
-    if (last_path != NULL) {
-        free(last_path);
-        last_path = NULL;
-    }
-
-    last_path = malloc((strlen(path)+1) * sizeof(char));
-    strcpy(last_path, path);
-}
 
 bool world_edit = false; // world editing 'yo
 static char temp_world_name[33]; // woa it's almost like the tile editor but now you place them
@@ -516,9 +499,9 @@ void W_StartWorldEdit(const char *tileset_name, const char *world_name)
         world_edit = true;
         file_menu = true;
         tile_sel_option = 0;
-        W_UpdateFiles(&tileset_dirfiles, va("%sdata/tiles", I_GetHomeDir())); // we need these too
-        W_UpdateFiles(&world_dirfiles, va("%sdata/worlds", I_GetHomeDir()));
-        W_UpdateFiles(&background_dirfiles, va("%sdata/back", I_GetHomeDir())); // and these
+        DF_UpdateDirfiles(&tileset_dirfiles, va("%sdata/tiles", I_GetHomeDir())); // we need these too
+        DF_UpdateDirfiles(&world_dirfiles, va("%sdata/worlds", I_GetHomeDir()));
+        DF_UpdateDirfiles(&background_dirfiles, va("%sdata/back", I_GetHomeDir())); // and these
         return;
     }
 
@@ -1486,7 +1469,7 @@ void W_StartTilesetEdit(const char *gfx_name, const char *tileset_name)
         tileset_edit = true;
         file_menu = true;
         tile_sel_option = 0;
-        W_UpdateFiles(&tileset_dirfiles, va("%sdata/tiles", I_GetHomeDir()));
+        DF_UpdateDirfiles(&tileset_dirfiles, va("%sdata/tiles", I_GetHomeDir()));
         return;
     }
 

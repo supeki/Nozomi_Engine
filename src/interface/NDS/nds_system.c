@@ -55,6 +55,7 @@ void I_printf (const char *text, ...)
 
 	printf(txt);
 }
+
 void I_Error (const char *error, ...)
 {
     va_list argptr;

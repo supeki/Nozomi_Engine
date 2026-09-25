@@ -10,8 +10,8 @@
 
 const char *I_GetHomeDir(void)
 {
-    // lets use "." for now
-    return ".";
+    // lets use "./" for now
+    return "./";
 }
 
 dirfiles_t I_GetDir(const char *path)

@@ -26,9 +26,7 @@ int main(int argc, char *argv[])
 	I_printf("Initializing SDL...\n");
 	
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_GAMECONTROLLER|SDL_INIT_JOYSTICK) < 0)
-	{
 		I_Error("Could not initialize SDL: %s\n", SDL_GetError());
-	}
 	
 	// add our controller mappings for quirky controllers we wanna support
 	SDL_GameControllerAddMappingsFromFile("data/gamecontrollerdb.txt");

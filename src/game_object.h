@@ -23,6 +23,8 @@ typedef enum
 	NUM_ANIMS 
 } obj_anims_e;
 
+extern const char *anim_names[NUM_ANIMS];
+
 typedef struct 
 {
 	uint8_t x_off;
@@ -42,6 +44,7 @@ typedef struct
 
 typedef struct object_info_s
 {
+	uint32_t id;
 	uint8_t health;
 	uint32_t flags;
 	uint8_t hit[4];
@@ -85,11 +88,13 @@ typedef struct object_s
 typedef enum
 {
 	OBJ_NULL, 
-	OBJ_PLAYER
+	OBJ_PLAYER,
+	NUM_DEF_OBJECTS
 } object_types_e; // these two object types already exist for pretty obvious reasons
 
 extern object_t objects;
 extern object_info_t *object_info;
+extern uint32_t num_object_info;
 
 // Including the camera in the object code out of laziness?
 typedef struct camera_s
@@ -114,5 +119,12 @@ object_t *OBJ_CreateObject(uint16_t x, uint16_t y, uint16_t type);
 void OBJ_RemoveObject(object_t *obj);
 void OBJ_DrawObjectLayer(uint8_t layer);
 bool OBJ_TryMovement(object_t *obj, int8_t x, int8_t y);
+
+void OBJINFO_CreateNewObjectAnimFrame(object_info_t obj_info, uint32_t anim_num);
+void OBJINFO_CreateNewObjectInfo(void);
+
+extern bool objectinfo_edit;
+void OBJINFO_LoadObjectInfoFile(const char *filename);
+void OBJINFO_StartObjectInfoEdit(const char *filename);
 
 #endif

@@ -22,6 +22,23 @@ char *va(const char *fmt, ...) {
     return buf[idx];
 }
 
+char *last_path;
+void DF_UpdateDirfiles(dirfiles_t *dirfiles, const char *path)
+{
+    if (dirfiles != NULL)
+        DF_Free(dirfiles);
+
+    *dirfiles = I_GetDir(path);
+
+    if (last_path != NULL) {
+        free(last_path);
+        last_path = NULL;
+    }
+
+    last_path = malloc((strlen(path)+1) * sizeof(char));
+    strcpy(last_path, path);
+}
+
 void DF_Free(dirfiles_t *dirfiles)
 {
     if (dirfiles != NULL) {

@@ -25,6 +25,8 @@ typedef struct
 
 const char *I_GetHomeDir(void);
 dirfiles_t I_GetDir(const char *path);
+extern char *last_path;
+void DF_UpdateDirfiles(dirfiles_t *dirfiles, const char *path);
 void DF_Free(dirfiles_t *dirfiles);
 
 #endif
