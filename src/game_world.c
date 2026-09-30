@@ -973,7 +973,7 @@ void W_DrawWorldEdit(void)
                     char *dot;
                     dot = strrchr(tileset_dirfiles.filenames[i - world_dirfiles.num_files], '.');
 
-                    if (!strcmp(dot, ".bmp") || !strcmp(dot, ".BMP"))
+                    if (strcmp(dot, ".wld") && strcmp(dot, ".WLD") && strcmp(dot, ".set") && strcmp(dot, ".SET"))
                         V_DrawText(va("N/A - %s", tileset_dirfiles.filenames[i - world_dirfiles.num_files]), (i/17) * 80 + 8, (i%17) * 10 + 20, 0);
                     else
                         V_DrawText(va("%s", tileset_dirfiles.filenames[i - world_dirfiles.num_files]), (i/17) * 80 + 8, (i%17) * 10 + 20, 0);

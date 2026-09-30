@@ -51,6 +51,7 @@ void DF_Free(dirfiles_t *dirfiles)
     }
 }
 
+#if defined(BIG_ENDIAN)
 uint16_t FIL_ReadU16(FILE *fp)
 {
 	uint8_t b[2];
@@ -59,11 +60,6 @@ uint16_t FIL_ReadU16(FILE *fp)
 
 	return (uint16_t)b[0] |
 	((uint16_t)b[1] << 8);
-}
-
-int16_t FIL_ReadS16(FILE *fp)
-{
-	return (int16_t)FIL_ReadU16(fp);
 }
 
 uint32_t FIL_ReadU32(FILE *fp)
@@ -76,6 +72,26 @@ uint32_t FIL_ReadU32(FILE *fp)
 	((uint32_t)b[1] << 8) |
 	((uint32_t)b[2] << 16)|
 	((uint32_t)b[3] << 24);
+}
+#else
+uint16_t FIL_ReadU16(FILE *fp)
+{
+	uint16_t b;
+	fread(&b, sizeof(uint16_t), 1, fp);
+	return b;
+}
+
+uint32_t FIL_ReadU32(FILE *fp)
+{
+	uint32_t b;
+	fread(&b, sizeof(uint32_t), 1, fp);
+	return b;
+}
+#endif
+
+int16_t FIL_ReadS16(FILE *fp)
+{
+	return (int16_t)FIL_ReadU16(fp);
 }
 
 int32_t FIL_ReadS32(FILE *fp)

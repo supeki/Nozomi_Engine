@@ -27,10 +27,10 @@ extern const char *anim_names[NUM_ANIMS];
 
 typedef struct 
 {
-	uint8_t x_off;
-	uint8_t y_off;
-	uint8_t width;
-	uint8_t height;
+	uint16_t x_off;
+	uint16_t y_off;
+	uint16_t width;
+	uint16_t height;
 } object_animframe_t;
 
 typedef struct
@@ -45,6 +45,7 @@ typedef struct
 typedef struct object_info_s
 {
 	uint32_t id;
+	char name[33]; // give them a recognizable name
 	uint8_t health;
 	uint32_t flags;
 	uint8_t hit[4];
@@ -120,11 +121,14 @@ void OBJ_RemoveObject(object_t *obj);
 void OBJ_DrawObjectLayer(uint8_t layer);
 bool OBJ_TryMovement(object_t *obj, int8_t x, int8_t y);
 
-void OBJINFO_CreateNewObjectAnimFrame(object_info_t obj_info, uint32_t anim_num);
+void OBJINFO_CreateNewObjectAnimFrame(object_info_t *obj_info, uint32_t anim_num);
 void OBJINFO_CreateNewObjectInfo(void);
+void OBJINFO_DefaultObjectInfo(void);
 
 extern bool objectinfo_edit;
 void OBJINFO_LoadObjectInfoFile(const char *filename);
 void OBJINFO_StartObjectInfoEdit(const char *filename);
+void OBJINFO_UpdateObjectInfoEdit(void);
+void OBJINFO_DrawObjectInfoEdit(void);
 
 #endif

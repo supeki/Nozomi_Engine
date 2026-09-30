@@ -245,6 +245,10 @@ void V_DrawCropped(gfx_t gfx, int32_t x, int32_t y, int32_t sx, int32_t sy, uint
 	for (zy = 0; zy < h; zy++)
 		for (zx = 0; zx < w; zx++)
 		{
+			if (sx + sy*gfx.width + zx + zy*gfx.width > (gfx.width * gfx.height)
+				|| sx + sy*gfx.width + zx + zy*gfx.width < 0)
+				return;
+
 			src = &gfx.data[sx + sy*gfx.width + zx + zy*gfx.width];
 			
 			vx = x + zx;

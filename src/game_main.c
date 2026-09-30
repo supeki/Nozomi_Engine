@@ -43,13 +43,13 @@ void gameMain(void)
 	GFX_InitGFX();
 	OBJ_InitObjects();
 
+	//FNT_StartFontEdit(NULL, NULL);
 	//W_StartTilesetEdit(NULL, NULL);
-	W_StartWorldEdit(NULL, NULL);
+	//W_StartWorldEdit(NULL, NULL);
+	OBJINFO_StartObjectInfoEdit(NULL);
 
 	I_PlayMusic(mus_demo, true);
 	//D_StartDialogue(0);
-
-	//FNT_StartFontEdit();
 }
 
 // The main game loop.
@@ -127,6 +127,9 @@ void gameRunStuff(void)
 
 	if (world_edit)
 		W_UpdateWorldEdit();
+
+	if (objectinfo_edit)
+		OBJINFO_UpdateObjectInfoEdit();
 }
 
 void gameDisplay(void)
@@ -139,6 +142,9 @@ void gameDisplay(void)
 
 	if (world_edit) 
 		W_DrawWorldEdit();
+
+	if (objectinfo_edit)
+		OBJINFO_DrawObjectInfoEdit();
 
 	if (in_diag)
 		D_DrawDialogue();
