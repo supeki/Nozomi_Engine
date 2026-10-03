@@ -14,13 +14,18 @@ object_t objects;
 object_info_t *object_info; // stores object information for every object
 uint32_t num_object_info = 0;
 
+gfx_t *object_gfx; // table to store currently loaded gfx that each object calls
+char **object_gfx_names; // it's like some kind of.. table of gfx names..
+uint32_t num_object_gfx = 0;
+
 // The camera is its own type, but we'll include it here ya
 camera_t camera;
 
 void OBJ_InitObjects(void)
 {
 	objects.prev = objects.next = &objects;
-	OBJINFO_DefaultObjectInfo();
+	OBJINFO_DefaultObjectInfo(); // default objs + info
+	OBJINFO_DefaultObjectGFX(); // dummy gfx
 }
 
 void OBJ_RunObjects(void)
@@ -120,6 +125,78 @@ bool OBJ_TryMovement(object_t *obj, int8_t x, int8_t y)
 }
 
 // Object Info
+
+// add a graphic name should it not be in our list already
+// also loads the graphic
+// returns an ID right away for quick usage, if it can't reallocate, return 0 for dummy gfx
+uint32_t OBJINFO_AddObjectGFX(const char *gfx_name)
+{
+	char **temp_names;
+	gfx_t *temp_gfx;
+
+	// make a larger array
+	num_object_gfx++;
+	temp_names = realloc(object_gfx_names, num_object_gfx * sizeof(char *));
+
+	// couldn't allocate
+	if (temp_names == NULL) {
+		num_object_gfx--;
+		return 0;
+	}
+
+	strcpy(temp_names[num_object_gfx-1], gfx_name);
+	object_gfx_names = temp_names;
+
+	temp_gfx = realloc(object_gfx, num_object_gfx * sizeof(gfx_t));
+
+	if (temp_gfx == NULL) {
+		num_object_gfx--;
+		return 0;
+	}
+
+	temp_gfx[num_object_gfx-1] = GFX_LoadGFX(va("%sdata/objects/%s", I_GetHomeDir(), gfx_name));
+	if (temp_gfx[num_object_gfx-1].width * temp_gfx[num_object_gfx-1].height <= 0) {
+		num_object_gfx--;
+		return 0;
+	}
+
+	object_gfx = temp_gfx;
+	return num_object_gfx-1;
+}
+
+// check if a graphic is already loaded by referring to our list
+// if it exists, give its number, if it doesn't, return 0 (dummy gfx)
+uint32_t OBJINFO_GetObjectGFXNameID(const char *gfx_name)
+{
+	int i;
+
+	for (i = 0; i < num_object_gfx; i++)
+		if (!strcmp(object_gfx_names[i], gfx_name))
+			return i;
+
+	return 0;
+}
+
+// frees the names AND the gfx
+void OBJINFO_FreeObjectGFX(void)
+{
+	int i;
+
+	if (num_object_gfx > 0) {
+		for (i = 0; i < num_object_gfx; i++) {
+			free(object_gfx_names[i]);
+			GFX_FreeGFX(&object_gfx[i]);
+		}
+
+		free(object_gfx_names);
+		object_gfx_names = NULL;
+
+		free(object_gfx);
+		object_gfx = NULL;
+	}
+
+	num_object_gfx = 0;
+}
 
 const char *anim_names[NUM_ANIMS] = {
 	"Stand",

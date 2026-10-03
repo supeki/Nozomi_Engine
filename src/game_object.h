@@ -96,6 +96,9 @@ typedef enum
 extern object_t objects;
 extern object_info_t *object_info;
 extern uint32_t num_object_info;
+extern gfx_t *object_gfx; // table to store currently loaded gfx that each object calls
+extern char **object_gfx_names; // it's like some kind of.. table of gfx names..
+extern uint32_t num_object_gfx;
 
 // Including the camera in the object code out of laziness?
 typedef struct camera_s
@@ -120,6 +123,11 @@ object_t *OBJ_CreateObject(uint16_t x, uint16_t y, uint16_t type);
 void OBJ_RemoveObject(object_t *obj);
 void OBJ_DrawObjectLayer(uint8_t layer);
 bool OBJ_TryMovement(object_t *obj, int8_t x, int8_t y);
+
+uint32_t OBJINFO_AddObjectGFX(const char *gfx_name);
+uint32_t OBJINFO_GetObjectGFXNameID(const char *gfx_name);
+void OBJINFO_FreeObjectGFX(void);
+void OBJINFO_DefaultObjectGFX(void);
 
 void OBJINFO_CreateNewObjectAnimFrame(object_info_t *obj_info, uint32_t anim_num);
 void OBJINFO_CreateNewObjectInfo(void);

@@ -393,7 +393,7 @@ endif
 
 ifeq ($(NDS),1)
 # Start Nintendo DS build requirements!
-all: $(INTERFACE_BIN)/$(NDS_NAME)
+all: $(INTERFACE_SRC)/soundbank.h $(INTERFACE_BIN)/$(NDS_NAME)
 
 $(INTERFACE_BIN)/$(NDS_NAME): $(INTERFACE_BIN)/$(ELF_NAME)
 	@echo "  NDSTOOL $@"
@@ -409,8 +409,7 @@ $(INTERFACE_BIN)/$(ELF_NAME): $(OBJ_DIR) $(OBJS) $(INTERFACE_OBJ) $(INTERFACE_BI
 
 # Create the soundbank!
 $(INTERFACE_SRC)/soundbank.h: $(INTERFACE_SRC)
-	$(BLOCKSDS)/tools/mmutil/mmutil -o bin/NDS/data/soundbank.bin -h $(INTERFACE_SRC)/soundbank.h -d \
-	$(AUDIOFILES)
+	$(BLOCKSDS)/tools/mmutil/mmutil -d $(AUDIOFILES) -obin/NDS/data/soundbank.bin -h$(INTERFACE_SRC)/soundbank.h
 
 # End Nintendo DS build requirements!
 else

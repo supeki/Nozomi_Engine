@@ -118,8 +118,8 @@ void V_DrawLine(int32_t x, int32_t y, int32_t angle, uint16_t length, uint16_t c
 	if (angle < 0)
 		angle += 360;
 
-	dx = COS_LUT[angle];
-	dy = SIN_LUT[angle];
+	dx = NOZOMI_COS_LUT[angle];
+	dy = NOZOMI_SIN_LUT[angle];
 
 	for (i = 0; i < length; i++)
 	{ 
@@ -155,10 +155,10 @@ void V_DrawBox(int32_t x, int32_t y, int32_t angle, uint16_t width, uint16_t hei
 	V_DrawLine(x, y, angle+180, height, col, flags);
 	V_DrawLine(x, y, angle+90, width, col, flags);
 
-	offx = (-SIN_LUT[rad_height] * height) >> 16;
-	offy = (-COS_LUT[rad_height] * height) >> 16;
-	offx2 = (-SIN_LUT[rad_width] * width) >> 16;
-	offy2 = (-COS_LUT[rad_width] * width) >> 16;
+	offx = (-NOZOMI_SIN_LUT[rad_height] * height) >> 16;
+	offy = (-NOZOMI_COS_LUT[rad_height] * height) >> 16;
+	offx2 = (-NOZOMI_SIN_LUT[rad_width] * width) >> 16;
+	offy2 = (-NOZOMI_COS_LUT[rad_width] * width) >> 16;
 
 	V_DrawLine(x - offx2 - 1, y + offy2, angle+180, height, col, flags);
 	V_DrawLine(x - offx, y + offy - 1, angle+90, width, col, flags);

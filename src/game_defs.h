@@ -73,8 +73,9 @@ char *va(const char *format, ...);
 #define PU 65536
 
 // 16.16 luts so i don't have to use sin or cos ever again in my life :3
-extern const int32_t SIN_LUT[360];
-extern const int32_t COS_LUT[360];
+// apparently BlocksDS has its own, so i gotta add NOZOMI_
+extern const int32_t NOZOMI_SIN_LUT[360];
+extern const int32_t NOZOMI_COS_LUT[360];
 
 uint16_t FIL_ReadU16(FILE *fp);
 int16_t FIL_ReadS16(FILE *fp);
