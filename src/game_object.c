@@ -134,6 +134,10 @@ uint32_t OBJINFO_AddObjectGFX(const char *gfx_name)
 	char **temp_names;
 	gfx_t *temp_gfx;
 
+	// hardcoded exception
+	if (!strcmp(gfx_name, "dummy") && num_object_gfx > 0)
+		return 0;
+
 	// make a larger array
 	num_object_gfx++;
 	temp_names = realloc(object_gfx_names, num_object_gfx * sizeof(char *));
@@ -154,7 +158,7 @@ uint32_t OBJINFO_AddObjectGFX(const char *gfx_name)
 		return 0;
 	}
 
-	temp_gfx[num_object_gfx-1] = GFX_LoadGFX(va("%sdata/objects/%s", I_GetHomeDir(), gfx_name));
+	temp_gfx[num_object_gfx-1] = GFX_LoadGFX(va("%sdata/objects/%s.bmp", I_GetHomeDir(), gfx_name));
 	if (temp_gfx[num_object_gfx-1].width * temp_gfx[num_object_gfx-1].height <= 0) {
 		num_object_gfx--;
 		return 0;
@@ -196,6 +200,12 @@ void OBJINFO_FreeObjectGFX(void)
 	}
 
 	num_object_gfx = 0;
+}
+
+void OBJINFO_DefaultObjectGFX(void)
+{
+	OBJINFO_FreeObjectGFX(); // free stuff
+	OBJINFO_AddObjectGFX("dummy"); // dummy
 }
 
 const char *anim_names[NUM_ANIMS] = {
@@ -272,6 +282,7 @@ void OBJINFO_CreateNewObjectInfo(void)
 
 	// give each object an id (mainly for debugging lol)
 	object_info[num_object_info-1].id = num_object_info-1;
+	object_info[num_object_info-1].gfx_id = OBJINFO_GetObjectGFXNameID("dummy");
 
 	// other info
 	sprintf(object_info[num_object_info-1].name, va("Object %d", num_object_info-NUM_DEF_OBJECTS));
@@ -323,6 +334,7 @@ void OBJINFO_DefaultObjectInfo(void)
 {
 	uint32_t i;
 	OBJINFO_FreeObjectInfo();
+	OBJINFO_DefaultObjectGFX();
 
 	for (i = 0; i < NUM_DEF_OBJECTS; i++) {
 		OBJINFO_CreateNewObjectInfo();
@@ -375,8 +387,20 @@ void OBJINFO_LoadObjectInfoFile(const char *filename)
 		OBJINFO_CreateNewObjectInfo();
 
 	for (i = 0; i < num_object_info; i++) {
+		char gfx_name[33];
+		uint32_t gfx_id; 
+
 		// set object info
 		object_info[i].id = FIL_ReadU32(fp);
+		fread(&gfx_name, sizeof(char), 32, fp);
+		gfx_name[32] = '\0';
+
+		gfx_id = OBJINFO_GetObjectGFXNameID(gfx_name);
+		if (gfx_id == 0)
+			object_info[num_object_info-1].gfx_id = OBJINFO_AddObjectGFX(gfx_name);
+		else
+			object_info[num_object_info-1].gfx_id = gfx_id;
+
 		fread(&object_info[i].health, sizeof(uint8_t), 1, fp);
 		object_info[i].flags = FIL_ReadU32(fp);
 		fread(&object_info[i].hit, sizeof(uint8_t), 4, fp);

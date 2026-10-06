@@ -45,6 +45,7 @@ typedef struct
 typedef struct object_info_s
 {
 	uint32_t id;
+	uint32_t gfx_id;
 	char name[33]; // give them a recognizable name
 	uint8_t health;
 	uint32_t flags;
