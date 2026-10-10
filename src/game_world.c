@@ -902,8 +902,8 @@ void W_UpdateWorldEdit(void)
                         break;
                     }
 
-        mouse_tilex = (G_MouseAxis(PLAYER_ONE, MOUSE_POSX)+world_cam_x) / (tile_width*2);
-        mouse_tiley = (G_MouseAxis(PLAYER_ONE, MOUSE_POSY)+world_cam_y - 41) / (tile_height*2);
+        mouse_tilex = (G_MouseAxis(PLAYER_ONE, MOUSE_POSX, true)+world_cam_x) / (tile_width*2);
+        mouse_tiley = (G_MouseAxis(PLAYER_ONE, MOUSE_POSY, true)+world_cam_y - 41) / (tile_height*2);
         
         if (mouse_tilex < 0)
             mouse_tilex = 0;

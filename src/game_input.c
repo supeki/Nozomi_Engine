@@ -190,7 +190,7 @@ bool G_MouseControlDown(uint8_t player, uint8_t control, bool pressed)
 		return (mousecontrols[player][control] > 0);
 }
 
-int32_t G_MouseAxis(uint8_t player, uint8_t axis)
+int32_t G_MouseAxis(uint8_t player, uint8_t axis, bool bounded)
 {
 	if (axis > NUMMOUSEAXIS-1)
 		return 0;
@@ -200,6 +200,7 @@ int32_t G_MouseAxis(uint8_t player, uint8_t axis)
 	if (mouseaxis[player][axis] < -0xFFFF)
 		mouseaxis[player][axis] = -0xFFFF;
 
+	if (bounded)
 	switch (axis) {
 		case MOUSE_POSX:
 			if (mouseaxis[player][axis] > VID_WIDTH-1) mouseaxis[player][axis] = VID_WIDTH-1;
