@@ -169,7 +169,7 @@ ifeq ($(LINUX),1)
 	EXEC_EXT = 
 
 	LIBS := $(LIBS) -lm -lc
-	CFLAGS := $(CFLAGS) $(pkg-config sdl2 SDL2_mixer --cflags) -O3 -std=gnu17 -w -DLINUX -fno-exceptions -s
+	CFLAGS := $(CFLAGS) $(pkg-config sdl2 SDL2_mixer --cflags) -g -std=gnu17 -w -DLINUX -fno-exceptions
 	LDFLAGS := $(LDFLAGS) -Wl,-rpath,'/lib' $(pkg-config sdl2 SDL2_mixer --libs)
 endif
 

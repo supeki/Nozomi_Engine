@@ -63,7 +63,7 @@ void OBJ_FreeObjects(void)
 	}
 }
 
-object_t *OBJ_CreateObject(uint16_t x, uint16_t y, uint16_t type)
+object_t *OBJ_CreateObject(int32_t x, int32_t y, int32_t z, uint32_t type)
 {
 	object_t *obj;
 	int i;
@@ -74,6 +74,7 @@ object_t *OBJ_CreateObject(uint16_t x, uint16_t y, uint16_t type)
 	obj->type = type;
 	obj->x = x;
 	obj->y = y;
+	obj->z = z;
 
 	// object info
 	obj->info = &object_info[type];
@@ -109,7 +110,7 @@ void OBJ_DrawObjectLayer(uint8_t layer)
 }
 
 // x and y are by tile
-static bool OBJ_InTile(object_t *obj, uint16_t x, uint16_t y)
+static bool OBJ_InTile(object_t *obj, int32_t x, int32_t y, int32_t z)
 {
 	
 }
@@ -119,7 +120,7 @@ static bool OBJ_InObject(object_t *obj, object_t *obj2)
 	
 }
 
-bool OBJ_TryMovement(object_t *obj, int8_t x, int8_t y)
+bool OBJ_TryMovement(object_t *obj, int32_t x, int32_t y, int32_t z)
 {	
 	
 }
@@ -351,10 +352,10 @@ void OBJINFO_DefaultObjectInfo(void)
 	object_info[OBJ_PLAYER].flags = 0; // i don't have any object flags yet
 
 	// a square hitbox at the bottom center
-	object_info[OBJ_PLAYER].hit[0] = 4; // start x
-	object_info[OBJ_PLAYER].hit[1] = 8; // start y
-	object_info[OBJ_PLAYER].hit[2] = 8; // width
-	object_info[OBJ_PLAYER].hit[3] = 8; // height
+	object_info[OBJ_PLAYER].hit[0] = -4; // left of x
+	object_info[OBJ_PLAYER].hit[1] = 4;  // right of x
+	object_info[OBJ_PLAYER].hit[2] = 8;  // top of y 
+	object_info[OBJ_PLAYER].hit[3] = 16; // bottom of y
 }
 
 bool objectinfo_edit = false;
@@ -401,9 +402,10 @@ void OBJINFO_LoadObjectInfoFile(const char *filename)
 		else
 			object_info[num_object_info-1].gfx_id = gfx_id;
 
-		fread(&object_info[i].health, sizeof(uint8_t), 1, fp);
+		object_info[i].health = FIL_ReadU32(fp);
 		object_info[i].flags = FIL_ReadU32(fp);
-		fread(&object_info[i].hit, sizeof(uint8_t), 4, fp);
+		for (j = 0; j < 4; j++)
+			object_info[i].hit[j] = FIL_ReadS32(fp);
 		object_info[i].spawn_logic = FIL_ReadU32(fp);
 		object_info[i].active_logic = FIL_ReadU32(fp);
 		object_info[i].death_logic = FIL_ReadU32(fp);
@@ -420,8 +422,8 @@ void OBJINFO_LoadObjectInfoFile(const char *filename)
 				OBJINFO_CreateNewObjectAnimFrame(&object_info[i], j);
 
 			for (k = 0; k < object_info[i].anims[j].num_frames; k++) {
-				object_info[i].anims[j].frames[k].x_off = FIL_ReadU16(fp);
-				object_info[i].anims[j].frames[k].y_off = FIL_ReadU16(fp);
+				object_info[i].anims[j].frames[k].x_off = FIL_ReadS32(fp);
+				object_info[i].anims[j].frames[k].y_off = FIL_ReadS32(fp);
 				object_info[i].anims[j].frames[k].width = FIL_ReadU16(fp);
 				object_info[i].anims[j].frames[k].height = FIL_ReadU16(fp);
 			}

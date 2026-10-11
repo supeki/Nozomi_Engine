@@ -10,11 +10,11 @@
 uint8_t num_players;
 player_t players[MAX_PLAYERS];
 
-void P_CreatePlayer(uint32_t x, uint32_t y, uint8_t dir)
+void P_CreatePlayer(int32_t x, int32_t y, int32_t z, uint16_t angle)
 {
 	memset(&players[num_players], 0, sizeof(player_t));
-	players[num_players].object = OBJ_CreateObject(x, y, OBJ_PLAYER);
-	players[num_players].object->dir_layer = dir;
+	players[num_players].object = OBJ_CreateObject(x, y, z, OBJ_PLAYER);
+	players[num_players].object->angle = angle;
 	players[num_players].object->player = &players[num_players];
 	
 	num_players++;

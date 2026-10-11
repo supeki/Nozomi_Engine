@@ -1,5 +1,4 @@
-// Nozomi Engine
-// game_object.h
+// Nozomi Engin// game_object.h
 
 #ifndef GAME_OBJECT_H
 #define GAME_OBJECT_H
@@ -27,8 +26,8 @@ extern const char *anim_names[NUM_ANIMS];
 
 typedef struct 
 {
-	uint16_t x_off;
-	uint16_t y_off;
+	int32_t x_off;
+	int32_t y_off;
 	uint16_t width;
 	uint16_t height;
 } object_animframe_t;
@@ -47,9 +46,9 @@ typedef struct object_info_s
 	uint32_t id;
 	uint32_t gfx_id;
 	char name[33]; // give them a recognizable name
-	uint8_t health;
+	uint32_t health;
 	uint32_t flags;
-	uint8_t hit[4];
+	int32_t hit[4];
 
 	uint32_t spawn_logic;
 	uint32_t active_logic;
@@ -61,7 +60,7 @@ typedef struct object_info_s
 typedef struct object_s
 {
 	// base variables
-	uint16_t type; // obj type
+	uint32_t type; // obj type
 	struct object_s *prev; // previous obj
 	struct object_s *next; // next obj
 
@@ -69,16 +68,18 @@ typedef struct object_s
 	struct object_info_s *info;
 
 	// utility variables
-	uint8_t health;
+	uint32_t health;
 	uint32_t flags; // any special flags for this obj
-	uint8_t hit[4]; // hitbox, index 0 is x offset, 1 is y offset, 2 is width, 3 is height
+	int32_t hit[4]; // hitbox, index 0 is x offset, 1 is y offset, 2 is width, 3 is height
 
 	// positional variables
-	uint16_t x; // obj x
-	uint16_t y; // obj y
-	int8_t momx; // obj momx
-	int8_t momy; // obj momy
-	uint8_t dir_layer; // LLLLLLDD L - layer D - dir
+	int32_t x; // obj x
+	int32_t y; // obj y
+	int32_t z; // obj z,,, 2d game can use this for layers me thinks
+	int32_t momx; // obj momx
+	int32_t momy; // obj momy
+	int32_t momz; // obj momz
+	uint16_t angle; // angle,,,, i wonder how this will work in 2d game
 	
 	obj_anims_e anim_state; // obj anim state
 	uint16_t anim_timer; // current anim tick
@@ -110,6 +111,9 @@ typedef struct camera_s
 	// X and Y coordinates
 	int32_t x;
 	int32_t y;
+	int32_t z;
+	uint16_t angle; // 0-359 to use with LUTs,,,
+	// idk if i want a vertical angle,,
 	
 	// Optional target object for certain modes
 	object_t *target;
@@ -120,10 +124,10 @@ extern camera_t camera;
 void OBJ_InitObjects(void);
 void OBJ_RunObjects(void);
 void OBJ_FreeObjects(void);
-object_t *OBJ_CreateObject(uint16_t x, uint16_t y, uint16_t type);
+object_t *OBJ_CreateObject(int32_t x, int32_t y, int32_t z, uint32_t type);
 void OBJ_RemoveObject(object_t *obj);
 void OBJ_DrawObjectLayer(uint8_t layer);
-bool OBJ_TryMovement(object_t *obj, int8_t x, int8_t y);
+bool OBJ_TryMovement(object_t *obj, int32_t x, int32_t y, int32_t z);
 
 uint32_t OBJINFO_AddObjectGFX(const char *gfx_name);
 uint32_t OBJINFO_GetObjectGFXNameID(const char *gfx_name);
