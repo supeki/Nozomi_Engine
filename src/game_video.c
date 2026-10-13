@@ -29,33 +29,33 @@ void V_LoadPalette(const char *filename, uint16_t* pal)
 	int i;
 	long size;
 	FILE *file = fopen(filename, "rb");
-	
+
 	if (file == NULL)
 		I_Error("Failed to read palette file!\n");
-	
+
 	fseek(file, 0L, SEEK_END);
 	size = ftell(file);
 	rewind(file);
-	
+
 	pal = malloc((size/3 + 1) * sizeof(uint16_t));
-	
+
 	pal[0] = 0; // pitch black!
-	
+
 	for (i = 0; i < size/3; i++)
 	{
 		uint8_t r, g, b;
-		
+
 		fread(&r, 1, 1, file);
 		fread(&g, 1, 1, file);
 		fread(&b, 1, 1, file);
-		
+
 		pal[i+1] = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
 	}
-	
+
 	fclose(file);
 }
 
-uint16_t V_MixColors(uint16_t c, uint16_t c2, uint8_t a) 
+uint16_t V_MixColors(uint16_t c, uint16_t c2, uint8_t a)
 {
     uint8_t r, g, b, r2, g2, b2, r_out, g_out, b_out;
 
@@ -90,14 +90,14 @@ void V_FillScreen(uint16_t col)
 }
 
 void V_DrawDot(int32_t x, int32_t y, uint16_t col, uint32_t flags)
-{	
+{
 	uint16_t *dest;
 
 	if (x < 0 || y < 0 || x >= VID_WIDTH || y >= VID_HEIGHT || col == 0)
         return;
 
 	dest = &vid.buffer[x + (y*VID_WIDTH)];
-	
+
 	if (flags & V_HALFTRANS)
 		*dest = V_MixColors(*dest, col, 127);
 	else
@@ -105,7 +105,7 @@ void V_DrawDot(int32_t x, int32_t y, uint16_t col, uint32_t flags)
 }
 
 void V_DrawLine(int32_t x, int32_t y, int32_t angle, uint16_t length, uint16_t col, uint32_t flags)
-{	
+{
 	uint16_t i;
 	int32_t px = x << 16, py = y << 16;
 	int32_t dx, dy;
@@ -122,7 +122,7 @@ void V_DrawLine(int32_t x, int32_t y, int32_t angle, uint16_t length, uint16_t c
 	dy = NOZOMI_SIN_LUT[angle];
 
 	for (i = 0; i < length; i++)
-	{ 
+	{
 		int16_t vx = px >> 16, vy = py >> 16;
 
 		if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT)
@@ -160,30 +160,30 @@ void V_DrawBox(int32_t x, int32_t y, int32_t angle, uint16_t width, uint16_t hei
 	offx2 = (-NOZOMI_SIN_LUT[rad_width] * width) >> 16;
 	offy2 = (-NOZOMI_COS_LUT[rad_width] * width) >> 16;
 
-	V_DrawLine(x - offx2 - 1, y + offy2, angle+180, height, col, flags);
-	V_DrawLine(x - offx, y + offy - 1, angle+90, width, col, flags);
+	V_DrawLine(x - offx2, y + offy2, angle+180, height, col, flags);
+	V_DrawLine(x - offx, y + offy, angle+90, width, col, flags);
 }
 
 void V_DrawCroppedAnimated(gfx_t gfx, int32_t x, int32_t y, int32_t sx, int32_t sy, uint16_t w, uint16_t h, uint32_t frames, uint32_t fps, uint32_t flags)
-{	
+{
 	uint32_t ticks = FRAMERATE / fps;
 	sx += ((I_GetTicks()/ticks) % frames)*w;
 	V_DrawCropped(gfx, x, y, sx, sy, w, h, flags);
 }
 
 void V_DrawCroppedScaled(gfx_t gfx, int32_t x, int32_t y, int32_t sx, int32_t sy, uint16_t w, uint16_t h, uint32_t scale, uint32_t flags)
-{	
+{
 	int vx, vy, zx, zy, dx, dy, px, py;
 	int32_t dest_x, dest_y = 0;
 	uint16_t *src, *dest;
 
 	if ((gfx.width * gfx.height) <= 0)
         return;
-	
+
 	// completely out of bounds
 	if (x >= VID_WIDTH || y >= VID_HEIGHT || x+(w*scale >> 16) < 0 || y+(h*scale >> 16) < 0 || scale == 0)
 		return;
-	
+
 	for (zy = 0; zy < h; zy++) {
 		dest_x = 0;
 
@@ -193,10 +193,10 @@ void V_DrawCroppedScaled(gfx_t gfx, int32_t x, int32_t y, int32_t sx, int32_t sy
 
 			vx = x + (dest_x >> 16);
 			vy = y + (dest_y >> 16);
-			
+
 			dx = x + ((dest_x+scale) >> 16);
 			dy = y + ((dest_y+scale) >> 16);
-			
+
 			if (vx < 0 || vy < 0 || vx >= VID_WIDTH || vy >= VID_HEIGHT || *src == 0) {
 				dest_x += scale;
 				continue;
@@ -231,17 +231,17 @@ void V_DrawCroppedScaled(gfx_t gfx, int32_t x, int32_t y, int32_t sx, int32_t sy
 }
 
 void V_DrawCropped(gfx_t gfx, int32_t x, int32_t y, int32_t sx, int32_t sy, uint16_t w, uint16_t h, uint32_t flags)
-{	
+{
 	int zx, zy, vx, vy;
 	uint16_t *src, *dest;
 
 	if ((gfx.width * gfx.height) <= 0)
         return;
-	
+
 	// completely out of bounds
 	if (x >= VID_WIDTH || y >= VID_HEIGHT || x+w < 0 || y+h < 0)
 		return;
-	
+
 	for (zy = 0; zy < h; zy++)
 		for (zx = 0; zx < w; zx++)
 		{
@@ -250,18 +250,18 @@ void V_DrawCropped(gfx_t gfx, int32_t x, int32_t y, int32_t sx, int32_t sy, uint
 				return;
 
 			src = &gfx.data[sx + sy*gfx.width + zx + zy*gfx.width];
-			
+
 			vx = x + zx;
 			vy = y + zy;
-			
+
 			if (vy > VID_HEIGHT)
 				return;
-			
+
 			if (vx < 0 || vy < 0 || vx >= VID_WIDTH || *src == 0)
 				continue;
 
 			dest = &vid.buffer[vx+(vy*VID_WIDTH)];
-			
+
 			if (flags & V_HALFTRANS)
 				*dest = V_MixColors(*dest, *src, 127);
 			else
@@ -295,35 +295,35 @@ void V_DrawTextFromFont(font_t font, const char* string, int32_t x, int32_t y, u
 		int c = (int)string[i];
 		int8_t xoff = font.offset[c] >> 8, yoff = font.offset[c] & 0xFF;
 		uint8_t w = font.size[c] >> 8, h = font.size[c] & 0xFF;
-		
+
 		if (y + yoff > VID_HEIGHT)
 			return;
-		
+
 		if ((string[i] == '\n') || (x+w >= VID_WIDTH && c != 32)) {
 			x = bx;
 			y += charh+1;
 		}
-		
+
 		if (y + yoff + charh < 0) {
 			x += w;
 			continue;
 		}
-		
+
 		if (c >= 32) {
 			c -= 33;
-			
+
 			if (flags & V_WAVYTEXT)
 				yoff += abs((game_tick + x) % FRAMERATE - FRAMERATE/2)/2 - charh/2;
-			
+
 			if (flags & V_WAVYTEXTTWO)
 				yoff += abs((game_tick + i) % FRAMERATE - FRAMERATE/2)/2 - charh/2;
-			
+
 			if (flags & V_JUMPYTEXT)
 				yoff += abs((game_tick/2 + x*w) % h - h/2)/2 - charh/2 + 2;
-				
+
 			if (c > -1)
 				V_DrawCropped(font.gfx, x + xoff, y + yoff, (c % 16) * charw, (c / 16) * charh, charw, charh, flags);
-			
+
 			x += w;
 		}
 	}

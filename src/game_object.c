@@ -80,7 +80,7 @@ object_t *OBJ_CreateObject(int32_t x, int32_t y, int32_t z, uint32_t type)
 	obj->info = &object_info[type];
 	obj->health = obj->info->health;
 	obj->flags = obj->info->flags;
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 5; i++)
 		obj->hit[i] = obj->info->hit[i];
 	
 	// add this object to the list of objects
@@ -302,6 +302,7 @@ void OBJINFO_CreateNewObjectInfo(void)
 	object_info[num_object_info-1].hit[1] = 0;
 	object_info[num_object_info-1].hit[2] = 0;
 	object_info[num_object_info-1].hit[3] = 0;
+	object_info[num_object_info-1].hit[4] = 0;
 
 	// no logic
 	object_info[num_object_info-1].spawn_logic = 0;
@@ -359,10 +360,11 @@ void OBJINFO_DefaultObjectInfo(void)
 	object_info[OBJ_PLAYER].flags = 0; // i don't have any object flags yet
 
 	// a square hitbox at the bottom center
-	object_info[OBJ_PLAYER].hit[0] = -4; // left of x
-	object_info[OBJ_PLAYER].hit[1] = 4;  // right of x
-	object_info[OBJ_PLAYER].hit[2] = 8;  // top of y 
-	object_info[OBJ_PLAYER].hit[3] = 16; // bottom of y
+	object_info[OBJ_PLAYER].hit[0] = 0; // x off, from center of object
+	object_info[OBJ_PLAYER].hit[1] = 0; // y off, from center of object
+	object_info[OBJ_PLAYER].hit[2] = 0; // z off, vertical offset, *is* used in 2d for the "y" offset
+	object_info[OBJ_PLAYER].hit[3] = 4; // radius
+	object_info[OBJ_PLAYER].hit[4] = 8; // height
 }
 
 bool objectinfo_edit = false;
@@ -411,7 +413,7 @@ void OBJINFO_LoadObjectInfoFile(const char *filename)
 
 		object_info[i].health = FIL_ReadU32(fp);
 		object_info[i].flags = FIL_ReadU32(fp);
-		for (j = 0; j < 4; j++)
+		for (j = 0; j < 5; j++)
 			object_info[i].hit[j] = FIL_ReadS32(fp);
 		object_info[i].spawn_logic = FIL_ReadU32(fp);
 		object_info[i].active_logic = FIL_ReadU32(fp);
@@ -442,32 +444,32 @@ void OBJINFO_LoadObjectInfoFile(const char *filename)
 
 void OBJINFO_StartObjectInfoEdit(const char *filename)
 {
-    if (filename == NULL)
-    {
-        objectinfo_edit = true;
-        file_menu = true;
+	if (filename == NULL)
+	{
+	        objectinfo_edit = true;
+	        file_menu = true;
 		file_sel = 0;
 		sel_obj = 0;
-        DF_UpdateDirfiles(&objectinfo_dirfiles, va("%sdata/", I_GetHomeDir()));
-        return;
-    }
+		DF_UpdateDirfiles(&objectinfo_dirfiles, va("%sdata/", I_GetHomeDir()));
+		return;
+	}
 
 	OBJINFO_LoadObjectInfoFile(va("%sdata/%s.inf", I_GetHomeDir(), filename));
 	sprintf(temp_objectinfo_name, filename);
 
 	file_sel = 0;
 	sel_obj = 0;
-    file_menu = false;
-    objectinfo_edit = true;
+	file_menu = false;
+	objectinfo_edit = true;
 }
 
 void OBJINFO_UpdateObjectInfoEdit(void)
 {
 	if (file_menu) {
 		if (G_ControlDown(PLAYER_ONE, CON_START, true)) {
-            file_menu = false;
-            return;
-        }
+			file_menu = false;
+			return;
+	        }
 
 		if (G_ControlDown(PLAYER_ONE, CON_SELECT, true)) {
 			OBJINFO_DefaultObjectInfo();
@@ -477,48 +479,48 @@ void OBJINFO_UpdateObjectInfoEdit(void)
 			return;
 		}
 
-        if (objectinfo_dirfiles.num_files < 1)
-            return; // no files so no loading anything
+	        if (objectinfo_dirfiles.num_files < 1)
+			return; // no files so no loading anything
 
 		if (G_ControlDown(PLAYER_ONE, CON_UP, true))
 			file_sel--;
-        if (G_ControlDown(PLAYER_ONE, CON_DOWN, true))
-            file_sel++;
-        if (G_ControlDown(PLAYER_ONE, CON_LEFT, true))
-            file_sel-=16;
-        if (G_ControlDown(PLAYER_ONE, CON_RIGHT, true))
-            file_sel+=16;
+		if (G_ControlDown(PLAYER_ONE, CON_DOWN, true))
+			file_sel++;
+		if (G_ControlDown(PLAYER_ONE, CON_LEFT, true))
+			file_sel-=16;
+	        if (G_ControlDown(PLAYER_ONE, CON_RIGHT, true))
+			file_sel+=16;
 
-        // sanity checks
-        if (file_sel < 0)
-            file_sel = objectinfo_dirfiles.num_files - abs(file_sel);
+		// sanity checks
+	        if (file_sel < 0)
+			file_sel = objectinfo_dirfiles.num_files - abs(file_sel);
 
-        // still below zero?
-        if (file_sel < 0)
-            file_sel = 0; // sigh..
-        
-        // loop around if need be
-        file_sel = file_sel % objectinfo_dirfiles.num_files;
+	        // still below zero?
+        	if (file_sel < 0)
+			file_sel = 0; // sigh..
+
+		// loop around if need be
+	        file_sel = file_sel % objectinfo_dirfiles.num_files;
 
 		if (G_ControlDown(PLAYER_ONE, CON_A, true)) {
-            char *dot;
-            char *name;
-            const char *filename;
-            int name_len;
+			char *dot;
+			char *name;
+			const char *filename;
+			int name_len;
 
-            filename = objectinfo_dirfiles.filenames[file_sel];
-            dot = strrchr(filename, '.');
+			filename = objectinfo_dirfiles.filenames[file_sel];
+			dot = strrchr(filename, '.');
 
-            name_len = strlen(filename) + 1;
-            name = malloc((name_len-4) * sizeof(char)); 
-            snprintf(name, name_len-4, "%s", filename);
-            name[name_len-4] = '\0'; // fix wince port
+			name_len = strlen(filename) + 1;
+			name = malloc((name_len-4) * sizeof(char)); 
+			snprintf(name, name_len-4, "%s", filename);
+			name[name_len-4] = '\0'; // fix wince port
 
-            if (!strcmp(dot, ".inf") || !strcmp(dot, ".INF"))
-                OBJINFO_StartObjectInfoEdit(name);
+			if (!strcmp(dot, ".inf") || !strcmp(dot, ".INF"))
+				OBJINFO_StartObjectInfoEdit(name);
 
-            free(name);
-        }
+			free(name);
+		}
 
 		return;
 	}
@@ -529,7 +531,7 @@ void OBJINFO_UpdateObjectInfoEdit(void)
 	}
 
 	if (num_object_info <= 0)
-	    return;
+		return;
 
 	if (sel_obj == num_object_info) {
 		if (G_ControlDown(PLAYER_ONE, CON_A, true))
@@ -541,7 +543,6 @@ void OBJINFO_UpdateObjectInfoEdit(void)
 
 	if (G_ControlDown(PLAYER_ONE, CON_LEFT, true))
 		sel_obj--;
-	
 
 	// sanity checks
 	if (sel_obj < 0)
@@ -553,7 +554,7 @@ void OBJINFO_UpdateObjectInfoEdit(void)
 
 	if (sel_obj > num_object_info)
 		sel_obj = num_object_info;
-	
+
 	// loop around if need be
 	sel_obj = sel_obj % (num_object_info+1);
 }
@@ -565,33 +566,33 @@ void OBJINFO_DrawObjectInfoEdit(void)
 	uint8_t ch = font_default.charsize & 0xFF;
 
 	if (file_menu) {
-        V_DrawText("Nozomi Engine Object Information Editor\nSelect a file to open:", 0, 0, 0);
+		V_DrawText("Nozomi Engine Object Information Editor\nSelect a file to open:", 0, 0, 0);
 
-        if (objectinfo_dirfiles.num_files > 0) {
-            for (i = 0; i < objectinfo_dirfiles.num_files; i++) {
+        	if (objectinfo_dirfiles.num_files > 0) {
+			for (i = 0; i < objectinfo_dirfiles.num_files; i++) {
 				char *dot;
-                dot = strrchr(objectinfo_dirfiles.filenames[i], '.');
+				dot = strrchr(objectinfo_dirfiles.filenames[i], '.');
 
-                if (strcmp(dot, ".inf") && strcmp(dot, ".INF"))
+				if (strcmp(dot, ".inf") && strcmp(dot, ".INF"))
 					V_DrawText(va("N/A - %s", objectinfo_dirfiles.filenames[i]), (i/17) * 80 + 8, (i%17) * 10 + 20, 0);
 				else
 					V_DrawText(va("%s", objectinfo_dirfiles.filenames[i]), (i/17) * 80 + 8, (i%17) * 10 + 20, 0);
 			}
 
-            V_DrawText(">", (file_sel/17) * 80 + 1, (file_sel%17) * 10 + 20, 0);
-        } else
-            V_DrawText("No files found.", 8, 20, 0);
+			V_DrawText(">", (file_sel/17) * 80 + 1, (file_sel%17) * 10 + 20, 0);
+		} else
+			V_DrawText("No files found.", 8, 20, 0);
 
 		V_DrawText("Press Select to create new Object Info. file.", 0, VID_HEIGHT-17, 0);
-        V_DrawText("Close the File Menu with Start/Enter", 0, VID_HEIGHT-8, 0);
-        // return early
-        return;
-    }
+		V_DrawText("Close the File Menu with Start/Enter", 0, VID_HEIGHT-8, 0);
+		// return early
+		return;
+	}
 
-    if (num_object_info <= 0) {
-        V_DrawText("No Object Information exists.\nRe-open the File Menu with Start/Enter.", 0, 0, 0);
-        return;
-    }
+	if (num_object_info <= 0) {
+		V_DrawText("No Object Information exists.\nRe-open the File Menu with Start/Enter.", 0, 0, 0);
+		return;
+	}
 
 	// draw little object id boxes
 	{ // doing this because C sillay
@@ -637,15 +638,22 @@ void OBJINFO_DrawObjectInfoEdit(void)
 		V_DrawText("New Object", cw, ch*3, 0);
 
 	V_DrawLine(0, ch*4 + ch/4, 90, VID_WIDTH, 0xFFFF, 0);
-	V_DrawBox(7, ch*5-1, 0, 66, 66, 0xFFFF, 0); // give 64x64 
+	V_DrawBox(7, ch*5-1, 0, 66, 66, 0xFFFF, 0);
 
-	// draw stand sprite here mayb
+	// draw stand sprite and hitbox
 	if (sel_obj < num_object_info)
 	{
 		object_animframe_t frame = object_info[sel_obj].anims[ANIM_STAND].frames[0];
-		//V_DrawCropped(<put gfx here>, 8, ch*5, frame.x_off, frame.y_off, frame.width, frame.height, 0);
+		gfx_t obj_gfx = object_gfx[object_info[sel_obj].gfx_id];		
+		V_DrawCropped(obj_gfx, 40 - frame.width/2, ch*5 + 32 - frame.height/2, frame.x_off, frame.y_off, frame.width, frame.height, 0);
+
+		if (sel_obj < num_object_info)
+			V_DrawBox(40 + object_info[sel_obj].hit[0] - object_info[sel_obj].hit[3], ch*5 + 32 + frame.height/2 - object_info[sel_obj].hit[2], 180, object_info[sel_obj].hit[3]*2, object_info[sel_obj].hit[4], 0x07E0, 0);
+
+		V_DrawText(va("GFX: %s.bmp", object_gfx_names[object_info[sel_obj].gfx_id]), 8, ch*5 + 68, 0);
+		V_DrawText(va("Hitbox:\nX off: %d\nY off: %d\nZ off (2D Y off): %d\nRadius: %d\nHeight: %d", object_info[sel_obj].hit[0], object_info[sel_obj].hit[1], object_info[sel_obj].hit[2], object_info[sel_obj].hit[3], object_info[sel_obj].hit[4]), 8, ch*5 + 78, 0);
 	}
 
-	if (sel_obj < num_object_info)
-		V_DrawBox(8+object_info[sel_obj].hit[0], ch*5 + object_info[sel_obj].hit[1], 0, object_info[sel_obj].hit[2], object_info[sel_obj].hit[3], 0x07E0, 0);
+	V_DrawBox(VID_WIDTH/2, VID_HEIGHT/2, I_GetTicks(), 16, 16, 0xFFFF, 0);
 }
+

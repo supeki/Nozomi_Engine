@@ -48,7 +48,7 @@ typedef struct object_info_s
 	char name[33]; // give them a recognizable name
 	uint32_t health;
 	uint32_t flags;
-	int32_t hit[4];
+	int32_t hit[5]; // x, y, z, radius, height
 
 	uint32_t spawn_logic;
 	uint32_t active_logic;
