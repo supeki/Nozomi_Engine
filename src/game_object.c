@@ -149,7 +149,10 @@ uint32_t OBJINFO_AddObjectGFX(const char *gfx_name)
 		return 0;
 	}
 
+	temp_names[num_object_gfx-1] = malloc(strlen(gfx_name)+1);
 	strcpy(temp_names[num_object_gfx-1], gfx_name);
+	temp_names[num_object_gfx-1][strlen(gfx_name)] = '\0';
+
 	object_gfx_names = temp_names;
 
 	temp_gfx = realloc(object_gfx, num_object_gfx * sizeof(gfx_t));
@@ -193,11 +196,15 @@ void OBJINFO_FreeObjectGFX(void)
 			GFX_FreeGFX(&object_gfx[i]);
 		}
 
-		free(object_gfx_names);
-		object_gfx_names = NULL;
+		if (object_gfx_names != NULL) {
+			free(object_gfx_names);
+			object_gfx_names = NULL;
+		}
 
-		free(object_gfx);
-		object_gfx = NULL;
+		if (object_gfx != NULL) {
+			free(object_gfx);
+			object_gfx = NULL;
+		}
 	}
 
 	num_object_gfx = 0;

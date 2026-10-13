@@ -93,7 +93,7 @@ gfx_t GFX_LoadGFX(const char *filename)
 				}
 			break;
 		default:
-			I_printf("Unsupported Bitmap BitsPerPixel!\n");
+			I_printf("GFX Error: File %s: Unsupported Bitmap BitsPerPixel!\n", filename);
 			return gfx;
 	}
 

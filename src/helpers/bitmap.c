@@ -25,7 +25,7 @@ bitmap_t Bitmap_Load(const char *filename)
 	
 	if (strcmp(header.ident, "BM") != 0)
 	{
-		I_printf("Invalid BMP identifier: %s\nExpected: BM\n", header.ident);
+		I_printf("Bitmap Error: File %s: Invalid BMP identifier: %s\nExpected: BM\n", filename, header.ident);
 		fclose(fp);
 		return bitmap;
 	}
@@ -62,7 +62,7 @@ bitmap_t Bitmap_Load(const char *filename)
 	
 	if (dib_header.compression > BI_RLE4)
 	{
-		I_printf("Unsupported BMP type!\nBit fields are not supported.\n\nThis isn't your fault, I'm just lazy.\n");
+		I_printf("Bitmap Error: File %s: Unsupported BMP type!\nBit fields are not supported.\n\nThis isn't your fault, I'm just lazy.\n", filename);
 		fclose(fp);
 		return bitmap;
 	}

@@ -231,7 +231,7 @@ ifeq ($(NDS),1)
 	i_system = nds_system
 	i_video = nds_video
 
-	GAME_ICON	?= assets/$(INTERFACE)/icon.gif
+	GAME_ICON	?= assets/icons/icon.gif
 	GAME_FULL_TITLE ?= $(GAME_TITLE);$(GAME_SUBTITLE);$(GAME_AUTHOR)
 	NDS_NAME = $(EXEC_NAME).nds
 	ELF_NAME = $(EXEC_NAME).elf

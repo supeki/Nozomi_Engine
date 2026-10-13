@@ -169,18 +169,19 @@ void W_LoadWorldFile(const char *filename)
 
         for (i = 0; i < num_objs; i++) {
             object_t *obj;
-            uint16_t type, x, y;
-            uint8_t dir_layer;
-            uint32_t flags;
+            uint32_t type, flags;
+	    int32_t x, y, z;
+            uint16_t angle;
 
-            type = FIL_ReadU16(fp);
-            x = FIL_ReadU16(fp);
-            y = FIL_ReadU16(fp);
-            fread(&dir_layer, sizeof(uint8_t), 1, fp);
+            type = FIL_ReadU32(fp);
+            x = FIL_ReadS32(fp);
+            y = FIL_ReadS32(fp);
+	    z = FIL_ReadS32(fp);
+	    angle = FIL_ReadU16(fp);
             flags = FIL_ReadU32(fp);
 
-            obj = OBJ_CreateObject(x, y, type);
-            obj->dir_layer = dir_layer;
+            obj = OBJ_CreateObject(x, y, z, type);
+            obj->angle = angle;
             obj->flags = flags;
         }
     }
@@ -1443,10 +1444,11 @@ void W_SaveWorldFile(const char *filename)
         I_printf("Writing object placements...\n");
         while (obj != &objects)
         {
-            fwrite(&obj->type, sizeof(uint16_t), 1, fp);
-            fwrite(&obj->x, sizeof(uint16_t), 1, fp);
-            fwrite(&obj->y, sizeof(uint16_t), 1, fp);
-            fwrite(&obj->dir_layer, sizeof(uint8_t), 1, fp);
+            fwrite(&obj->type, sizeof(uint32_t), 1, fp);
+            fwrite(&obj->x, sizeof(int32_t), 1, fp);
+            fwrite(&obj->y, sizeof(int32_t), 1, fp);
+	    fwrite(&obj->z, sizeof(int32_t), 1, fp);
+            fwrite(&obj->angle, sizeof(uint16_t), 1, fp);
             fwrite(&obj->flags, sizeof(uint32_t), 1, fp);
             obj = obj->next;
         }
