@@ -111,8 +111,7 @@ void V_DrawLine(int32_t x, int32_t y, int32_t angle, uint16_t length, uint16_t c
 	int32_t dx, dy;
 	uint16_t *dest;
 
-	if (col == 0)
-		return; // bow wow wow yippee yo yippee yay
+	// used to be a color check here but i wanna see if i could use pitch black for a masking technique
 
 	angle = (angle - 90) % 360;
 	if (angle < 0)
@@ -152,16 +151,16 @@ void V_DrawBox(int32_t x, int32_t y, int32_t angle, uint16_t width, uint16_t hei
 	if (rad_height < 0)
 		rad_height += 360;
 
-	V_DrawLine(x, y, angle+180, height, col, flags);
-	V_DrawLine(x, y, angle+90, width, col, flags);
+	V_DrawLine(x, y, angle+180, height, col, flags); //top-left going down
+	V_DrawLine(x, y, angle+90, width, col, flags); //top-left going right
 
-	offx = (-NOZOMI_SIN_LUT[rad_height] * height) >> 16;
-	offy = (-NOZOMI_COS_LUT[rad_height] * height) >> 16;
-	offx2 = (-NOZOMI_SIN_LUT[rad_width] * width) >> 16;
-	offy2 = (-NOZOMI_COS_LUT[rad_width] * width) >> 16;
+	offx = (-NOZOMI_SIN_LUT[rad_height] * (height-1)) >> 16;
+	offy = (-NOZOMI_COS_LUT[rad_height] * (height-1)) >> 16;
+	offx2 = (-NOZOMI_SIN_LUT[rad_width] * (width-1)) >> 16;
+	offy2 = (-NOZOMI_COS_LUT[rad_width] * (width-1)) >> 16;
 
-	V_DrawLine(x - offx2, y + offy2, angle+180, height, col, flags);
-	V_DrawLine(x - offx, y + offy, angle+90, width, col, flags);
+	V_DrawLine(x - offx2, y + offy2, angle+180, height, col, flags); // bottom-right going up
+	V_DrawLine(x - offx, y + offy, angle+90, width, col, flags); // bottom-left going right
 }
 
 void V_DrawCroppedAnimated(gfx_t gfx, int32_t x, int32_t y, int32_t sx, int32_t sy, uint16_t w, uint16_t h, uint32_t frames, uint32_t fps, uint32_t flags)

@@ -31,22 +31,22 @@ void OBJ_InitObjects(void)
 void OBJ_RunObjects(void)
 {
 	object_t *obj = objects.next;
-	
+
 	while (obj != &objects)
 	{
 		switch (obj->type)
-		{				
+		{
 			case OBJ_NULL:
 				break;
 		}
-		
+
 		if (obj->type == OBJ_NULL) {
 			object_t *obj2 = obj->next;
 			OBJ_RemoveObject(obj);
 			obj = obj2;
 			continue;
 		}
-		
+
 		obj = obj->next;
 	}
 }
@@ -54,9 +54,9 @@ void OBJ_RunObjects(void)
 void OBJ_FreeObjects(void)
 {
 	object_t *obj = objects.next;
-	
+
 	while (obj != &objects)
-	{	
+	{
 		object_t *obj2 = obj->next;
 		OBJ_RemoveObject(obj);
 		obj = obj2;
@@ -70,7 +70,7 @@ object_t *OBJ_CreateObject(int32_t x, int32_t y, int32_t z, uint32_t type)
 
 	obj = malloc(sizeof(object_t));
 	memset(obj, 0, sizeof(object_t));
-	
+
 	obj->type = type;
 	obj->x = x;
 	obj->y = y;
@@ -82,7 +82,7 @@ object_t *OBJ_CreateObject(int32_t x, int32_t y, int32_t z, uint32_t type)
 	obj->flags = obj->info->flags;
 	for (i = 0; i < 5; i++)
 		obj->hit[i] = obj->info->hit[i];
-	
+
 	// add this object to the list of objects
 	objects.prev->next = obj;
 	obj->next = &objects;
@@ -102,9 +102,9 @@ void OBJ_RemoveObject(object_t *obj)
 void OBJ_DrawObjectLayer(uint8_t layer)
 {
 	object_t *obj = objects.next;
-	
+
 	while (obj != &objects)
-	{		
+	{
 		obj = obj->next;
 	}
 }
@@ -112,17 +112,17 @@ void OBJ_DrawObjectLayer(uint8_t layer)
 // x and y are by tile
 static bool OBJ_InTile(object_t *obj, int32_t x, int32_t y, int32_t z)
 {
-	
+
 }
 
 static bool OBJ_InObject(object_t *obj, object_t *obj2)
 {
-	
+
 }
 
 bool OBJ_TryMovement(object_t *obj, int32_t x, int32_t y, int32_t z)
-{	
-	
+{
+
 }
 
 // Object Info
@@ -266,11 +266,11 @@ void OBJINFO_CreateNewObjectAnimFrame(object_info_t *obj_info, uint32_t anim_num
 		0,
 		sizeof(object_animframe_t)
 	);
-	
+
 	obj_info->anims[anim_num].frames = temp;
 }
 
-void OBJINFO_CreateNewObjectInfo(void) 
+void OBJINFO_CreateNewObjectInfo(void)
 {
 	object_info_t *temp;
 	int i;
@@ -354,7 +354,7 @@ void OBJINFO_DefaultObjectInfo(void)
 	// these object types are hardcoded into the engine for important reasons
 	// well actually OBJ_NULL doesn't need anything done lmao
 	sprintf(object_info[OBJ_NULL].name, "Null"); // THAT IS A LIEEEEEE
-	
+
 	sprintf(object_info[OBJ_PLAYER].name, "Player");
 	object_info[OBJ_PLAYER].health = 15;
 	object_info[OBJ_PLAYER].flags = 0; // i don't have any object flags yet
@@ -644,16 +644,12 @@ void OBJINFO_DrawObjectInfoEdit(void)
 	if (sel_obj < num_object_info)
 	{
 		object_animframe_t frame = object_info[sel_obj].anims[ANIM_STAND].frames[0];
-		gfx_t obj_gfx = object_gfx[object_info[sel_obj].gfx_id];		
+		gfx_t obj_gfx = object_gfx[object_info[sel_obj].gfx_id];
 		V_DrawCropped(obj_gfx, 40 - frame.width/2, ch*5 + 32 - frame.height/2, frame.x_off, frame.y_off, frame.width, frame.height, 0);
-
-		if (sel_obj < num_object_info)
-			V_DrawBox(40 + object_info[sel_obj].hit[0] - object_info[sel_obj].hit[3], ch*5 + 32 + frame.height/2 - object_info[sel_obj].hit[2], 180, object_info[sel_obj].hit[3]*2, object_info[sel_obj].hit[4], 0x07E0, 0);
+		V_DrawBox(40 + object_info[sel_obj].hit[0] - object_info[sel_obj].hit[3], ch*5 + 32 + frame.height/2 - object_info[sel_obj].hit[2] - object_info[sel_obj].hit[4], 0, object_info[sel_obj].hit[3]*2, object_info[sel_obj].hit[4], 0x07E0, 0);
 
 		V_DrawText(va("GFX: %s.bmp", object_gfx_names[object_info[sel_obj].gfx_id]), 8, ch*5 + 68, 0);
 		V_DrawText(va("Hitbox:\nX off: %d\nY off: %d\nZ off (2D Y off): %d\nRadius: %d\nHeight: %d", object_info[sel_obj].hit[0], object_info[sel_obj].hit[1], object_info[sel_obj].hit[2], object_info[sel_obj].hit[3], object_info[sel_obj].hit[4]), 8, ch*5 + 78, 0);
 	}
-
-	V_DrawBox(VID_WIDTH/2, VID_HEIGHT/2, I_GetTicks(), 16, 16, 0xFFFF, 0);
 }
 
