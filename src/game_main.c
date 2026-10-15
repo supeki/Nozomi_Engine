@@ -149,5 +149,6 @@ void gameDisplay(void)
 	if (in_diag)
 		D_DrawDialogue();
 
+	V_Draw(gfx_noaachan, 0, 0, 0);
 	//V_DrawText(va("%d, %d", G_MouseAxis(PLAYER_ONE, MOUSE_POSX, false), G_MouseAxis(PLAYER_ONE, MOUSE_POSY, false)), 0, 0, 0);
 }

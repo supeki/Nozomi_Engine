@@ -373,6 +373,7 @@ static bool file_menu = false;
 static int16_t file_sel = 0;
 static char temp_objectinfo_name[33];
 static uint32_t sel_obj = 0;
+static bool selected_object = false;
 
 void OBJINFO_LoadObjectInfoFile(const char *filename)
 {
@@ -460,6 +461,7 @@ void OBJINFO_StartObjectInfoEdit(const char *filename)
 	file_sel = 0;
 	sel_obj = 0;
 	file_menu = false;
+	selected_object = false;
 	objectinfo_edit = true;
 }
 
@@ -533,27 +535,35 @@ void OBJINFO_UpdateObjectInfoEdit(void)
 	if (num_object_info <= 0)
 		return;
 
-	if (sel_obj == num_object_info) {
-		if (G_ControlDown(PLAYER_ONE, CON_A, true))
-			OBJINFO_CreateNewObjectInfo();
-		if (G_ControlDown(PLAYER_ONE, CON_RIGHT, true))
-			sel_obj = 0; // hacky
-	} else if (G_ControlDown(PLAYER_ONE, CON_RIGHT, true))
-		sel_obj++;
+	if (!selected_object) {
+		if (sel_obj == num_object_info) {
+			if (G_ControlDown(PLAYER_ONE, CON_A, true))
+				OBJINFO_CreateNewObjectInfo();
+			if (G_ControlDown(PLAYER_ONE, CON_RIGHT, true))
+				sel_obj = 0; // hacky
+		} else if (G_ControlDown(PLAYER_ONE, CON_RIGHT, true))
+			sel_obj++;
 
-	if (G_ControlDown(PLAYER_ONE, CON_LEFT, true))
-		sel_obj--;
+		if (G_ControlDown(PLAYER_ONE, CON_LEFT, true))
+			sel_obj--;
 
-	// sanity checks
-	if (sel_obj < 0)
-		sel_obj = num_object_info;
+		// sanity checks
+		if (sel_obj < 0)
+			sel_obj = num_object_info;
 
-	// still below zero?
-	if (sel_obj < 0)
-		sel_obj = 0; // sigh..
+		// still below zero?
+		if (sel_obj < 0)
+			sel_obj = 0; // sigh..
 
-	if (sel_obj > num_object_info)
-		sel_obj = num_object_info;
+		if (sel_obj > num_object_info)
+			sel_obj = num_object_info;
+
+		if (sel_obj < num_object_info && G_ControlDown(PLAYER_ONE, CON_A, true))
+			selected_object = true;
+	} else {
+		if (G_ControlDown(PLAYER_ONE, CON_B, true))
+			selected_object = false;
+	}
 
 	// loop around if need be
 	sel_obj = sel_obj % (num_object_info+1);

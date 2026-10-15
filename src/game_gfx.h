@@ -18,6 +18,6 @@ gfx_t GFX_LoadGFX(const char *filename);
 void GFX_FreeGFX(gfx_t *gfx);
 gfx_t GFX_LoadLegacyGFX(const char *filename);
 
-extern gfx_t gfx_textbox;
+extern gfx_t gfx_textbox, gfx_noaachan;
 
 #endif

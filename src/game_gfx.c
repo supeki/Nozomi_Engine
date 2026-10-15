@@ -7,11 +7,12 @@
 #include "i_system.h"
 #include "helpers/bitmap.h"
 
-gfx_t gfx_textbox;
+gfx_t gfx_textbox, gfx_noaachan;
 
 void GFX_InitGFX(void)
 {
 	gfx_textbox = GFX_LoadGFX(va("%sdata/textbox.bmp", I_GetHomeDir()));
+	gfx_noaachan = GFX_LoadGFX(va("%sdata/noaachan.bmp", I_GetHomeDir()));
 }
 
 // Load a Bitmap and convert it to our GFX format
