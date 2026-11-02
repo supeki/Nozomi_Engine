@@ -27,15 +27,17 @@ void gameMain(void)
 {
 	I_printf("Initializing video...\n");
 	V_Init();
-		
+
 	I_printf("Starting graphics backend...\n");
 	I_StartupGraphics();
-	
+
 	I_printf("Starting sound backend...\n");
 	I_StartupSound();
 
+#ifdef NET
 	I_printf("Starting networking backend...\n");
 	I_StartupNetwork();
+#endif
 
 	I_printf("Setting default controls...\n");
 	G_DefaultControls();
@@ -57,7 +59,7 @@ void gameLoop(void)
 {
 	uint32_t elapsed_tick, old_tick = I_GetTicks();
 	uint32_t render_tick = 0;
-	
+
 	while (!game_quit) {
 		game_tick = I_GetTicks();
 		elapsed_tick = game_tick - old_tick;
@@ -68,9 +70,10 @@ void gameLoop(void)
 			I_Sleep(1);
 			continue;
 		}
-		
+
 		// dumbass hack for SDL and WINCE ports
-		#if defined(SDL) || defined(WINCE)
+		// apparently X11 needs it as well =w= Nozomi 02-NOV-26
+		#if defined(SDL) || defined(WINCE) || defined(X11)
 		{
 			int j, c;
 			for (j = 0; j < MAX_PLAYERS; j++) {
@@ -83,7 +86,7 @@ void gameLoop(void)
 			}
 		}
 		#endif
-		
+
 		while (elapsed_tick > 0) {
 			I_PollEvents();
 
@@ -93,11 +96,11 @@ void gameLoop(void)
 			gameRunStuff();
 			elapsed_tick--;
 		}
-		
+
 		if (game_tick > render_tick)
 		{
 			render_tick = game_tick;
-			
+
 			gameDisplay(); // Run all draw loops before pushing to the screen.
 			I_PushGraphics();
 			V_FillScreen(0);
@@ -106,7 +109,9 @@ void gameLoop(void)
 
 	OBJ_FreeObjects();
 	W_Free();
+#ifdef NET
 	I_ShutdownNetwork();
+#endif
 	I_ShutdownSound();
 	I_ShutdownGraphics();
 	V_Free();

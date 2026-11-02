@@ -2,11 +2,12 @@
 // dummy sound backend
 // dummy_sound.c
 
-#include "../i_sound.h"
-#include "../i_system.h"
-#include "../game_defs.h"
-#include "../game_sound.h"
-#include "../game_video.h"
+#include "../../i_sound.h"
+#include "../../i_system.h"
+
+#include "../../game_defs.h"
+#include "../../game_sound.h"
+#include "../../game_video.h"
 
 const char *jadefrac_to_dummy[NUMMUSIC] = {
 	"\0",

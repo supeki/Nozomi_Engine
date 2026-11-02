@@ -1,6 +1,7 @@
 # Nozomi Engine
 # A game engine created by Marilyn Nozomi with assistance from xdf, save_as, and trusted others.
 # See LICENSE.txt for details on outside usage of this engine, the code, and any bundled assets.
+# TO-DO: Write LICENSE.txt :3 Nozomi 02-NOV-26
 
 CC = gcc
 
@@ -14,9 +15,9 @@ EXEC_NAME ?= game
 EXEC_EXT ?= .exe
 
 # Name of the game Nozomi 08-12-2026
-GAME_TITLE	?= Nozomi Engine
+GAME_TITLE ?= Nozomi Engine
 GAME_SUBTITLE ?= Demo
-GAME_AUTHOR	?= Unknown Author
+GAME_AUTHOR ?= Unknown Author
 GAME_VERSION ?= v1.0.0
 
 # Assume Windows SDL by default Nozomi 04-15-2026
@@ -26,10 +27,14 @@ DOS ?= 0
 AMIGA ?= 0
 LINUX ?= 0
 LINUX_32 ?= 0
+X11 ?= 0
 GLFW ?= 0
 SDL ?= 1
 NDS ?= 0
 PSP ?= 0
+
+# Add a universal dummy backend mrrp Nozomi 02-NOV-26
+DUMMY ?= 0
 
 ifeq ($(WIN_32),1)
 WINDOWS = 0
@@ -55,6 +60,13 @@ WINDOWS = 0
 endif
 
 ifeq ($(LINUX_32),1)
+LINUX = 1
+endif
+
+ifeq ($(X11),1)
+SDL = 0
+GLFW = 0
+WINDOWS = 0
 LINUX = 1
 endif
 
@@ -92,11 +104,10 @@ ifeq ($(SDL),1)
 	DEFINES = -DSDL
 	OPTS := $(OPTS) -I.
 	LIBS := $(LIBS) -lSDL2main -lSDL2 -lSDL2_mixer
-	LDFLAGS =  
-	
+	LDFLAGS = 
 	CFLAGS = $(OPTS) \
-			 $(LIBS) \
-			 $(DEFINES)
+		 $(LIBS) \
+		 $(DEFINES)
 endif
 
 ifeq ($(GLFW),1)
@@ -109,11 +120,26 @@ ifeq ($(GLFW),1)
 	DEFINES = -DGLFW
 	OPTS := $(OPTS) -I.
 	LIBS := $(LIBS) -lglfw -lGL -lGLU -lSDL2 -lSDL2_mixer -lm -lc
-	LDFLAGS =  
-	
+	LDFLAGS = 
 	CFLAGS = $(OPTS) \
-		$(LIBS) \
-		$(DEFINES)
+		 $(LIBS) \
+		 $(DEFINES)
+endif
+
+ifeq ($(X11),1)
+	INTERFACE = X11
+	i_main = x11_main
+	i_event = x11_event
+	i_system = x11_system
+	i_video = x11_video
+
+	DEFINES = -DX11
+	OPTS := $(OPTS) -I.
+	LIBS := $(LIBS) -lX11 -lm -lc
+	LDFLAGS = 
+	CFLAGS = $(OPTS) \
+		 $(LIBS) \
+		 $(DEFINES)
 endif
 
 ifeq ($(WINDOWS),1)
@@ -126,7 +152,7 @@ ifeq ($(WINDOWS),1)
 endif
 
 ifeq ($(WIN_32),1)
-    CC = i686-w64-mingw32-gcc
+	CC = i686-w64-mingw32-gcc
 	OPTS := $(OPTS) -I/usr/local/i686-w64-mingw32/include
 	LIBS := $(LIBS) -mwindows -lmingw32
 	LDFLAGS := $(LDFLAGS) -L/usr/local/i686-w64-mingw32/lib
@@ -158,7 +184,7 @@ ifeq ($(AMIGA), 1)
 	i_system = amiga_system
 	i_video = amiga_video
 
-	EXEC_EXT =
+	EXEC_EXT = 
 
 	DEFINES := -DAMIGA 
 	LIBS := $(LIBS) -mcrt=nix13
@@ -201,11 +227,11 @@ ifeq ($(LINUX_32),1)
 	CFLAGS := $(CFLAGS) -m32 -O3 -std=gnu17 -fno-exceptions -s
 endif
 
-ifeq ($(PSP),1)	
-	PSPSDK=$(shell psp-config --pspsdk-path)
+ifeq ($(PSP),1)
+	PSPSDK = $(shell psp-config --pspsdk-path)
 	CFLAGS := $(CFLAGS) $(shell $(PSPDIR)/bin/sdl2-config --cflags) $(shell ~/pspdev/bin/psp-pkg-config SDL2_mixer --cflags) -O3 -std=gnu17 -fno-exceptions -s
 	LIBS = $(shell $(PSPDIR)/bin/sdl2-config --libs) $(shell ~/pspdev/bin/psp-pkg-config SDL2_mixer --libs) -lGL -lGLU -lglut -lz -lpspvfpu -lpsphprm -lpspsdk -lpspctrl -lpspumd -lpsprtc -lpsppower -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpspvram
-	
+
 	TARGET = $(EXEC_NAME)
 	EXTRA_TARGETS = EBOOT.PBP
 	PSP_EBOOT_TITLE = $(GAME_TITLE)
@@ -213,57 +239,94 @@ endif
 
 # Nintendo DS port!
 ifeq ($(NDS),1)
-	export BLOCKSDS			?= /opt/wonderful/thirdparty/blocksds/core
-	export BLOCKSDSEXT		?= /opt/wonderful/thirdparty/blocksds/external
-	export WONDERFUL_TOOLCHAIN	?= /opt/wonderful
-	ARM_NONE_EABI_PATH	?= $(WONDERFUL_TOOLCHAIN)/toolchain/gcc-arm-none-eabi/bin/
+	export BLOCKSDS ?= /opt/wonderful/thirdparty/blocksds/core
+	export BLOCKSDSEXT ?= /opt/wonderful/thirdparty/blocksds/external
+	export WONDERFUL_TOOLCHAIN ?= /opt/wonderful
+	ARM_NONE_EABI_PATH ?= $(WONDERFUL_TOOLCHAIN)/toolchain/gcc-arm-none-eabi/bin/
 
 	CC = $(ARM_NONE_EABI_PATH)arm-none-eabi-gcc
-	
+
 	# src;obj;bin / NDS :D
 	INTERFACE = NDS
 	i_main = nds_main
 	i_event = nds_event
-	
+
 	# NDS input isn't handled in its own file!
 	#i_input = nds_input
 	i_sound = nds_sound
 	i_system = nds_system
 	i_video = nds_video
 
-	GAME_ICON	?= assets/icons/icon.gif
+	GAME_ICON ?= assets/icons/icon.gif
 	GAME_FULL_TITLE ?= $(GAME_TITLE);$(GAME_SUBTITLE);$(GAME_AUTHOR)
 	NDS_NAME = $(EXEC_NAME).nds
 	ELF_NAME = $(EXEC_NAME).elf
 	#NITROFSDIR := assets/$(INTERFACE)/nitrofs
 	AUDIODIR := assets/data/audio
 	AUDIOFILES := $(AUDIODIR)/eshop_8.it
-	
-	DEFINES	:= -DARM9 -D__NDS__
+
+	DEFINES := -DARM9 -D__NDS__
 	SPECS := $(BLOCKSDS)/sys/crts/ds_arm9.specs
 	OPTS := $(OPTS) -I. -I$(BLOCKSDS)/libs/libnds/include -I$(BLOCKSDS)/libs/maxmod/include
 	LIBS = -lmm9 -lnds9 -lm -lc
 	LDFLAGS = -L$(BLOCKSDS)/libs/libnds/lib -L$(BLOCKSDS)/libs/maxmod/lib
 
-	ARM7ELF	:= $(BLOCKSDS)/sys/arm7/main_core/arm7_dswifi_maxmod.elf
+	ARM7ELF := $(BLOCKSDS)/sys/arm7/main_core/arm7_dswifi_maxmod.elf
 
 	CFLAGS = $(OPTS) \
-			 $(LIBS) \
-			 $(DEFINES) \
-			 -marm \
-			 -mcpu=arm946e-s+nofp \
-			 -O3 \
-			 -ffast-math \
-			 -fomit-frame-pointer \
-			 -std=gnu17 \
-			 -fmodulo-sched-allow-regmoves \
-			 -fno-ira-share-save-slots \
-			 -Wwrite-strings \
-			 -Wno-format \
-			 -Wpointer-arith \
-			 -fno-exceptions \
-			 -specs=$(SPECS) \
-			 -s
+		 $(LIBS) \
+		 $(DEFINES) \
+		 -marm \
+		 -mcpu=arm946e-s+nofp \
+		 -O3 \
+		 -ffast-math \
+		 -fomit-frame-pointer \
+		 -std=gnu17 \
+		 -fmodulo-sched-allow-regmoves \
+		 -fno-ira-share-save-slots \
+		 -Wwrite-strings \
+		 -Wno-format \
+		 -Wpointer-arith \
+		 -fno-exceptions \
+		 -specs=$(SPECS) \
+		 -s
+endif
+
+ifeq ($(DUMMY),1)
+	INTERFACE = DUMMY
+	i_main ?= dummy_main
+	i_event ?= dummy_event
+	i_system ?= dummy_system
+	i_video ?= dummy_video
+	i_sound ?= dummy_sound
+	i_filesystem ?= dummy_filesystem
+
+	OPTS := $(OPTS) -I.
+	LIBS = -lm -lc
+
+	CFLAGS = $(OPTS) \
+		 $(LIBS) \
+		 $(DEFINES)
+endif
+
+ifndef i_main
+i_main = ../DUMMY/dummy_main
+endif
+
+ifndef i_event
+i_event = ../DUMMY/dummy_event
+endif
+
+ifndef i_system
+i_system = ../DUMMY/dummy_system
+endif
+
+ifndef i_video
+i_video = ../DUMMY/dummy_video
+endif
+
+ifndef i_sound
+i_sound = ../DUMMY/dummy_sound
 endif
 
 INTERFACE_SRC = $(SRC_DIR)/interface/$(INTERFACE)
@@ -291,6 +354,7 @@ OBJS := $(OBJS) \
 		$(INTERFACE_OBJ)/$(i_event).o \
 		$(INTERFACE_OBJ)/$(i_system).o \
 		$(INTERFACE_OBJ)/$(i_video).o \
+		$(INTERFACE_OBJ)/$(i_sound).o
 
 ifeq ($(WINDOWS), 0)
 ifeq ($(WIN_32), 0)
@@ -319,27 +383,15 @@ ifeq ($(LINUX_32), 1)
 INTERFACE_BIN = $(BIN_DIR)/Linux32
 endif
 
-ifdef i_sound
-ADDITIONAL_OBJS := $(ADDITIONAL_OBJS) $(INTERFACE_OBJ)/$(i_sound).o
-else
-ADDITIONAL_OBJS := $(ADDITIONAL_OBJS) $(OBJ_DIR)/dummy_sound.o
-endif
-
 ifdef i_input
 ADDITIONAL_OBJS := $(ADDITIONAL_OBJS) $(INTERFACE_OBJ)/$(i_input).o
 endif
 
-ifdef i_net
-ADDITIONAL_OBJS := $(ADDITIONAL_OBJS) $(INTERFACE_OBJ)/$(i_net).o
-else
-ADDITIONAL_OBJS := $(ADDITIONAL_OBJS) $(OBJ_DIR)/dummy_net.o
+ifndef i_filesystem
+i_filesystem = ../DUMMY/dummy_filesystem
 endif
 
-ifdef i_filesystem
-ADDITIONAL_OBJS := $(ADDITIONAL_OBJS) $(INTERFACE_OBJ)/$(i_filesystem).o
-else
-ADDITIONAL_OBJS := $(ADDITIONAL_OBJS) $(OBJ_DIR)/dummy_filesystem.o
-endif
+OBJS := $(OBJS) $(INTERFACE_OBJ)/$(i_filesystem).o
 
 ifdef ADDITIONAL_OBJS
 OBJS := $(OBJS) $(ADDITIONAL_OBJS)
@@ -425,104 +477,91 @@ endif
 clean:
 	rm -rf $(OBJ_DIR)/*
 	rm -rf $(INTERFACE_BIN)/*
-	
+
 # Make all required directories!
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
-	
+
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
-	
+
 $(INTERFACE_OBJ): $(OBJ_DIR)
 	mkdir -p $(INTERFACE_OBJ)
-	
+
 $(INTERFACE_BIN): $(BIN_DIR)
 	mkdir -p $(INTERFACE_BIN)
-	
+
 # The executable file itself? :3
 $(INTERFACE_BIN)/$(EXEC_NAME)$(EXEC_EXT): $(OBJ_DIR) $(INTERFACE_OBJ) $(OBJS) $(INTERFACE_BIN)
 	@echo Linking...
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) \
 	-o $(INTERFACE_BIN)/$(EXEC_NAME)$(EXEC_EXT) $(LIBS)
-	
+
 # Game-related objs!
 $(OBJ_DIR)/game_main.o: $(SRC_DIR)/game_main.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_main.h $(SRC_DIR)/game_object.h $(SRC_DIR)/game_video.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-	
+
 $(OBJ_DIR)/game_gfx.o: $(SRC_DIR)/game_gfx.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_gfx.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-	
+
 $(OBJ_DIR)/game_font.o: $(SRC_DIR)/game_font.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_font.h $(SRC_DIR)/game_gfx.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-	
+
 $(OBJ_DIR)/game_input.o: $(SRC_DIR)/game_input.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_input.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-	
+
 $(OBJ_DIR)/game_misc.o: $(SRC_DIR)/game_misc.c $(SRC_DIR)/game_defs.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-	
+
 $(OBJ_DIR)/game_object.o: $(SRC_DIR)/game_object.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_object.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-	
+
 $(OBJ_DIR)/game_player.o: $(SRC_DIR)/game_player.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_object.h $(SRC_DIR)/game_player.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-	
+
 $(OBJ_DIR)/game_sound.o: $(SRC_DIR)/game_sound.c $(SRC_DIR)/game_sound.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-	
+
 $(OBJ_DIR)/game_video.o: $(SRC_DIR)/game_video.c $(SRC_DIR)/game_video.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-	
+
 $(OBJ_DIR)/game_world.o: $(SRC_DIR)/game_world.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_gfx.h $(SRC_DIR)/game_world.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-	
+
 $(OBJ_DIR)/game_dialogue.o: $(SRC_DIR)/game_dialogue.c $(SRC_DIR)/game_defs.h $(SRC_DIR)/game_gfx.h $(SRC_DIR)/game_dialogue.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-	
+
 # Make the interface objs!
 $(INTERFACE_OBJ)/$(i_main).o: $(INTERFACE_SRC)/$(i_main).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-	
+
 $(INTERFACE_OBJ)/$(i_event).o: $(INTERFACE_SRC)/$(i_event).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 
-ifdef i_input	
+ifdef i_input
 $(INTERFACE_OBJ)/$(i_input).o: $(INTERFACE_SRC)/$(i_input).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 endif
-	
-ifdef i_net	
+
+ifdef i_net
 $(INTERFACE_OBJ)/$(i_net).o: $(INTERFACE_SRC)/$(i_net).c $(SRC_DIR)/i_net.h $(SRC_DIR)/game_defs.h $(INTERFACE_OBJ)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-else
-$(OBJ_DIR)/dummy_net.o: $(SRC_DIR)/interface/dummy_net.c $(SRC_DIR)/i_net.h $(SRC_DIR)/game_defs.h
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 endif
 
-ifdef i_filesystem
 $(INTERFACE_OBJ)/$(i_filesystem).o: $(INTERFACE_SRC)/$(i_filesystem).c $(SRC_DIR)/i_system.h $(SRC_DIR)/game_defs.h $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-else
-$(OBJ_DIR)/dummy_filesystem.o: $(SRC_DIR)/interface/dummy_filesystem.c $(SRC_DIR)/i_system.h $(SRC_DIR)/game_defs.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-endif
 
 ifeq ($(NDS),1)
 $(INTERFACE_OBJ)/$(i_sound).o: $(INTERFACE_SRC)/$(i_sound).c $(SRC_DIR)/i_sound.h $(INTERFACE_SRC)/soundbank.h $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 else
-ifdef i_sound
 $(INTERFACE_OBJ)/$(i_sound).o: $(INTERFACE_SRC)/$(i_sound).c $(SRC_DIR)/i_sound.h $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-else
-$(OBJ_DIR)/dummy_sound.o: $(SRC_DIR)/interface/dummy_sound.c $(SRC_DIR)/i_sound.h
-	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 endif
-endif
-	
+
 $(INTERFACE_OBJ)/$(i_system).o: $(INTERFACE_SRC)/$(i_system).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
-	
+
 $(INTERFACE_OBJ)/$(i_video).o: $(INTERFACE_SRC)/$(i_video).c $(INTERFACE_OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) $(WFLAGS) -c $< -o $@
 
